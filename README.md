@@ -6,7 +6,9 @@
 
 ## 🧬 Overview
 
-This project introduces a **novel computational framework** that encodes DNA sequences as **complex-valued waveforms**, enabling mutation analysis through **signal processing techniques**. Using this representation, we define **spectral disruption scores** to quantify how single-nucleotide variants alter the mathematical structure of DNA.
+This project introduces a **novel computational framework** that encodes DNA sequences as **complex-valued waveforms**,
+enabling mutation analysis through **signal processing techniques**. Using this representation, we define **spectral
+disruption scores** to quantify how single-nucleotide variants alter the mathematical structure of DNA.
 
 > ⚠️ This is a purely computational method — it does **not** model physical DNA vibrations or molecular dynamics.
 
@@ -17,6 +19,35 @@ This project introduces a **novel computational framework** that encodes DNA seq
 * Provide a **new feature space** for variant analysis and machine learning models
 * Quantify mutational effects using **sequence-encoded spectral properties**
 * Explore non-biological representations of DNA that may correlate with biological function
+
+---
+
+# Advantages
+
+Complex-valued waveform encoding offers several notable advantages over traditional methods for analyzing DNA sequences
+and mutations:
+
+- **Captures Phase and Amplitude Information**
+  Traditional DNA encodings (e.g., one-hot vectors) are purely real-valued and typically binary, recording only the
+  presence or absence of each nucleotide at a position. In contrast, complex-valued encoding assigns both real and
+  imaginary components to each nucleotide, allowing representation of both amplitude and phase. This richer
+  representation enables the capture of more nuanced sequential and structural information in the DNA.
+- **Enables Frequency-Domain Analysis**
+  By encoding DNA as a synthetic complex waveform, it becomes possible to apply Fourier/spectral analysis directly to
+  genomic data. This facilitates the detection of periodicities, motifs, harmonics, and global sequence features that
+  are otherwise difficult to summarize quantitatively using classical metrics.
+- **Quantifies Mutational Disruption Mathematically**
+  Changes caused by single-nucleotide variants can be precisely described in the frequency domain (via magnitude shifts
+  at specific harmonics, entropy changes, and alterations in spectral peaks). Such mathematical descriptors provide a
+  novel, interpretable, and continuous feature space for mutation effect prediction and machine learning
+  pipelines—enabling distinction between subtle and dramatic mutational impacts in a single framework.
+- **Retains Spatial Relationships**
+  The position-based phase modulation in the encoding scheme means that changes at different sequence positions yield
+  distinct spectral fingerprints. This property is valuable for modeling spatial context and mutation locality, which
+  can be important in both regulatory and coding regions.
+- **Promotes Generalization and Integrability**
+  Since spectral features are independent of sequence length and can be combined or compared across sequences, this
+  approach is easily integrated into scalable machine learning models for genome-wide analyses.
 
 ---
 
@@ -44,32 +75,18 @@ This project introduces a **novel computational framework** that encodes DNA seq
 
 * For a given point mutation:
 
-  * The waveform is rebuilt with local positional scaling (Z-tuning)
-  * FFT is applied to extract spectral features
-  * Differences from baseline include:
+    * The waveform is rebuilt with local positional scaling (Z-tuning)
+    * FFT is applied to extract spectral features
+    * Differences from baseline include:
 
-    * Δf₁: Frequency magnitude shift at selected harmonic
-    * ΔEntropy: Spectral entropy change
-    * ΔPeaks: Side-lobe count increase
+        * Δf₁: Frequency magnitude shift at selected harmonic
+        * ΔEntropy: Spectral entropy change
+        * ΔPeaks: Side-lobe count increase
 * A **composite disruption score** is computed:
 
   $$
   \text{Score} = Z_n \cdot |\Delta f_1| + \text{ΔPeaks} + \text{ΔEntropy}
   $$
-
----
-
-## 📦 Repository Structure
-
-```
-.
-├── wave_crispr_signal.py         # Main script for mutation scoring
-├── README.md                     # Documentation (this file)
-├── notebooks/
-│   └── validation.ipynb          # Benchmarking with public datasets (WIP)
-├── data/                         # Sample sequences or variant datasets
-└── examples/                     # Demonstration outputs
-```
 
 ---
 
@@ -81,46 +98,6 @@ This project introduces a **novel computational framework** that encodes DNA seq
 
 ---
 
-## ❌ What This Method **Is Not**
-
-* ❌ A model of DNA vibrational physics or THz spectroscopy
-* ❌ A predictor of gene function or expression on its own
-* ❌ A substitute for biochemical or chromatin-based CRISPR scoring
-
----
-
-## 📊 Experimental Validation Plan
-
-### 🔬 Phase 1: Correlation Studies
-
-* **ClinVar** pathogenicity comparison (ROC/AUC)
-* CRISPR guide efficiency datasets (correlation with activity)
-* PhyloP conservation alignment (signal vs. conservation)
-
-### 🔬 Phase 2: Functional Overlays
-
-* eQTL effect size correlation (GTEx)
-* TF binding and chromatin accessibility (ENCODE)
-
-### 🔬 Phase 3: Predictive Modeling
-
-* Integrate disruption scores with:
-
-  * CADD / DeepSEA / Basenji features
-  * CRISPR base editing prediction tools
-* Evaluate predictive performance improvements
-
----
-
-## 📈 Success Criteria
-
-| Level      | Outcome                                                                                |
-| ---------- | -------------------------------------------------------------------------------------- |
-| ✅ Minimal  | Statistically significant correlation (p < 0.001) with at least one biological dataset |
-| ✅ Moderate | Comparable or superior to baseline conservation metrics                                |
-| ✅ High     | Improvement in existing predictive models or discovery of new interpretable patterns   |
-
----
 
 ## 📚 Usage
 
