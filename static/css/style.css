@@ -1,0 +1,212 @@
+/* Custom styles for Z Framework web application */
+
+:root {
+    --primary-color: #007bff;
+    --secondary-color: #6c757d;
+    --success-color: #28a745;
+    --warning-color: #ffc107;
+    --danger-color: #dc3545;
+    --info-color: #17a2b8;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Mathematical formulas */
+.math-formula {
+    font-family: 'Times New Roman', serif;
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-left: 4px solid var(--primary-color);
+    margin: 15px 0;
+    border-radius: 0 5px 5px 0;
+    overflow-x: auto;
+}
+
+/* Code blocks */
+pre {
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 5px;
+    padding: 15px;
+    overflow-x: auto;
+}
+
+/* Sequence display */
+.sequence-display {
+    font-family: 'Courier New', monospace;
+    background-color: #f8f9fa;
+    padding: 10px;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    word-break: break-all;
+    line-height: 1.6;
+}
+
+/* DNA base colors */
+.base-a { color: #dc3545; font-weight: bold; }
+.base-t { color: #ffc107; font-weight: bold; }
+.base-c { color: #17a2b8; font-weight: bold; }
+.base-g { color: #28a745; font-weight: bold; }
+
+/* Progress bars for base composition */
+.base-composition .progress-bar {
+    font-size: 0.8em;
+    font-weight: bold;
+}
+
+/* Precision badges */
+.precision-badge {
+    background-color: var(--success-color);
+    color: white;
+    padding: 3px 10px;
+    border-radius: 15px;
+    font-size: 0.8em;
+    font-weight: bold;
+}
+
+/* Convergence indicators */
+.convergence-true {
+    color: var(--success-color);
+    font-weight: bold;
+}
+
+.convergence-false {
+    color: var(--danger-color);
+    font-weight: bold;
+}
+
+.convergence-partial {
+    color: var(--warning-color);
+    font-weight: bold;
+}
+
+/* Cards */
+.card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    border: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.card-header {
+    background-color: rgba(0, 123, 255, 0.1);
+    border-bottom: 1px solid rgba(0, 123, 255, 0.2);
+}
+
+/* Form styling */
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Button styling */
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+
+/* Navigation */
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+/* Footer */
+.footer {
+    background-color: #f8f9fa;
+    border-top: 1px solid #dee2e6;
+    margin-top: 50px;
+}
+
+/* Chart containers */
+.chart-container {
+    position: relative;
+    height: 300px;
+    margin: 20px 0;
+}
+
+/* Loading spinner */
+.loading-spinner {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+}
+
+/* Tooltips */
+.tooltip-inner {
+    max-width: 300px;
+    text-align: left;
+}
+
+/* Table styling */
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(0, 123, 255, 0.05);
+}
+
+/* Alert styling */
+.alert {
+    border-radius: 8px;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .math-formula {
+        font-size: 0.9em;
+        padding: 10px;
+    }
+    
+    .sequence-display {
+        font-size: 0.8em;
+    }
+    
+    .chart-container {
+        height: 200px;
+    }
+}
+
+/* Animation classes */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.slide-up {
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
