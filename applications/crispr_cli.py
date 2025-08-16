@@ -179,6 +179,8 @@ def score_guide_command(args):
     # Add repair predictions if target context provided
     if args.target_context:
         repair = designer.predict_repair_outcomes(guide_seq, args.target_context.upper())
+        # Convert numpy types to Python types for JSON serialization
+        repair = {k: float(v) if hasattr(v, 'item') else v for k, v in repair.items()}
         result['repair_outcomes'] = repair
     
     # Output result
