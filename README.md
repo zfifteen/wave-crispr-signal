@@ -182,14 +182,101 @@ This approach provides a **mathematically rigorous framework** to model DNA as a
 
 ## 📚 Usage
 
+### Basic DNA Mutation Analysis
+
 ```bash
-python wave_crispr_signal.py
+python wave-crispr-signal.py
 ```
 
 Outputs top mutational "hotspots" in terms of spectral disruption score.
 
+### CRISPR Guide Design (NEW!)
+
+The repository now includes comprehensive CRISPR guide design tools using signal-theoretic analysis:
+
+#### Quick Start - Python API
+
+```python
+from applications.crispr_guide_designer import CRISPRGuideDesigner
+
+# Initialize designer
+designer = CRISPRGuideDesigner(pam_pattern="NGG", guide_length=20)
+
+# Design guides for your target sequence
+target_sequence = "ATGCTGCGGAGACCTGGAGAGAAAGCAGTGGCCGGGGCAGTGG..."
+guides = designer.design_guides(target_sequence, num_guides=5)
+
+# Print results
+for i, guide in enumerate(guides, 1):
+    print(f"Guide {i}: {guide['sequence']}")
+    print(f"  Position: {guide['position']}")
+    print(f"  On-target score: {guide['on_target_score']:.3f}")
+    print(f"  GC content: {guide['gc_content']:.1%}")
+```
+
+#### Command Line Interface
+
+```bash
+# Design guides for a sequence
+python applications/crispr_cli.py design ATGCGATCGATCGATCG
+
+# Design guides from FASTA file  
+python applications/crispr_cli.py design target.fasta -o results.json
+
+# Score a specific guide
+python applications/crispr_cli.py score GACGATCGATCGATCGATCG
+
+# Batch scoring from file
+python applications/crispr_cli.py batch-score guides.txt -o scores.csv -f csv
+```
+
+#### Advanced Metrics & Visualization
+
+```python
+from applications.wave_crispr_metrics import WaveCRISPRMetrics
+from applications.crispr_visualization import CRISPRVisualizer
+
+# Calculate comprehensive metrics
+metrics = WaveCRISPRMetrics()
+comprehensive_score = metrics.calculate_comprehensive_score(guide_seq, target_seq)
+
+# Create visualizations
+visualizer = CRISPRVisualizer()
+fig = visualizer.plot_guide_scores(guides)
+dashboard = visualizer.create_dashboard(sequence, guides, "dashboard.html")
+```
+
+### Key CRISPR Features
+
+🎯 **Signal-Theoretic Guide Design**
+- Uses spectral entropy and harmonic analysis for efficiency prediction
+- Novel approach combining frequency domain analysis with traditional metrics
+
+🔍 **Off-Target Risk Assessment**
+- Spectral signature comparison between target and off-target sites
+- Detects subtle structural differences beyond sequence similarity
+
+🔧 **Repair Outcome Prediction**
+- Predicts NHEJ, MMEJ, and HDR probabilities using spectral stability
+- Context-aware analysis of cut site properties
+
+📊 **Comprehensive Scoring**
+- Weighted composite scores combining multiple signal-theoretic metrics
+- Benchmarking tools for guide set evaluation
+
+🎨 **Rich Visualizations**
+- Interactive dashboards with Plotly
+- Spectral analysis plots and guide comparison charts
+- Sequence mapping with guide positions and PAM sites
+
+### Installation
+
+```bash
+pip install -r requirements.txt
+```
+
 *NOTE:*
-This tool currently uses a hardcoded 150bp mock sequence. Swap in real sequences for production use.
+The basic tool uses a hardcoded 150bp mock sequence. For CRISPR applications, provide your own target sequences.
 
 ---
 
