@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+
+{% block title %}Documentation - Z Framework{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-10 mx-auto">
+        <h1 class="mb-4">Scientific Documentation</h1>
+        
+        <!-- Overview -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Z Framework Overview</h4>
+            </div>
+            <div class="card-body">
+                <p class="lead">
+                    The Z Framework provides a mathematically rigorous approach to DNA sequence analysis 
+                    through spectral disruption profiling and signal-theoretic principles.
+                </p>
+                
+                <h5>Key Principles</h5>
+                <ul>
+                    <li><strong>Universal Sequence Encoding:</strong> DNA sequences are transformed into mathematical representations using Z Framework principles</li>
+                    <li><strong>Convergence Testing:</strong> Analysis validates convergence to the golden ratio conjugate (φ⁻¹ ≈ 0.618)</li>
+                    <li><strong>Spectral Disruption:</strong> Quantifies mutational effects in spectral space</li>
+                    <li><strong>High-Precision Arithmetic:</strong> Uses mpmath for arbitrary precision calculations</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Mathematical Foundation -->
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0">Mathematical Foundation</h4>
+            </div>
+            <div class="card-body">
+                <h5>Core Algorithm</h5>
+                <p>The Z Framework employs an iterative calculation that converges to the golden ratio conjugate:</p>
+                
+                <div class="math-formula">
+                    <strong>Z<sub>n+1</sub> = f(Z<sub>n</sub>, DNA<sub>n</sub>)</strong><br>
+                    <em>where DNA<sub>n</sub> represents the encoded nucleotide at position n</em>
+                </div>
+                
+                <h5>Golden Ratio Convergence</h5>
+                <p>The target convergence value is the golden ratio conjugate:</p>
+                
+                <div class="math-formula">
+                    <strong>φ⁻¹ = (√5 - 1) / 2 ≈ 0.618033988749...</strong>
+                </div>
+                
+                <h5>Sequence Encoding</h5>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Base</th>
+                            <th>Encoding</th>
+                            <th>Mathematical Property</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>A (Adenine)</td>
+                            <td>0</td>
+                            <td>Additive identity</td>
+                        </tr>
+                        <tr>
+                            <td>T (Thymine)</td>
+                            <td>1</td>
+                            <td>Multiplicative identity</td>
+                        </tr>
+                        <tr>
+                            <td>C (Cytosine)</td>
+                            <td>2</td>
+                            <td>Even prime basis</td>
+                        </tr>
+                        <tr>
+                            <td>G (Guanine)</td>
+                            <td>3</td>
+                            <td>Odd prime basis</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Analysis Components -->
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h4 class="mb-0">Analysis Components</h4>
+            </div>
+            <div class="card-body">
+                <h5>1. Z Framework Core Analysis</h5>
+                <p>Computes the fundamental Z value and tests convergence to φ⁻¹. Key metrics include:</p>
+                <ul>
+                    <li><strong>Z Value:</strong> Final calculated value after convergence</li>
+                    <li><strong>Convergence Status:</strong> Whether the algorithm reached the target</li>
+                    <li><strong>Distance to φ⁻¹:</strong> Quantitative measure of convergence quality</li>
+                    <li><strong>Iterations:</strong> Number of steps required for convergence</li>
+                </ul>
+
+                <h5>2. Density Enhancement Analysis</h5>
+                <p>Applies sliding window analysis to identify regions of enhanced spectral density:</p>
+                <ul>
+                    <li><strong>Window Size:</strong> Configurable analysis window (default: 10 bases)</li>
+                    <li><strong>Enhancement Factor:</strong> Overall density improvement</li>
+                    <li><strong>Peak Enhancement:</strong> Maximum local enhancement detected</li>
+                    <li><strong>Density Profile:</strong> Position-wise enhancement values</li>
+                </ul>
+
+                <h5>3. Falsification Testing</h5>
+                <p>Validates results through controlled perturbation experiments:</p>
+                <ul>
+                    <li><strong>Random Perturbations:</strong> Systematic sequence modifications</li>
+                    <li><strong>Statistical Analysis:</strong> P-value and confidence testing</li>
+                    <li><strong>Robustness Assessment:</strong> Sensitivity to sequence changes</li>
+                    <li><strong>Control Validation:</strong> Comparison with unperturbed sequence</li>
+                </ul>
+
+                <h5>4. CRISPR Cross-Validation (Optional)</h5>
+                <p>Cross-validates Z Framework results with CRISPR efficiency benchmarks:</p>
+                <ul>
+                    <li><strong>Guide Design:</strong> Automatic CRISPR guide identification</li>
+                    <li><strong>Efficiency Scoring:</strong> On-target and off-target predictions</li>
+                    <li><strong>Z Framework Analysis:</strong> Apply Z Framework to guide sequences</li>
+                    <li><strong>Correlation Analysis:</strong> Compare Z values with CRISPR scores</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Interpretation Guidelines -->
+        <div class="card mb-4">
+            <div class="card-header bg-warning text-dark">
+                <h4 class="mb-0">Interpretation Guidelines</h4>
+            </div>
+            <div class="card-body">
+                <h5>Convergence Quality</h5>
+                <ul>
+                    <li><strong>High Quality:</strong> Distance to φ⁻¹ < 10⁻⁶</li>
+                    <li><strong>Moderate Quality:</strong> Distance to φ⁻¹ < 10⁻³</li>
+                    <li><strong>Low Quality:</strong> Distance to φ⁻¹ > 10⁻³</li>
+                </ul>
+
+                <h5>Density Enhancement</h5>
+                <ul>
+                    <li><strong>Significant Enhancement:</strong> Factor > 1.5</li>
+                    <li><strong>Moderate Enhancement:</strong> Factor 1.1 - 1.5</li>
+                    <li><strong>Minimal Enhancement:</strong> Factor < 1.1</li>
+                </ul>
+
+                <h5>Falsification Test Results</h5>
+                <ul>
+                    <li><strong>Strong Validation:</strong> P-value < 0.01</li>
+                    <li><strong>Moderate Validation:</strong> P-value 0.01 - 0.05</li>
+                    <li><strong>Weak Validation:</strong> P-value > 0.05</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Technical Specifications -->
+        <div class="card mb-4">
+            <div class="card-header bg-dark text-white">
+                <h4 class="mb-0">Technical Specifications</h4>
+            </div>
+            <div class="card-body">
+                <h5>Computational Requirements</h5>
+                <ul>
+                    <li><strong>Precision:</strong> 15-100 decimal places (configurable)</li>
+                    <li><strong>Memory:</strong> Scales linearly with sequence length</li>
+                    <li><strong>Runtime:</strong> O(n) for sequence length n</li>
+                    <li><strong>Dependencies:</strong> mpmath, numpy, scipy</li>
+                </ul>
+
+                <h5>Input Constraints</h5>
+                <ul>
+                    <li><strong>Sequence Length:</strong> 10-1000 bases</li>
+                    <li><strong>Characters:</strong> A, T, C, G only (case insensitive)</li>
+                    <li><strong>Window Size:</strong> 5-50 bases</li>
+                    <li><strong>Perturbations:</strong> 10-500 tests</li>
+                </ul>
+
+                <h5>Output Formats</h5>
+                <ul>
+                    <li><strong>Web Interface:</strong> Interactive HTML results</li>
+                    <li><strong>API:</strong> JSON format with full precision</li>
+                    <li><strong>Downloads:</strong> JSON export for further analysis</li>
+                    <li><strong>Visualizations:</strong> Chart.js based graphics</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- References -->
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <h4 class="mb-0">References & Further Reading</h4>
+            </div>
+            <div class="card-body">
+                <h5>Core Mathematical Concepts</h5>
+                <ul>
+                    <li>Golden Ratio and Fibonacci Sequences in Nature</li>
+                    <li>Signal Processing and Spectral Analysis</li>
+                    <li>High-Precision Arithmetic in Scientific Computing</li>
+                    <li>Convergence Theory and Numerical Analysis</li>
+                </ul>
+
+                <h5>Bioinformatics Applications</h5>
+                <ul>
+                    <li>DNA Sequence Analysis Algorithms</li>
+                    <li>CRISPR Guide Design Methodologies</li>
+                    <li>Mutation Impact Prediction</li>
+                    <li>Cross-Domain Validation Techniques</li>
+                </ul>
+
+                <h5>Repository Information</h5>
+                <ul>
+                    <li><strong>GitHub:</strong> <a href="#" target="_blank">wave-crispr-signal</a></li>
+                    <li><strong>License:</strong> MIT License</li>
+                    <li><strong>Version:</strong> 2025.1</li>
+                    <li><strong>Documentation:</strong> This page provides complete methodology</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
