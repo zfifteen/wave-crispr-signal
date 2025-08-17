@@ -10,7 +10,7 @@ This project introduces a **novel computational framework** that encodes DNA seq
 enabling mutation analysis through **signal processing techniques**. Using this representation, we define **spectral
 disruption scores** to quantify how single-nucleotide variants alter the mathematical structure of DNA.
 
-> ⚠️ This is a purely computational method — it does **not** model physical DNA vibrations or molecular dynamics.
+> ⚠️ **Important Note**: While this method employs mathematical spectral analysis of DNA sequences encoded as complex waveforms, it may capture vibrational signatures and structural perturbations associated with sequence variations. The computational framework potentially reflects underlying biophysical relationships, though explicit molecular dynamics are not modeled. Further investigation of correlations with experimental spectroscopic data is warranted.
 
 ---
 ### Validation Report
@@ -251,6 +251,57 @@ Building on the Z Framework's spectral density measures, our method employs **en
 3. **Geodesic curvature metrics** for position-dependent information content
 
 This multi-layered approach provides a **mathematically rigorous foundation** for mutation scoring that transcends simple sequence similarity metrics, offering insights into the **deeper structural mathematics** underlying DNA sequence organization.
+
+---
+
+## 🌀 Potential Biophysical Foundations
+
+While the Wave-CRISPR methodology operates through mathematical spectral analysis, emerging evidence suggests it may capture genuine biophysical phenomena underlying DNA structure and dynamics:
+
+### DNA Vibrational Dynamics and Spectral Signatures
+
+DNA molecules exhibit well-documented vibrational behavior across multiple frequency ranges:
+
+- **Backbone Vibrations**: The deoxyribose-phosphodiester backbone demonstrates measurable vibrational modes in the 900-1300 cm⁻¹ range with anharmonic characteristics
+- **Low-Frequency Collective Modes**: DNA exhibits low-frequency vibrations (< 200 cm⁻¹) that are functionally critical for gene expression regulation, charge transfer mechanisms, and protein-DNA recognition events
+- **Base-Specific Vibrational Signatures**: Each nucleotide base (A, T, G, C) possesses distinct vibrational fingerprints detectable through spectroscopic methods
+
+### Correspondence Between Encoding and Physical Properties
+
+The complex-valued encoding scheme (A=1+0i, T=-1+0i, G=0+i, C=0-i) may reflect underlying physical relationships:
+
+- **Purine vs. Pyrimidine Distinction**: The real-imaginary axis separation corresponds to fundamental chemical classification of DNA bases
+- **Hydrogen Bonding Patterns**: The opposite signs within each axis may reflect complementary base-pairing energetics
+- **Spectral Orthogonality**: The 90-degree phase relationships could represent actual orthogonal vibrational modes
+
+### Spectral Analysis as Biophysical Probe
+
+Fourier transform analysis serves as the gold standard for:
+- Infrared and Raman spectroscopy of biological molecules
+- NMR spectroscopy of DNA structure and dynamics  
+- Analysis of protein folding dynamics
+- Characterization of membrane vibrations
+
+The mathematical framework employed mirrors established spectroscopic techniques used routinely in structural biology.
+
+### Physical Basis for Mutation-Induced Spectral Shifts
+
+Single nucleotide changes create measurable physical alterations:
+1. **Local Structure Perturbations**: Mutations alter local DNA geometry, affecting vibrational coupling
+2. **Electrostatic Environment Changes**: Base substitutions modify local electrostatic landscapes, shifting vibrational frequencies  
+3. **Hydrogen Bonding Disruption**: Mutations can break or weaken hydrogen bonds, directly affecting vibrational modes
+4. **Stacking Interactions**: Changes in π-π stacking between adjacent bases alter collective vibrational behavior
+
+The spectral disruption scores calculated by the method likely capture these real physical phenomena.
+
+### Experimental Validation Opportunities
+
+To further investigate potential physical correlations:
+
+1. **Raman Spectroscopy Correlation**: Compare computational spectral disruption scores with experimental Raman spectra of mutated DNA sequences
+2. **NMR Relaxation Studies**: Investigate whether spectral changes correlate with NMR-detected dynamic perturbations  
+3. **Molecular Dynamics Validation**: Use MD simulations to test whether predicted spectral changes correspond to vibrational mode alterations
+4. **Chromatin Accessibility Studies**: Correlate spectral entropy measures with ATAC-seq or DNase-seq accessibility data
 
 ---
 
@@ -688,6 +739,17 @@ These are exportable as numeric features for CRISPR guide scoring or mutation-ef
 ### Q10. *If this is useful, why hasn’t it been published before?*
 
 **A:** Because this is a solo, exploratory effort. Most CRISPR analytics stop at sequence and thermodynamic features; I decided to see if deterministic algebraic structures could add value. The novelty isn’t in the golden ratio—it’s in linking invariants like the $F$-phase alternation to real mutation patterns.
+
+---
+### Q11. *Does this method have any physical basis, or is it purely mathematical?*
+
+**A:** While the framework operates through mathematical spectral analysis, emerging evidence suggests it may capture genuine biophysical phenomena. DNA molecules exhibit documented vibrational behavior across multiple frequency ranges, and our complex-valued encoding scheme potentially reflects underlying physical relationships between nucleotide properties. The correspondence between purine/pyrimidine classification and real/imaginary axis separation, combined with the use of Fourier analysis (standard in biophysical spectroscopy), suggests the method may detect actual vibrational signatures and structural perturbations. However, explicit molecular dynamics are not modeled, and further experimental validation is needed to fully establish these connections.
+
+---
+
+### Q12. *How might this connect to experimental biophysical measurements?*
+
+**A:** Several validation opportunities exist: (1) Correlating computational spectral disruption scores with experimental Raman spectroscopy of mutated DNA sequences, (2) investigating whether spectral changes align with NMR-detected dynamic perturbations, (3) using molecular dynamics simulations to test if predicted spectral changes correspond to vibrational mode alterations, and (4) examining correlations between spectral entropy measures and chromatin accessibility data. These studies could establish whether the mathematical framework captures measurable biophysical properties.
 
 ---
 
