@@ -2,7 +2,7 @@
 CRISPR Guide Designer using Signal-Theoretic DNA Analysis
 
 This module implements CRISPR guide RNA design using spectral disruption profiling
-based on the wave-crispr-signal methodology.
+based on the wave-crispr-signal methodology with enhanced invariant features.
 """
 
 import numpy as np
@@ -10,11 +10,17 @@ from scipy.fft import fft
 from scipy.stats import entropy
 from collections import Counter
 import re
+import sys
+import os
 from typing import List, Dict, Tuple, Optional, Union
+
+# Add parent directory for invariant features import
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from invariant_features import InvariantFeatureSet
 
 
 class CRISPRGuideDesigner:
-    """CRISPR guide RNA designer using signal-theoretic analysis."""
+    """CRISPR guide RNA designer using signal-theoretic analysis with invariant features."""
     
     # Base weights for wave function mapping
     WEIGHTS = {'A': 1 + 0j, 'T': -1 + 0j, 'C': 0 + 1j, 'G': 0 - 1j}
@@ -29,6 +35,9 @@ class CRISPRGuideDesigner:
         """
         self.pam_pattern = pam_pattern.replace('N', '[ATCG]')
         self.guide_length = guide_length
+        
+        # Initialize invariant feature calculator
+        self.invariant_features = InvariantFeatureSet(pam_pattern)
         
     def build_waveform(self, seq: str, d: float = 0.34, zn_map: Optional[Dict[int, float]] = None) -> np.ndarray:
         """
@@ -89,6 +98,128 @@ class CRISPRGuideDesigner:
         # Combined score
         return np.clip((entropy_score * 0.4 + sidelobe_score * 0.4 + gc_score * 0.2), 0, 1)
     
+    def calculate_comprehensive_score(self, sequence: str, include_invariants: bool = True) -> Dict[str, float]:
+        """
+        Calculate comprehensive guide score including invariant features.
+        
+        Args:
+            sequence: Guide sequence
+            include_invariants: Whether to include invariant features
+            
+        Returns:
+            Dictionary with comprehensive scoring metrics
+        """
+        # Traditional spectral features
+        wave = self.build_waveform(sequence)
+        spec = self.compute_spectrum(wave)
+        
+        entropy_val = self.normalized_entropy(spec)
+        sidelobes = self.count_sidelobes(spec)
+        gc_content = (sequence.count('G') + sequence.count('C')) / len(sequence)
+        
+        # Base scoring
+        entropy_score = 1.0 - (entropy_val / 10.0)  # Lower entropy → higher efficiency
+        sidelobe_score = 1.0 - (sidelobes / len(spec))  # Fewer sidelobes → higher efficiency
+        gc_score = 1.0 - abs(gc_content - 0.5) * 2  # Optimal GC ~50%
+        
+        base_score = entropy_score * 0.4 + sidelobe_score * 0.4 + gc_score * 0.2
+        
+        results = {
+            'base_score': base_score,
+            'entropy_score': entropy_score,
+            'sidelobe_score': sidelobe_score,
+            'gc_score': gc_score,
+            'spectral_entropy': entropy_val,
+            'sidelobe_count': sidelobes,
+            'gc_content': gc_content
+        }
+        
+        # Add invariant features if requested
+        if include_invariants:
+            invariant_features = self.invariant_features.calculate_complete_feature_set(sequence)
+            
+            # Extract key invariant metrics for scoring
+            phase_bit = invariant_features.get('phase_bit', 0)
+            delta_phi = invariant_features.get('delta_phi', 1.0)
+            
+            # Phase coherence boost (phase-specific optimization)
+            phase_boost = 1.1 if phase_bit == 0 else 1.0  # Slight preference for phase 0
+            
+            # Golden proximity bonus (lower δφ = more stable)
+            golden_bonus = max(0, 1.0 - delta_phi * 2)  # Bonus for proximity to golden ratio
+            
+            # Phase-difference stability (consistent phase differences indicate real effects)
+            phase_entropy_diff = abs(invariant_features.get('delta_phase_entropy', 0))
+            phase_stability = 1.0 - min(phase_entropy_diff / 5.0, 1.0)  # Normalize to [0,1]
+            
+            # Comprehensive score with invariant features
+            invariant_score = base_score * phase_boost + golden_bonus * 0.2 + phase_stability * 0.3
+            invariant_score = np.clip(invariant_score, 0, 2.0)  # Allow scores > 1 for exceptional guides
+            
+            results.update({
+                'comprehensive_score': invariant_score,
+                'phase_bit': phase_bit,
+                'delta_phi': delta_phi,
+                'golden_bonus': golden_bonus,
+                'phase_stability': phase_stability,
+                'phase_boost': phase_boost,
+                **invariant_features  # Include all invariant features
+            })
+        else:
+            results['comprehensive_score'] = base_score
+        
+        return results
+
+    def analyze_gc_transition_effects(self, sequence: str, window_size: int = 25) -> Dict[str, float]:
+        """
+        Analyze G→C transition effects using phase-coherent validation.
+        
+        Args:
+            sequence: DNA sequence to analyze
+            window_size: Window size for local analysis
+            
+        Returns:
+            Dictionary with G→C transition analysis results
+        """
+        results = {}
+        g_positions = [i for i, base in enumerate(sequence) if base == 'G']
+        
+        if not g_positions:
+            return {'gc_transition_score': 0.0, 'num_g_sites': 0}
+        
+        transition_scores = []
+        phase_coherence_scores = []
+        
+        for pos in g_positions:
+            # Calculate features for G→C mutation
+            features = self.invariant_features.calculate_complete_feature_set(
+                sequence, pos, 'C')
+            
+            # Phase coherence check: real G→C effects should be phase-coherent
+            delta_phase_entropy = features.get('delta_phase_entropy_change', 0)
+            delta_phase_flatness = features.get('delta_phase_flatness_change', 0)
+            
+            # G→C transitions should show consistent signed phase differences
+            phase_coherence = 1.0 - abs(delta_phase_entropy + delta_phase_flatness) / 10.0
+            phase_coherence = max(0, phase_coherence)
+            
+            # Curvature disruption analysis
+            curv_disruption = features.get('delta_curv_structural_complexity', 0)
+            transition_impact = abs(curv_disruption) / 10.0  # Normalize
+            
+            transition_scores.append(transition_impact)
+            phase_coherence_scores.append(phase_coherence)
+        
+        results = {
+            'gc_transition_score': np.mean(transition_scores) if transition_scores else 0.0,
+            'phase_coherence_score': np.mean(phase_coherence_scores) if phase_coherence_scores else 0.0,
+            'num_g_sites': len(g_positions),
+            'avg_transition_impact': np.mean(transition_scores) if transition_scores else 0.0,
+            'gc_transition_consistency': 1.0 - np.std(transition_scores) if len(transition_scores) > 1 else 1.0
+        }
+        
+        return results
+    
     def calculate_off_target_risk(self, guide_seq: str, target_seq: str, off_target_seq: str) -> float:
         """
         Calculate off-target risk using spectral signature comparison.
@@ -137,13 +268,14 @@ class CRISPRGuideDesigner:
             
         return pam_sites
     
-    def design_guides(self, sequence: str, num_guides: int = 5) -> List[Dict]:
+    def design_guides(self, sequence: str, num_guides: int = 5, use_invariants: bool = True) -> List[Dict]:
         """
-        Design CRISPR guides for a target sequence.
+        Design CRISPR guides for a target sequence using comprehensive scoring.
         
         Args:
             sequence: Target DNA sequence
             num_guides: Number of top guides to return
+            use_invariants: Whether to use invariant features for scoring
             
         Returns:
             List of guide dictionaries with scores and positions
@@ -159,26 +291,39 @@ class CRISPRGuideDesigner:
             if guide_end - guide_start >= self.guide_length:
                 guide_seq = sequence[guide_start:guide_end].upper()
                 
-                # Calculate scores
-                on_target_score = self.calculate_on_target_score(guide_seq)
+                # Calculate comprehensive scores
+                if use_invariants:
+                    score_data = self.calculate_comprehensive_score(guide_seq, include_invariants=True)
+                    primary_score = score_data['comprehensive_score']
+                else:
+                    score_data = self.calculate_comprehensive_score(guide_seq, include_invariants=False)
+                    primary_score = score_data['base_score']
+                
+                # G→C transition analysis
+                gc_analysis = self.analyze_gc_transition_effects(guide_seq)
                 
                 # Basic quality filters
-                gc_content = (guide_seq.count('G') + guide_seq.count('C')) / len(guide_seq)
+                gc_content = score_data['gc_content']
                 has_poly_t = 'TTTT' in guide_seq  # Avoid poly-T stretches
                 
                 if 0.2 <= gc_content <= 0.8 and not has_poly_t:
-                    guides.append({
+                    guide_data = {
                         'sequence': guide_seq,
                         'position': guide_start,
                         'pam_position': pam_pos,
                         'pam_sequence': pam_seq,
-                        'on_target_score': on_target_score,
+                        'comprehensive_score': primary_score,
+                        'on_target_score': score_data['base_score'],  # Keep traditional score for comparison
                         'gc_content': gc_content,
-                        'length': len(guide_seq)
-                    })
+                        'length': len(guide_seq),
+                        **score_data,  # Include all scoring metrics
+                        **gc_analysis  # Include G→C analysis
+                    }
+                    guides.append(guide_data)
         
-        # Sort by on-target score and return top guides
-        guides.sort(key=lambda x: x['on_target_score'], reverse=True)
+        # Sort by comprehensive score and return top guides
+        sort_key = 'comprehensive_score' if use_invariants else 'on_target_score'
+        guides.sort(key=lambda x: x[sort_key], reverse=True)
         return guides[:num_guides]
     
     def predict_repair_outcomes(self, guide_seq: str, target_seq: str) -> Dict:
