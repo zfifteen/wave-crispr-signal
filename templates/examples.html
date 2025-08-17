@@ -1,0 +1,301 @@
+{% extends "base.html" %}
+
+{% block title %}Examples - Z Framework{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-10 mx-auto">
+        <h1 class="mb-4">Example DNA Sequences</h1>
+        
+        <div class="alert alert-info" role="alert">
+            <h5 class="alert-heading">Getting Started with Examples</h5>
+            <p class="mb-0">
+                These curated DNA sequences demonstrate different aspects of Z Framework analysis. 
+                Click "Analyze" to run the sequence through the full analysis pipeline, or "Fill Form" 
+                to load the sequence into the main analysis form for parameter customization.
+            </p>
+        </div>
+
+        {% for example in examples %}
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">{{ example.name }}</h5>
+                <div>
+                    <button class="btn btn-outline-primary btn-sm" onclick="fillAnalysisForm('{{ example.sequence }}')">
+                        <i class="fas fa-edit"></i> Fill Form
+                    </button>
+                    <button class="btn btn-primary btn-sm" onclick="analyzeSequence('{{ example.sequence }}')">
+                        <i class="fas fa-play"></i> Analyze
+                    </button>
+                </div>
+            </div>
+            
+            <div class="card-body">
+                <p class="card-text">{{ example.description }}</p>
+                
+                <div class="row">
+                    <div class="col-md-8">
+                        <h6>DNA Sequence ({{ example.sequence|length }} bases)</h6>
+                        <div class="sequence-display" id="sequence-{{ loop.index }}">
+                            {{ example.sequence }}
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <h6>Quick Stats</h6>
+                        <table class="table table-sm table-borderless">
+                            <tr>
+                                <td><strong>Length:</strong></td>
+                                <td>{{ example.sequence|length }} bp</td>
+                            </tr>
+                            <tr>
+                                <td><strong>GC Content:</strong></td>
+                                <td>
+                                    {% set gc_count = (example.sequence.count('G') + example.sequence.count('C')) %}
+                                    {% set gc_percent = (gc_count / example.sequence|length * 100) %}
+                                    {{ "%.1f"|format(gc_percent) }}%
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Base Composition:</strong></td>
+                                <td>
+                                    <small>
+                                        A:{{ example.sequence.count('A') }} 
+                                        T:{{ example.sequence.count('T') }} 
+                                        C:{{ example.sequence.count('C') }} 
+                                        G:{{ example.sequence.count('G') }}
+                                    </small>
+                                </td>
+                            </tr>
+                        </table>
+                        
+                        <div class="mt-2">
+                            <button class="btn btn-outline-secondary btn-sm w-100" onclick="copySequence('{{ example.sequence }}')">
+                                <i class="fas fa-copy"></i> Copy Sequence
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+        <!-- Analysis Guidelines -->
+        <div class="card mt-5">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0">Analysis Guidelines</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Recommended Parameters</h6>
+                        <ul>
+                            <li><strong>Short sequences (&lt;50 bp):</strong> Lower precision (15-30 decimal places)</li>
+                            <li><strong>Medium sequences (50-200 bp):</strong> Standard precision (30-50 decimal places)</li>
+                            <li><strong>Long sequences (&gt;200 bp):</strong> Higher precision (50-100 decimal places)</li>
+                            <li><strong>Window size:</strong> 10-20% of sequence length for density analysis</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <h6>Expected Analysis Time</h6>
+                        <ul>
+                            <li><strong>Basic analysis:</strong> 1-5 seconds</li>
+                            <li><strong>With CRISPR validation:</strong> 5-15 seconds</li>
+                            <li><strong>High precision (100 dp):</strong> 10-30 seconds</li>
+                            <li><strong>Many perturbations (&gt;200):</strong> 30-60 seconds</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <h6>Interpreting Results</h6>
+                <div class="row">
+                    <div class="col-md-4">
+                        <strong>Convergence Quality:</strong>
+                        <ul class="small">
+                            <li>Distance &lt; 10⁻⁶: Excellent</li>
+                            <li>Distance &lt; 10⁻³: Good</li>
+                            <li>Distance &gt; 10⁻³: Poor</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <strong>Enhancement Factor:</strong>
+                        <ul class="small">
+                            <li>&gt; 1.5: High enhancement</li>
+                            <li>1.1 - 1.5: Moderate</li>
+                            <li>&lt; 1.1: Low enhancement</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <strong>P-Value Significance:</strong>
+                        <ul class="small">
+                            <li>&lt; 0.01: Highly significant</li>
+                            <li>0.01 - 0.05: Significant</li>
+                            <li>&gt; 0.05: Not significant</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Custom Sequence Input -->
+        <div class="card mt-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Custom Sequence Analysis</h5>
+            </div>
+            <div class="card-body">
+                <p>Have your own DNA sequence to analyze? Use the form below for quick analysis or go to the main analysis page for full parameter control.</p>
+                
+                <form id="quickAnalysisForm">
+                    <div class="mb-3">
+                        <label for="customSequence" class="form-label">DNA Sequence</label>
+                        <textarea class="form-control" id="customSequence" rows="3" placeholder="ATGCTGCGGAGACCTGGAGAGAAAGCAGTGG..."></textarea>
+                        <div class="form-text">Enter 10-1000 bases (A, T, C, G only)</div>
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-primary" onclick="analyzeCustomSequence()">
+                            <i class="fas fa-play"></i> Quick Analysis
+                        </button>
+                        <button type="button" class="btn btn-outline-primary" onclick="fillMainForm()">
+                            <i class="fas fa-cog"></i> Advanced Analysis
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" onclick="generateRandomSequence()">
+                            <i class="fas fa-random"></i> Generate Random
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Format DNA sequences with colors
+document.addEventListener('DOMContentLoaded', function() {
+    {% for example in examples %}
+    formatDNASequence('{{ example.sequence }}', 'sequence-{{ loop.index }}');
+    {% endfor %}
+});
+
+// Fill the main analysis form with a sequence
+function fillAnalysisForm(sequence) {
+    // Store sequence in localStorage to pass to main form
+    localStorage.setItem('analysisSequence', sequence);
+    window.location.href = '{{ url_for("index") }}';
+}
+
+// Perform direct analysis of a sequence
+function analyzeSequence(sequence) {
+    // Create a form and submit it
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '{{ url_for("analyze_sequence") }}';
+    
+    // Add CSRF token if needed
+    const csrfToken = document.querySelector('meta[name=csrf-token]');
+    if (csrfToken) {
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = 'csrf_token';
+        csrfInput.value = csrfToken.content;
+        form.appendChild(csrfInput);
+    }
+    
+    // Add sequence
+    const sequenceInput = document.createElement('input');
+    sequenceInput.type = 'hidden';
+    sequenceInput.name = 'sequence';
+    sequenceInput.value = sequence;
+    form.appendChild(sequenceInput);
+    
+    // Add default parameters
+    const defaultParams = {
+        'precision': '50',
+        'window_size': '10',
+        'num_perturbations': '100',
+        'perturbation_rate': '0.1',
+        'enable_crispr_validation': 'y'
+    };
+    
+    for (const [name, value] of Object.entries(defaultParams)) {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = name;
+        input.value = value;
+        form.appendChild(input);
+    }
+    
+    document.body.appendChild(form);
+    form.submit();
+}
+
+// Copy sequence to clipboard
+function copySequence(sequence) {
+    copyToClipboard(sequence, true);
+}
+
+// Custom sequence analysis functions
+function analyzeCustomSequence() {
+    const sequence = document.getElementById('customSequence').value.trim().toUpperCase();
+    
+    if (!sequence) {
+        alert('Please enter a DNA sequence');
+        return;
+    }
+    
+    if (!/^[ATCG]+$/.test(sequence)) {
+        alert('Invalid DNA sequence. Only A, T, C, G are allowed.');
+        return;
+    }
+    
+    if (sequence.length < 10 || sequence.length > 1000) {
+        alert('Sequence length must be between 10 and 1000 bases.');
+        return;
+    }
+    
+    analyzeSequence(sequence);
+}
+
+function fillMainForm() {
+    const sequence = document.getElementById('customSequence').value.trim().toUpperCase();
+    
+    if (!sequence) {
+        alert('Please enter a DNA sequence');
+        return;
+    }
+    
+    if (!/^[ATCG]+$/.test(sequence)) {
+        alert('Invalid DNA sequence. Only A, T, C, G are allowed.');
+        return;
+    }
+    
+    fillAnalysisForm(sequence);
+}
+
+function generateRandomSequence() {
+    const length = Math.floor(Math.random() * 191) + 60; // 60-250 bases
+    const bases = ['A', 'T', 'C', 'G'];
+    let sequence = '';
+    
+    for (let i = 0; i < length; i++) {
+        sequence += bases[Math.floor(Math.random() * 4)];
+    }
+    
+    document.getElementById('customSequence').value = sequence;
+}
+
+// Check if there's a sequence to load from localStorage
+document.addEventListener('DOMContentLoaded', function() {
+    const savedSequence = localStorage.getItem('analysisSequence');
+    if (savedSequence) {
+        localStorage.removeItem('analysisSequence');
+        // This will be handled by the main page
+    }
+});
+</script>
+{% endblock %}

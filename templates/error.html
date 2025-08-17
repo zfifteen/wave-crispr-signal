@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Error {{ error_code }} - Z Framework{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="text-center">
+            <div class="mb-4">
+                <i class="fas fa-exclamation-triangle text-warning" style="font-size: 4rem;"></i>
+            </div>
+            
+            <h1 class="display-4 text-muted">{{ error_code }}</h1>
+            <h2 class="mb-4">{{ error_message }}</h2>
+            
+            {% if error_code == 404 %}
+                <p class="lead text-muted">
+                    The page you're looking for doesn't exist or has been moved.
+                </p>
+                <div class="mt-4">
+                    <a href="{{ url_for('index') }}" class="btn btn-primary">
+                        <i class="fas fa-home"></i> Go Home
+                    </a>
+                    <a href="{{ url_for('examples') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-list"></i> View Examples
+                    </a>
+                </div>
+            {% elif error_code == 500 %}
+                <p class="lead text-muted">
+                    Something went wrong on our end. Please try again later.
+                </p>
+                <div class="mt-4">
+                    <a href="{{ url_for('index') }}" class="btn btn-primary">
+                        <i class="fas fa-home"></i> Go Home
+                    </a>
+                    <button class="btn btn-outline-secondary" onclick="window.location.reload()">
+                        <i class="fas fa-redo"></i> Try Again
+                    </button>
+                </div>
+            {% else %}
+                <p class="lead text-muted">
+                    An unexpected error occurred.
+                </p>
+                <div class="mt-4">
+                    <a href="{{ url_for('index') }}" class="btn btn-primary">
+                        <i class="fas fa-home"></i> Go Home
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Helpful Links -->
+        <div class="card mt-5">
+            <div class="card-header">
+                <h5 class="mb-0">Need Help?</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-4 mb-3">
+                        <a href="{{ url_for('index') }}" class="text-decoration-none">
+                            <i class="fas fa-calculator fa-2x text-primary mb-2"></i>
+                            <div><strong>DNA Analysis</strong></div>
+                            <small class="text-muted">Start a new analysis</small>
+                        </a>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <a href="{{ url_for('examples') }}" class="text-decoration-none">
+                            <i class="fas fa-list fa-2x text-success mb-2"></i>
+                            <div><strong>Examples</strong></div>
+                            <small class="text-muted">Try sample sequences</small>
+                        </a>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <a href="{{ url_for('documentation') }}" class="text-decoration-none">
+                            <i class="fas fa-book fa-2x text-info mb-2"></i>
+                            <div><strong>Documentation</strong></div>
+                            <small class="text-muted">Learn about the methods</small>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

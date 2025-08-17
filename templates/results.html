@@ -1,0 +1,330 @@
+{% extends "base.html" %}
+
+{% block title %}Analysis Results - Z Framework{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Analysis Results</h2>
+            <div>
+                <button class="btn btn-outline-primary" onclick="downloadResults()">
+                    <i class="fas fa-download"></i> Download JSON
+                </button>
+                <a href="{{ url_for('index') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> New Analysis
+                </a>
+            </div>
+        </div>
+
+        <!-- Sequence Information -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Sequence Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h6>DNA Sequence ({{ results.sequence_info.length }} bases)</h6>
+                        <div class="sequence-display" id="sequence-display">
+                            {{ results.sequence_info.sequence }}
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <h6>Base Composition</h6>
+                        <div class="row text-center">
+                            <div class="col-3">
+                                <div class="base-a fs-4">A</div>
+                                <small>{{ results.sequence_info.base_composition.A }}</small>
+                            </div>
+                            <div class="col-3">
+                                <div class="base-t fs-4">T</div>
+                                <small>{{ results.sequence_info.base_composition.T }}</small>
+                            </div>
+                            <div class="col-3">
+                                <div class="base-c fs-4">C</div>
+                                <small>{{ results.sequence_info.base_composition.C }}</small>
+                            </div>
+                            <div class="col-3">
+                                <div class="base-g fs-4">G</div>
+                                <small>{{ results.sequence_info.base_composition.G }}</small>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="text-center">
+                            <strong>GC Content:</strong> {{ "%.1f"|format(results.sequence_info.gc_content * 100) }}%
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Z Framework Results -->
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">Z Framework Analysis</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Core Metrics</h6>
+                        <table class="table table-sm">
+                            <tr>
+                                <td><strong>Z Value:</strong></td>
+                                <td><span class="font-monospace">{{ results.z_framework_results.z_value }}</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Convergence:</strong></td>
+                                <td>
+                                    {% if results.z_framework_results.converged %}
+                                        <span class="badge bg-success">Converged</span>
+                                    {% else %}
+                                        <span class="badge bg-warning">Not Converged</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Iterations:</strong></td>
+                                <td>{{ results.z_framework_results.iterations }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Golden Ratio Analysis</h6>
+                        <table class="table table-sm">
+                            <tr>
+                                <td><strong>φ⁻¹ (Target):</strong></td>
+                                <td><span class="font-monospace">{{ results.z_framework_results.golden_ratio_conjugate }}</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Distance:</strong></td>
+                                <td><span class="font-monospace">{{ results.z_framework_results.distance_to_phi_conjugate }}</span></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Density Enhancement Results -->
+        {% if results.density_enhancement %}
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">Density Enhancement Analysis</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Enhancement Metrics</h6>
+                        <table class="table table-sm">
+                            <tr>
+                                <td><strong>Enhancement Factor:</strong></td>
+                                <td>{{ results.density_enhancement.enhancement_factor }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Peak Enhancement:</strong></td>
+                                <td>{{ results.density_enhancement.peak_enhancement }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Window Size:</strong></td>
+                                <td>{{ results.analysis_parameters.window_size }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Density Profile</h6>
+                        <div class="chart-container">
+                            <canvas id="densityChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Falsification Testing Results -->
+        {% if results.falsification_testing %}
+        <div class="card mb-4">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">Falsification Testing</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Test Parameters</h6>
+                        <table class="table table-sm">
+                            <tr>
+                                <td><strong>Perturbations:</strong></td>
+                                <td>{{ results.analysis_parameters.num_perturbations }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Perturbation Rate:</strong></td>
+                                <td>{{ "%.1f"|format(results.analysis_parameters.perturbation_rate * 100) }}%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Passed Tests:</strong></td>
+                                <td>
+                                    {{ results.falsification_testing.tests_passed }} / 
+                                    {{ results.falsification_testing.total_tests }}
+                                    <span class="badge bg-{{ 'success' if results.falsification_testing.all_tests_passed else 'warning' }}">
+                                        {{ "PASS" if results.falsification_testing.all_tests_passed else "PARTIAL" }}
+                                    </span>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Statistical Summary</h6>
+                        <table class="table table-sm">
+                            <tr>
+                                <td><strong>Mean Z-Distance:</strong></td>
+                                <td>{{ results.falsification_testing.mean_z_distance }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Std Deviation:</strong></td>
+                                <td>{{ results.falsification_testing.std_z_distance }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>P-Value:</strong></td>
+                                <td>{{ results.falsification_testing.p_value }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- CRISPR Cross-Validation -->
+        {% if results.crispr_cross_validation %}
+        <div class="card mb-4">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0">CRISPR Cross-Validation</h5>
+            </div>
+            <div class="card-body">
+                {% if results.crispr_cross_validation.error %}
+                    <div class="alert alert-warning">
+                        <strong>CRISPR Analysis Error:</strong> {{ results.crispr_cross_validation.error }}
+                    </div>
+                {% elif results.crispr_cross_validation.num_guides_found == 0 %}
+                    <div class="alert alert-info">
+                        <strong>No CRISPR guides found</strong> for this sequence. This may be due to lack of suitable PAM sites or sequence constraints.
+                    </div>
+                {% else %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Best Guide Information</h6>
+                            <table class="table table-sm">
+                                <tr>
+                                    <td><strong>Guides Found:</strong></td>
+                                    <td>{{ results.crispr_cross_validation.num_guides_found }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Best Guide:</strong></td>
+                                    <td><span class="font-monospace">{{ results.crispr_cross_validation.best_guide.sequence }}</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Position:</strong></td>
+                                    <td>{{ results.crispr_cross_validation.best_guide.position }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>On-Target Score:</strong></td>
+                                    <td>{{ "%.3f"|format(results.crispr_cross_validation.best_guide.on_target_score) }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Z Framework Analysis of Guide</h6>
+                            <table class="table table-sm">
+                                <tr>
+                                    <td><strong>Guide Z Value:</strong></td>
+                                    <td>{{ results.crispr_cross_validation.guide_z_analysis.z_value }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Comprehensive Score:</strong></td>
+                                    <td>{{ results.crispr_cross_validation.comprehensive_score }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Analysis Metadata -->
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">Analysis Metadata</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <strong>Timestamp:</strong> {{ results.timestamp }}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Precision:</strong> {{ results.analysis_parameters.precision }} decimal places
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Make results data available for download
+const resultsData = {{ results | tojson }};
+
+function downloadResults() {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(resultsData, null, 2));
+    const downloadAnchorNode = document.createElement('a');
+    downloadAnchorNode.setAttribute("href", dataStr);
+    downloadAnchorNode.setAttribute("download", "z_framework_analysis_results.json");
+    document.body.appendChild(downloadAnchorNode);
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
+}
+
+// Format DNA sequence with colors
+document.addEventListener('DOMContentLoaded', function() {
+    formatDNASequence('{{ results.sequence_info.sequence }}', 'sequence-display');
+});
+
+// Create density chart if data is available
+{% if results.density_enhancement and results.density_enhancement.density_profile %}
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('densityChart');
+    if (ctx) {
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: Array.from({length: {{ results.density_enhancement.density_profile | length }}}, (_, i) => i + 1),
+                datasets: [{
+                    label: 'Density Enhancement',
+                    data: {{ results.density_enhancement.density_profile | tojson }},
+                    borderColor: 'rgb(75, 192, 192)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Density Enhancement Profile'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false
+                    }
+                }
+            }
+        });
+    }
+});
+{% endif %}
+</script>
+{% endblock %}
