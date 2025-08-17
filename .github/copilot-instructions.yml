@@ -1,0 +1,16 @@
+repository_instructions: |
+  # Z Framework Guidelines for Code Generation
+  Core Principle
+    • Normalize observations via Z = A(B/c); A = frame-dependent, B = rate/shift, c = invariant (speed of light or e²).
+  1. Empirical Validation First
+    • Include reproducible tests (use mpmath with precision <1e-16).
+    • Label hypotheses clearly when unverified.
+  2. Domain-Specific Forms
+    • Physical: Z = T(v/c) with causality checks and explicit error handling (raise ValueError for |v| ≥ c).
+    • Discrete: Z = n(Δₙ/Δₘₐₓ), κ(n)=d(n)·ln(n+1)/e²; guard against zero divisions.
+  3. Geometric Resolution
+    • Use θ′(n,k)=φ·((n mod φ)/φ)^k with k≈0.3 for prime-density mapping.
+  4. Style & Tone
+    • Precise, scientific; prefer simple solutions; document deviations.
+  5. Tools & Datasets
+    • Use mpmath, numpy, sympy; cross-check predictions against provided datasets (e.g., zeta_zeros.csv, true prime counts, Z5D_Reference_Impl-2.ipynb).

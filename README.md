@@ -608,6 +608,88 @@ The basic tool uses a hardcoded 150bp mock sequence. For CRISPR applications, pr
 
 ---
 
+# FAQ: Spectral–Geodesic Framework for CRISPR Analysis
+
+### Q1. *Isn’t this just numerology with “golden ratio” dressing?*
+
+**A:** No. The “golden” language is a metaphor. I’m not claiming a theorem; I’m using $\varphi-1$ as a descriptive anchor because $\mu_Z$ repeatedly clusters near it in biological sequences. To make this testable, I define an explicit feature:
+
+$$
+\delta_\varphi = |\mu_Z-(\varphi-1)|
+$$
+
+so it’s a bounded statistic, not a mystical property.
+
+---
+
+### Q2. *Why does $F$ alternate between two values? Isn’t that unstable?*
+
+**A:** It alternates by design. The algebra forces the driver ratio into a period-2 cycle, so $F$ flips between two predictable states. Instead of treating that as noise, I treat the alternation as a **phase bit** that adds resolution to the spectral features.
+
+---
+
+### Q3. *How does this connect to real CRISPR outcomes, like mutation biases?*
+
+**A:** In the encoding I use, G↔C substitutions rotate the local base vectors in opposite directions. Under the geodesic map, those flips create **coherent spectral shifts**. Because $F$ alternates deterministically, genuine G→C disruptions show consistent sign patterns across both phases. That consistency makes them easier to separate from background variation.
+
+---
+
+### Q4. *What about the “trimming” parameter (0.013)? Isn’t that arbitrary?*
+
+**A:** It’s not universal, and I don’t claim it is. It’s a **calibration constant** I chose to stabilize variance across runs. I report the formula openly so others can re-estimate or replace it if they want. It’s a practical device, not a grand law.
+
+---
+
+### Q5. *Does sequence length or window size affect comparability?*
+
+**A:** I addressed that by normalizing with $c=e$. That choice makes ratios like $z=a(b/c)$ scale consistently, so entropy, flatness, and harmonic features can be compared across loci without extra rescaling.
+
+---
+
+### Q6. *Is “geodesic curvature” just a fancy weighting trick?*
+
+**A:** It is a reparameterization, yes—but not a trivial one. The curvature map
+
+$$
+\theta'(n,k) = \varphi\Big(\frac{n\bmod \varphi}{\varphi}\Big)^k
+$$
+
+keeps ordering intact while modulating sensitivity. This lets me analyze local disruptions while preserving a stable global frame of reference.
+
+---
+
+### Q7. *What’s the practical output of all this math?*
+
+**A:** Five feature classes:
+
+1. The **phase bit** ($\pi=0,1$) from $F$.
+2. **Phase-difference features** ($\Delta_{\text{phase}}$ of entropy, flatness, harmonic shifts).
+3. **Curvature-localized disruptions** around PAM sites.
+4. **Golden proximity** ($\delta_\varphi$) as a stability index.
+5. **Length-invariant normalization**, so comparisons across guides are valid.
+
+These are exportable as numeric features for CRISPR guide scoring or mutation-effect analysis.
+
+---
+
+### Q8. *How do you check that it works?*
+
+**A:** I use bootstrapping for confidence intervals, a phase-stability index to quantify coherence, and stratified comparisons across mutation classes (especially G→C). For scoring, I integrate the features and test predictive lift against simple baselines.
+
+---
+
+### Q9. *This seems abstract—can biologists actually use it?*
+
+**A:** The implementation outputs standard quantities (entropy, flatness, harmonic shifts, stability indices) that can be correlated with efficiency, off-target rates, or repair biases. The math sits under the hood; the output is practical.
+
+---
+
+### Q10. *If this is useful, why hasn’t it been published before?*
+
+**A:** Because this is a solo, exploratory effort. Most CRISPR analytics stop at sequence and thermodynamic features; I decided to see if deterministic algebraic structures could add value. The novelty isn’t in the golden ratio—it’s in linking invariants like the $F$-phase alternation to real mutation patterns.
+
+---
+
 ## 🧠 License & Attribution
 
 MIT License.
