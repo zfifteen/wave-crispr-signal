@@ -4,7 +4,7 @@
 
 ---
 
-## 🧬 Overview
+### 🧬 Overview
 
 This project introduces a **novel computational framework** that encodes DNA sequences as **complex-valued waveforms**,
 enabling mutation analysis through **signal processing techniques**. Using this representation, we define **spectral
@@ -209,6 +209,7 @@ Efficacy boost Δ_eff ≈ 5.8% aligns with ~15% density enhancement + trimmed va
 - Guards added in code for Δmax > 0 (raise ValueError if zero).
 - Hypotheses labeled (e.g., tuning parameter for scaling).
 </details>
+
 ## 🎯 Purpose
 
 * Provide a **new feature space** for variant analysis and machine learning models
