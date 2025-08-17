@@ -4,7 +4,7 @@
 
 ---
 
-## 🧬 Overview
+### 🧬 Overview
 
 This project introduces a **novel computational framework** that encodes DNA sequences as **complex-valued waveforms**,
 enabling mutation analysis through **signal processing techniques**. Using this representation, we define **spectral
