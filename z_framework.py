@@ -362,6 +362,10 @@ def format_mpmath_for_json(value):
     """Convert mpmath values to float for JSON serialization."""
     if isinstance(value, mp.mpf):
         return float(value)
+    elif isinstance(value, (np.integer, np.int64, np.int32)):
+        return int(value)
+    elif isinstance(value, (np.floating, np.float64, np.float32)):
+        return float(value)
     elif isinstance(value, list):
         return [format_mpmath_for_json(item) for item in value]
     elif isinstance(value, dict):
