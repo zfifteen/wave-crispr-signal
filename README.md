@@ -209,6 +209,7 @@ Efficacy boost Δ_eff ≈ 5.8% aligns with ~15% density enhancement + trimmed va
 - Guards added in code for Δmax > 0 (raise ValueError if zero).
 - Hypotheses labeled (e.g., tuning parameter for scaling).
 </details>
+
 ## 🎯 Purpose
 
 * Provide a **new feature space** for variant analysis and machine learning models
