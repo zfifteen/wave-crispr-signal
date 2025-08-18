@@ -250,6 +250,32 @@ Building on the Z Framework's spectral density measures, our method employs **en
 2. **Spectral flatness** (Wiener entropy) for harmonic distribution analysis  
 3. **Geodesic curvature metrics** for position-dependent information content
 
+### NEW: Topological Analysis Framework
+
+The latest extension introduces **topological analysis** linking geodesic curvature to f(x) properties:
+
+$$f(x) = \arcsin\left(\frac{x-1}{2x+3}\right)$$
+
+This groundbreaking analysis establishes mathematical bridges between:
+
+- **Topological singularities** in f(x) space (pole at x = -3/2, branch at x = -2/3)
+- **Geodesic mapping** θ'(n, k) = φ · ((n mod φ)/φ)^k in the Z Framework
+- **Domain constraints** (-1 ≤ (x-1)/(2x+3) ≤ 1) creating "admissible universes"
+- **Invariant alignment** with c = e² ≈ 7.389 constant
+
+Key discoveries include optimal curvature parameter k* ≈ 0.3 and universal scaling through golden ratio φ.
+
+**Usage:**
+```python
+from topological_analysis import TopologicalAnalyzer
+
+analyzer = TopologicalAnalyzer()
+results = analyzer.comprehensive_analysis()
+```
+
+See `docs/TOPOLOGICAL_ANALYSIS.md` for complete documentation.
+3. **Geodesic curvature metrics** for position-dependent information content
+
 This multi-layered approach provides a **mathematically rigorous foundation** for mutation scoring that transcends simple sequence similarity metrics, offering insights into the **deeper structural mathematics** underlying DNA sequence organization.
 
 ---
