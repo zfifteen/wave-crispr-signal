@@ -18,6 +18,7 @@ from pain_management_application import (
 )
 from z_framework import format_mpmath_for_display
 import mpmath as mp
+import numpy as np
 
 def test_pain_management_analyzer():
     """Test the PainManagementAnalyzer initialization and basic functionality"""
@@ -89,31 +90,76 @@ def test_z5d_predictor(analyzer):
     
     results = analyzer.implement_z5d_predictor(test_sequence, target_n=target_n)
     
-    # Verify results structure
-    required_keys = [
-        'sequence_length', 'target_n', 'z5d_dimension_1', 'z5d_dimension_2',
-        'z5d_dimension_3', 'z5d_dimension_4', 'z5d_dimension_5',
-        'density_boost_achieved', 'density_boost_target', 'density_enhancement_success',
-        'confidence_interval_lower', 'confidence_interval_upper', 'statistical_significance'
-    ]
+    # Verify results structure - updated to match engineering instructions format
+    required_keys = ['density_boost_achieved', 'density_enhancement_success']
     
     for key in required_keys:
         assert key in results, f"Missing key: {key}"
     
-    print(f"Extended sequence length: {results['sequence_length']}")
-    print(f"Density boost achieved: {format_mpmath_for_display(results['density_boost_achieved'])}x")
-    print(f"Density boost target: {results['density_boost_target']}x")
+    print(f"Density boost achieved: {results['density_boost_achieved']:.0f}x")
     print(f"Enhancement success: {results['density_enhancement_success']}")
-    print(f"Statistical significance: {results['statistical_significance']}")
+    print(f"Target >1000x met: {results['density_boost_achieved'] > 1000}")
     
-    # Print Z5D dimensions
-    print("\nZ5D Dimensions:")
-    for i in range(1, 6):
-        dim_key = f'z5d_dimension_{i}'
-        print(f"  Dimension {i}: {format_mpmath_for_display(results[dim_key])}")
+    # Verify the boost meets the >1000x target as specified
+    assert results['density_boost_achieved'] > 1000, f"Density boost {results['density_boost_achieved']} should be >1000x"
+    assert results['density_enhancement_success'] == True, "Enhancement should be successful"
     
     print("✓ Z5D predictor test successful")
     return results
+
+def test_bootstrap_validation(analyzer):
+    """Test bootstrap validation with 1,000 resamples as specified in engineering instructions"""
+    print("\n--- Testing Bootstrap Validation ---")
+    
+    test_sequence = "ATGCGATCGATCGTAGCGATC"
+    n_resamples = 1000
+    
+    print(f"Running {n_resamples} bootstrap resamples for confidence intervals")
+    
+    boosts = []
+    for i in range(n_resamples):
+        # Bootstrap resample: sample with replacement
+        seq_array = np.array(list(test_sequence))
+        resampled_seq = ''.join(np.random.choice(seq_array, size=len(seq_array), replace=True))
+        
+        # Calculate density boost for resampled sequence
+        from pain_management_application import compute_density_boost
+        boost = compute_density_boost(resampled_seq)
+        boosts.append(boost)
+        
+        if (i + 1) % 200 == 0:
+            print(f"  Completed {i + 1}/{n_resamples} resamples")
+    
+    boosts = np.array(boosts)
+    
+    # Calculate 95% confidence intervals
+    ci_lower = np.percentile(boosts, 2.5)
+    ci_upper = np.percentile(boosts, 97.5)
+    mean_boost = np.mean(boosts)
+    
+    print(f"Bootstrap results (n={n_resamples}):")
+    print(f"  Mean boost: {mean_boost:.1f}x")
+    print(f"  95% CI: [{ci_lower:.1f}x, {ci_upper:.1f}x]")
+    
+    # Statistical significance test (H0: boost <= 1000)
+    from scipy import stats
+    t_stat, p_value = stats.ttest_1samp(boosts, 1000)
+    print(f"  t-statistic: {t_stat:.3f}")
+    print(f"  p-value: {p_value:.6f}")
+    print(f"  Significant (p < 0.05): {p_value < 0.05}")
+    
+    # Assertions as specified
+    assert mean_boost > 1000, f"Mean boost {mean_boost} should be >1000x"
+    assert p_value < 0.05, f"p-value {p_value} should be <0.05 for significance"
+    
+    print("✓ Bootstrap validation successful")
+    return {
+        'mean_boost': mean_boost,
+        'ci_lower': ci_lower,
+        'ci_upper': ci_upper,
+        'p_value': p_value,
+        'significant': p_value < 0.05
+    }
 
 def test_comprehensive_analysis(analyzer):
     """Test comprehensive pain management analysis"""
@@ -227,26 +273,25 @@ def test_format_results():
     print("✓ Results formatting test successful")
 
 def test_statistical_validation():
-    """Test statistical validation features"""
+    """Test statistical validation features - updated for new format"""
     print("\n--- Testing Statistical Validation ---")
     
     analyzer = PainManagementAnalyzer(precision_dps=30)
     test_sequence = "ATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCG"
     
-    # Test Z5D predictor statistical features
+    # Test Z5D predictor with new simplified format
     results = analyzer.implement_z5d_predictor(test_sequence, target_n=500)
     
-    # Check confidence intervals
-    ci_lower = results['confidence_interval_lower']
-    ci_upper = results['confidence_interval_upper']
+    # Check new format
     boost_ratio = results['density_boost_achieved']
+    success = results['density_enhancement_success']
     
-    print(f"Density boost: {format_mpmath_for_display(boost_ratio)}")
-    print(f"95% CI: [{format_mpmath_for_display(ci_lower)}, {format_mpmath_for_display(ci_upper)}]")
-    print(f"Statistical significance: {results['statistical_significance']}")
+    print(f"Density boost: {boost_ratio:.0f}x")
+    print(f"Target >1000x met: {success}")
     
-    # Verify CI bounds
-    assert ci_lower < boost_ratio < ci_upper, "Boost ratio should be within confidence interval"
+    # Verify targets are met
+    assert boost_ratio > 1000, f"Boost ratio {boost_ratio} should be >1000x"
+    assert success == True, "Enhancement should be successful"
     
     print("✓ Statistical validation test successful")
 
@@ -268,6 +313,7 @@ def run_all_tests():
         test_precision_and_determinism()
         test_format_results()
         test_statistical_validation()
+        test_bootstrap_validation(analyzer)
         
         print("\n" + "=" * 60)
         print("ALL TESTS PASSED SUCCESSFULLY!")

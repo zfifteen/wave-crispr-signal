@@ -65,11 +65,9 @@ def analyze_single_target(analyzer: PainManagementAnalyzer, target: PainManageme
     z5d_results = analyzer.implement_z5d_predictor(target.sequence, target_n=1000)
     
     print("📈 Z5D Predictor Results:")
-    print(f"   Density Boost: {format_mpmath_for_display(z5d_results['density_boost_achieved'])}x")
-    print(f"   Target: {z5d_results['density_boost_target']}x (210%)")
+    print(f"   Density Boost: {z5d_results['density_boost_achieved']:.1f}x")
+    print(f"   Target: >1000x as specified in engineering instructions")
     print(f"   Enhancement Success: {'✅ YES' if z5d_results['density_enhancement_success'] else '❌ NO'}")
-    print(f"   Statistical Significance: {'✅ YES' if z5d_results['statistical_significance'] else '❌ NO'}")
-    print(f"   95% CI: [{format_mpmath_for_display(z5d_results['confidence_interval_lower'])}, {format_mpmath_for_display(z5d_results['confidence_interval_upper'])}]")
     print()
     
     return results, z5d_results
