@@ -1,10 +1,26 @@
+# Exact package versions for reproducible Z Framework validation
+# Generated for Python 3.12+ with Z Framework Pain Management Application
+# 
+# RESEARCH USE ONLY - Not for clinical applications
+#
 mpmath==1.3.0
 numpy==1.26.4
 biopython==1.83
 scikit-learn==1.5.1
 sympy==1.13.1
-matplotlib>=3.5.0
-scipy>=1.7.0
-plotly>=5.0.0
-seaborn>=0.11.0
-pandas>=1.3.0
+matplotlib==3.10.5
+scipy==1.16.1
+plotly==6.3.0
+seaborn==0.13.2
+pandas==2.3.1
+
+# Additional exact dependencies for validation
+joblib==1.5.1
+threadpoolctl==3.6.0
+contourpy==1.3.3
+cycler==0.12.1
+fonttools==4.59.1
+kiwisolver==1.4.9
+pillow==11.3.0
+narwhals==2.1.2
+tzdata==2025.2

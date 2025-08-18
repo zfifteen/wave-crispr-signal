@@ -78,3 +78,7 @@ test_results/
 temp/
 tmp/
 /wave-crispr-signal.iml
+
+# Validation results (generated files)
+proof_pack/validation_results/
+proof_pack/__pycache__/

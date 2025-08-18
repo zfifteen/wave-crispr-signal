@@ -1,18 +1,22 @@
 """
 Pain Management Application using Z Framework
 
-This module implements the Z Framework for pain management industry applications,
-specifically leveraging FDA-approved Casgevy (CRISPR-Cas9 therapy) and Vertex 
-Pharmaceuticals' JOURNAVX (suzetrigine) as molecular anchors for interdisciplinary 
-exploration.
+RESEARCH USE ONLY - NOT FOR CLINICAL DECISIONS
+
+This module implements the Z Framework for heuristic feature scoring in pain management 
+research, using FDA-approved Casgevy (CRISPR-Cas9 therapy) and Vertex Pharmaceuticals' 
+JOURNAVX (suzetrigine) as molecular anchors for mathematical validation only.
 
 Key Features:
-- Prime curvature analysis for pain-related gene targets
-- Z5D predictor with density enhancement (~210% boost at N=10^6)
-- Casgevy therapy molecular characterization
-- JOURNAVX (suzetrigine) structural analysis
-- High-precision statistical validation
-- Reproducible experimental framework
+- Prime curvature analysis for pain-related gene targets (research)
+- Z5D predictor with density enhancement for hypothesis generation
+- Heuristic scoring of Casgevy therapy molecular features  
+- Mathematical analysis of JOURNAVX (suzetrigine) structural properties
+- High-precision statistical validation with synthetic data
+- Reproducible experimental framework for research validation
+
+IMPORTANT: This provides heuristic feature scoring for hypothesis generation only, 
+not therapeutic stability or efficacy prediction for clinical use.
 
 Based on the established Z Framework principles with empirical validation.
 """
