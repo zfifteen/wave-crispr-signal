@@ -26,7 +26,6 @@ import os
 import time
 import hashlib
 import warnings
-warnings.filterwarnings('ignore', category=UserWarning)
 
 # Add the project root to path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
