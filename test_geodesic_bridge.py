@@ -217,7 +217,9 @@ class GeodesicBridgeTest:
         
         # Use partial match for flexibility (full validation would require exact file)
         if not sha.startswith(EXPECTED_SHA[:7]):  # Relaxed check for test data
-            print(f"Warning: CRISPR dataset SHA mismatch (got {sha[:16]}...)")
+        # Validate full SHA-256 hash for proper data integrity
+        if sha != EXPECTED_SHA:
+            print(f"Warning: CRISPR dataset SHA mismatch (got {sha})")
         
         # Load efficiency data
         df = pd.read_csv(file)
