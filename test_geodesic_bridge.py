@@ -304,7 +304,9 @@ class GeodesicBridgeTest:
                     assert False, f"Unexpected failure at {pt} (should be valid)"
         
         # Test invalid points in (-4, -2/3)
-        invalid_pts = np.random.uniform(-3.999, -0.667, 1000)
+        # Test invalid points in (DOMAIN_GAP_LOWER, DOMAIN_GAP_UPPER)
+        invalid_pts = np.random.uniform(self.DOMAIN_GAP_LOWER + self.DOMAIN_GAP_EPS,
+                                        self.DOMAIN_GAP_UPPER - self.DOMAIN_GAP_EPS, 1000)
         for pt in invalid_pts:
             try:
                 self.f(mp.mpf(pt))
