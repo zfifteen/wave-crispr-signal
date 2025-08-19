@@ -236,7 +236,7 @@ class TopologicalAnalyzer:
         """
         # Generate test points in valid domain
         # Use interval (0, 2) which is in valid domain
-        x_start = mp.mpf(0.1)   # Start slightly above 0
+        x_start = self.DOMAIN_X_START   # Start slightly above 0 to avoid edge cases
         x_end = mp.mpf(2.0)     # Safe upper bound
         
         x_values = [x_start + (x_end - x_start) * mp.mpf(i) / mp.mpf(n_points-1) 
