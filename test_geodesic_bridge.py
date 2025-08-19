@@ -172,7 +172,13 @@ class GeodesicBridgeTest:
         """
         if not os.path.exists(file):
             print(f"Computing {num} zeta zeros (this may take time)...")
-            return np.array([float(sp.ntheory.nth_riemann_zero(i).n(50)) for i in range(1, num+1)])
+            zeros = [float(mp.zetazero(i)) for i in range(1, num+1)]
+            # Save to file for future use
+            os.makedirs(os.path.dirname(file), exist_ok=True)
+            with open(file, 'w') as f:
+                for z in zeros:
+                    f.write(f"{z}\n")
+            return np.array(zeros)
         
         with open(file, 'r') as f:
             zeros = [float(line.strip()) for line in f.readlines()][:num]
