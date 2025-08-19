@@ -122,7 +122,7 @@ class TopologicalAnalyzer:
         """
         if n == 0:
             # Handle n=0 case to avoid modulo issues
-            return self.phi * (mp.mpf(0.1) ** mp.mpf(k))
+            return self.phi * (self.geodesic_n0_offset ** mp.mpf(k))
         
         n_mod_phi = mp.fmod(mp.mpf(n), self.phi)
         ratio = n_mod_phi / self.phi
