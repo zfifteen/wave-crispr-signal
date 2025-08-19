@@ -138,7 +138,7 @@ class GeodesicBridgeTest:
                     # Fallback approximation: li(x) ≈ x / ln(x)
                     li_n = float(n / np.log(n)) if n > 1 else 1
         except:
-            li_n = float(n / np.log(n)) if n > 1 else 1
+        li_n = self._compute_log_integral(n)
         
         # Count values above threshold (hypothetical prime-like threshold)
         predicted = len(theta_vals[theta_vals > 1.0])
