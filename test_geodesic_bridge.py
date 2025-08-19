@@ -80,7 +80,17 @@ class GeodesicBridgeTest:
             raise ValueError("n must be positive")
         
         mod = n % float(phi)
-        return float(phi) * (mod / float(phi)) ** k
+        if np.isscalar(n):
+            if n <= 0:
+                raise ValueError("n must be positive")
+            mod = n % float(phi)
+            return float(phi) * (mod / float(phi)) ** k
+        else:
+            n_arr = n if isinstance(n, np.ndarray) else np.asarray(n)
+            if np.any(n_arr <= 0):
+                raise ValueError("n must be positive")
+            mod = n_arr % float(phi)
+            return float(phi) * (mod / float(phi)) ** k
     
     def f(self, x):
         """
