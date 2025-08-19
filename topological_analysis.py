@@ -273,7 +273,10 @@ class TopologicalAnalyzer:
         logger.info(f"  Baseline variance: {float(baseline_variance)}")
         logger.info(f"  Enhanced variance (k=0.3): {float(enhanced_variance)}")
         logger.info(f"  Enhancement: {float(enhancement_percentage)}%")
-        logger.info(f"  Target achievement: {float(results['achievement_ratio']):.2f}")
+        logger.info(f"  Baseline variance: {self._format_mpf_for_log(baseline_variance)}")
+        logger.info(f"  Enhanced variance (k=0.3): {self._format_mpf_for_log(enhanced_variance)}")
+        logger.info(f"  Enhancement: {self._format_mpf_for_log(enhancement_percentage, precision=2)}%")
+        logger.info(f"  Target achievement: {self._format_mpf_for_log(results['achievement_ratio'], precision=2)}")
         
         return results
     
