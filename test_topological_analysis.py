@@ -54,16 +54,16 @@ class TestTopologicalAnalysis(unittest.TestCase):
         domain_info = self.analyzer.analyze_domain_constraints()
         
         # Check that expected keys are present
-        expected_keys = ['domain_lower_bound', 'domain_upper_bound', 'pole', 'admissible_intervals']
+        expected_keys = ['boundary_arg_minus1', 'boundary_arg1', 'pole', 'admissible_intervals']
         for key in expected_keys:
             self.assertIn(key, domain_info)
         
         # Verify mathematical relationships
-        # Lower bound should be -2/3
-        self.assertAlmostEqual(float(domain_info['domain_lower_bound']), -2.0/3.0, places=10)
+        # Boundary where arg = -1 should be -2/3
+        self.assertAlmostEqual(float(domain_info['boundary_arg_minus1']), -2.0/3.0, places=10)
         
-        # Upper bound should be -4
-        self.assertAlmostEqual(float(domain_info['domain_upper_bound']), -4.0, places=10)
+        # Boundary where arg = 1 should be -4
+        self.assertAlmostEqual(float(domain_info['boundary_arg1']), -4.0, places=10)
         
         # Pole should be -3/2
         self.assertAlmostEqual(float(domain_info['pole']), -1.5, places=10)
@@ -112,13 +112,13 @@ class TestTopologicalAnalysis(unittest.TestCase):
         alignment = self.analyzer.analyze_invariant_alignment()
         
         # Check expected keys
-        expected_keys = ['main_interval_span', 'e_squared_ratio', 'phi_ratio', 
+        expected_keys = ['domain_gap_span', 'e_squared_ratio', 'phi_ratio', 
                         'e_squared_resonance', 'phi_resonance', 'optimal_alignment']
         for key in expected_keys:
             self.assertIn(key, alignment)
         
-        # Main interval span should be positive
-        self.assertGreater(alignment['main_interval_span'], 0)
+        # Domain gap span should be positive
+        self.assertGreater(alignment['domain_gap_span'], 0)
         
         # Ratios should be meaningful
         self.assertGreater(alignment['e_squared_ratio'], 0)
@@ -171,8 +171,8 @@ class TestTopologicalAnalysis(unittest.TestCase):
         # Pole at -3/2
         self.assertAlmostEqual(float(self.analyzer.pole_x), -1.5, places=10)
         
-        # Branch at -2/3
-        self.assertAlmostEqual(float(self.analyzer.branch_x), -2.0/3.0, places=10)
+        # Domain boundary at -2/3
+        self.assertAlmostEqual(float(self.analyzer.boundary_arg_minus1), -2.0/3.0, places=10)
     
     def test_valid_fx_calculation_examples(self):
         """Test f(x) calculation with specific valid examples"""

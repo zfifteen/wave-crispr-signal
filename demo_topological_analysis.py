@@ -37,15 +37,15 @@ def main():
     print(f"✓ Golden ratio φ = {format_mpf(analyzer.phi, 10)}")
     print(f"✓ Invariant e² = {format_mpf(analyzer.e_squared, 10)}")
     print(f"✓ Pole at x = {format_mpf(analyzer.pole_x)}")
-    print(f"✓ Branch at x = {format_mpf(analyzer.branch_x)}")
+    print(f"✓ Domain boundary at x = {format_mpf(analyzer.boundary_arg_minus1)}")
     
     # Domain Analysis
     print_section("DOMAIN CONSTRAINT ANALYSIS")
     print("Analyzing f(x) = arcsin((x-1)/(2x+3)) domain constraints...")
     
     domain_info = analyzer.analyze_domain_constraints()
-    print(f"📍 Domain lower bound (arg = -1): x = {format_mpf(domain_info['domain_lower_bound'])}")
-    print(f"📍 Domain upper bound (arg = 1): x = {format_mpf(domain_info['domain_upper_bound'])}")
+    print(f"📍 Boundary where arg = -1: x = {format_mpf(domain_info['boundary_arg_minus1'])}")
+    print(f"📍 Boundary where arg = 1: x = {format_mpf(domain_info['boundary_arg1'])}")
     print(f"⚠️  Pole singularity: x = {format_mpf(domain_info['pole'])}")
     
     print("\n🔒 Admissible intervals:")
@@ -97,7 +97,7 @@ def main():
     print("Analyzing how arcsine domain aligns with Z Framework invariant...")
     
     alignment = analyzer.analyze_invariant_alignment()
-    print(f"📏 Main interval span: {format_mpf(alignment['main_interval_span'])}")
+    print(f"📏 Domain gap span: {format_mpf(alignment['domain_gap_span'])}")
     print(f"🔗 Ratio to e²: {format_mpf(alignment['e_squared_ratio'])}")
     print(f"🔗 Ratio to φ: {format_mpf(alignment['phi_ratio'])}")
     print(f"🎯 e² resonance: {format_mpf(alignment['e_squared_resonance'])}")

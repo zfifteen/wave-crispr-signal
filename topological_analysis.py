@@ -31,13 +31,13 @@ class TopologicalAnalyzer:
         
         # Critical points of f(x) = arcsin((x-1)/(2x+3))
         self.pole_x = mp.mpf(-3) / mp.mpf(2)  # x = -3/2, where denominator = 0
-        self.branch_x = mp.mpf(-2) / mp.mpf(3)  # x = -2/3, special branch point
+        self.boundary_arg_minus1 = mp.mpf(-2) / mp.mpf(3)  # x = -2/3, domain boundary
         
         logger.info(f"Initialized TopologicalAnalyzer with {precision_dps} decimal precision")
         logger.info(f"φ = {self.phi}")
         logger.info(f"e² = {self.e_squared}")
         logger.info(f"Pole at x = {self.pole_x}")
-        logger.info(f"Branch at x = {self.branch_x}")
+        logger.info(f"Domain boundary at x = {self.boundary_arg_minus1}")
     
     def f_x(self, x: mp.mpf) -> mp.mpf:
         """
@@ -80,30 +80,31 @@ class TopologicalAnalyzer:
         # x - 1 = -2x - 3
         # 3x = -2
         # x = -2/3
-        x_lower = mp.mpf(-2) / mp.mpf(3)
-        results['domain_lower_bound'] = x_lower
+        boundary_arg_minus1 = mp.mpf(-2) / mp.mpf(3)
+        results['boundary_arg_minus1'] = boundary_arg_minus1
         
         # For (x-1)/(2x+3) = 1:
         # x - 1 = 2x + 3
         # -x = 4
         # x = -4
-        x_upper = mp.mpf(-4)
-        results['domain_upper_bound'] = x_upper
+        boundary_arg1 = mp.mpf(-4)
+        results['boundary_arg1'] = boundary_arg1
         
         # Pole at x = -3/2
         results['pole'] = self.pole_x
         
-        # The valid domain is: x ∈ (-∞, -3/2) ∪ (-4, -2/3]
-        # This creates "admissible universe" constraints
+        # The valid domain is: x ∈ (-∞, -4] ∪ [-2/3, ∞), excluding pole at x = -3/2
+        # The pole is already excluded by the gap between intervals
         results['admissible_intervals'] = [
-            ('(-∞, -3/2)', None, self.pole_x),
-            ('(-4, -2/3]', mp.mpf(-4), mp.mpf(-2)/mp.mpf(3))
+            ('(-∞, -4]', None, mp.mpf(-4)),
+            ('[-2/3, ∞)', mp.mpf(-2)/mp.mpf(3), None)
         ]
         
         logger.info(f"Domain analysis complete:")
-        logger.info(f"  Lower bound (arg = -1): x = {x_lower}")
-        logger.info(f"  Upper bound (arg = 1): x = {x_upper}")
+        logger.info(f"  Boundary where arg = -1: x = {boundary_arg_minus1}")
+        logger.info(f"  Boundary where arg = 1: x = {boundary_arg1}")
         logger.info(f"  Pole singularity: x = {self.pole_x}")
+        logger.info(f"  Valid domain: (-∞, -4] ∪ [-2/3, ∞)")
         
         return results
     
@@ -192,26 +193,26 @@ class TopologicalAnalyzer:
         """
         domain_info = self.analyze_domain_constraints()
         
-        # Calculate the span of admissible intervals
-        x_lower = domain_info['domain_lower_bound']  # -2/3
-        x_upper = domain_info['domain_upper_bound']  # -4
+        # Calculate the span between domain boundaries
+        boundary_minus1 = domain_info['boundary_arg_minus1']  # -2/3
+        boundary_1 = domain_info['boundary_arg1']  # -4
         pole = domain_info['pole']  # -3/2
         
-        # Main admissible interval: (-4, -2/3]
-        main_interval_span = x_lower - x_upper  # -2/3 - (-4) = 4 - 2/3 = 10/3
+        # Gap between domain intervals: from -4 to -2/3
+        gap_span = boundary_minus1 - boundary_1  # -2/3 - (-4) = 4 - 2/3 = 10/3
         
         # Compare with e² invariant
-        invariant_ratio = main_interval_span / self.e_squared
+        invariant_ratio = gap_span / self.e_squared
         
         # Golden ratio relationship
-        phi_ratio = main_interval_span / self.phi
+        phi_ratio = gap_span / self.phi
         
-        # Topological resonance: how well the domain aligns with mathematical constants
-        e_squared_resonance = mp.fabs(main_interval_span - self.e_squared)
-        phi_resonance = mp.fabs(main_interval_span - self.phi)
+        # Topological resonance: how well the domain gap aligns with mathematical constants
+        e_squared_resonance = mp.fabs(gap_span - self.e_squared)
+        phi_resonance = mp.fabs(gap_span - self.phi)
         
         results = {
-            'main_interval_span': main_interval_span,
+            'domain_gap_span': gap_span,
             'e_squared_ratio': invariant_ratio,
             'phi_ratio': phi_ratio,
             'e_squared_resonance': e_squared_resonance,
@@ -220,7 +221,7 @@ class TopologicalAnalyzer:
         }
         
         logger.info(f"Invariant alignment analysis:")
-        logger.info(f"  Main interval span: {main_interval_span}")
+        logger.info(f"  Domain gap span: {gap_span}")
         logger.info(f"  Ratio to e²: {invariant_ratio}")
         logger.info(f"  Ratio to φ: {phi_ratio}")
         logger.info(f"  Best resonance: {results['optimal_alignment']}")
