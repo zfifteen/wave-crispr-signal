@@ -582,6 +582,24 @@ The signal-theoretic techniques demonstrated in the script offer innovative appr
 - **Physical basis**: Incorporate DNA biophysical models (e.g., *ab initio* charge distributions)
 - **Runtime**: Optimize FFT computation for genome-scale analysis
 
+### Potential Weaknesses / Risks
+
+#### Scope of Test Values (k)
+Only six points (10³ to 10⁷). Bootstrap resampling is on these errors, not on new primes; statistical power is limited. Might overstate significance.
+Could benefit from more dense sampling across k (e.g., 100+ values).
+
+#### Assumptions on Independence
+Error measurements at different k are not independent (zeta error terms are correlated). Bootstrap resampling assumes exchangeability, which might underestimate CI widths.
+
+#### RH Assumption
+The entire framework presumes Re(ρ) = 0.5. This is standard in analytic number theory approximations, but it should be explicitly acknowledged that any deviation would break the method.
+
+#### Convergence Risks
+Newton's method on π(x) ≈ k could misbehave near large k if initial guesses are poor. No discussion of fallback strategies.
+
+#### Effect Size Precision
+The claim of [28.5%, 41.2%] CI might be too precise given noise and computational limits. Results could show "20–40%" improvement but not lock into a tight interval.
+
 This approach provides a **mathematically rigorous framework** grounded in **universal principles from the Z Framework** to model DNA as an information-carrying waveform – bridging digital sequence analysis and analog structural biology. By quantifying mutational disruptions in spectral space using **empirically validated methods with high-precision arithmetic**, it offers new dimensions for predicting CRISPR behavior beyond sequence-level patterns. The integration of **curvature-based geodesics, cross-domain validation techniques, and statistical rigor** ensures both **reproducibility and precision** in computational biology applications.
 ---
 
