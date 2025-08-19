@@ -57,7 +57,8 @@ class TopologicalAnalyzer:
         
         # Check for pole at x = -3/2 (when denominator = 0)
         # Only check actual denominator value, not proximity to pole x
-        if mp.almosteq(denominator, mp.mpf(0), 1e-10):
+        # Check if x is at the pole value, not if denominator is close to zero
+        if mp.almosteq(x, self.pole_x, 1e-10):
             raise ValueError(f"Pole singularity at x = {self.pole_x}")
         
         arg = numerator / denominator
