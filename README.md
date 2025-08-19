@@ -753,6 +753,49 @@ These are exportable as numeric features for CRISPR guide scoring or mutation-ef
 
 ---
 
+## 🧪 Testing & Validation
+
+The Z Framework implementation includes comprehensive test suites to validate mathematical correctness and framework integrity:
+
+### Test Suite Components
+
+1. **Z Framework Core Tests** (`test_z_framework.py`)
+   - High-precision mathematical calculations (mpmath dps=50)
+   - Convergence validation to golden ratio conjugate (φ-1)
+   - Variance analysis and falsification testing
+   - JSON serialization validation
+
+2. **Invariant Features Tests** (`test_invariant_features.py`)
+   - Phase bit detection from F alternation patterns
+   - Golden proximity calculations and trimming
+   - Length-invariant normalization framework
+   - Integration tests for feature consistency
+
+3. **Geodesic Bridge Tests** (`test_geodesic_bridge.py`)
+   - Domain validation for f(x) = arcsin((x-1)/(2x+3))
+   - Geodesic curvature function θ'(n, k) = φ · ((n mod φ)/φ)^k
+   - Statistical validation with bootstrap confidence intervals
+   - Correlation analysis with zeta zeros and CRISPR efficiency data
+   - Monte Carlo boundary testing and permutation analysis
+
+### Running Tests
+
+```bash
+# Run individual test suites
+python test_z_framework.py
+python test_invariant_features.py
+python test_geodesic_bridge.py
+
+# Run complete test suite
+python run_tests.py
+```
+
+### Validation Notes
+
+The geodesic bridge test implements the mathematical framework and validation requirements from issue #28, including corrected domain constraints and comprehensive statistical testing. While the test uses mock data for reproducibility, production validation would require real Riemann zeta zeros and experimental CRISPR datasets to achieve the theoretical correlation thresholds (r ≥ 0.93) specified in the research framework.
+
+---
+
 ## 🧠 License & Attribution
 
 MIT License.
