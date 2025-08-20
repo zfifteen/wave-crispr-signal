@@ -17,7 +17,7 @@ import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from pain_management_application import PainManagementAnalyzer, PainManagementTarget
-from z_framework import format_mpmath_for_display
+from modules.z_framework import format_mpmath_for_display
 
 
 def print_banner():

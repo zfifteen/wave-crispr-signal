@@ -5,9 +5,16 @@ This script demonstrates the complete invariant feature set implementation
 as outlined in the theoretical framework, showing all 7 key capabilities.
 """
 
+import sys
+import os
+
+# Add repository root to Python path for imports
+repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, repo_root)
+
 from applications.crispr_guide_designer import CRISPRGuideDesigner
-from invariant_features import InvariantFeatureSet
-from invariant_validation import InvariantValidator, generate_test_sequences
+from modules.invariant_features import InvariantFeatureSet
+from experiments.invariant_validation import InvariantValidator, generate_test_sequences
 
 
 def demonstrate_invariant_features():

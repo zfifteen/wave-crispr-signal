@@ -17,7 +17,7 @@ import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "applications"))
 
 # Import our main analysis
-from bio_v_arbitrary import EmpiricalValidator, ArbitraryEncoder
+from modules.bio_v_arbitrary import EmpiricalValidator, ArbitraryEncoder
 
 
 class BiologicalEncoder3:

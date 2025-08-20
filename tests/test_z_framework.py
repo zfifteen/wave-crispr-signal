@@ -9,9 +9,11 @@ proper mathematical calculations and convergence validation.
 import sys
 import os
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+# Add the repository root to the path for importing modules
+repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, repo_root)
 
-from z_framework import (
+from modules.z_framework import (
     ZFrameworkCalculator,
     format_mpmath_for_json,
     format_mpmath_for_display,

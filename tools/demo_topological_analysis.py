@@ -9,7 +9,7 @@ Run this script to see the mathematical connections in action.
 """
 
 import sys
-from topological_analysis import TopologicalAnalyzer
+from modules.topological_analysis import TopologicalAnalyzer
 import mpmath as mp
 
 

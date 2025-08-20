@@ -28,8 +28,8 @@ import logging
 from dataclasses import dataclass
 
 # Import core Z Framework components
-from z_framework import ZFrameworkCalculator, format_mpmath_for_display
-from invariant_features import CurvatureDisruptionAnalyzer, ZetaUnfoldCalculator
+from modules.z_framework import ZFrameworkCalculator, format_mpmath_for_display
+from modules.invariant_features import CurvatureDisruptionAnalyzer, ZetaUnfoldCalculator
 from sklearn.mixture import GaussianMixture
 
 # Configure high precision

@@ -19,7 +19,7 @@ import numpy as np
 from typing import List, Dict, Tuple, Any
 import logging
 from dataclasses import dataclass
-from z_framework import ZFrameworkCalculator
+from .z_framework import ZFrameworkCalculator
 import hashlib
 from collections import defaultdict
 
