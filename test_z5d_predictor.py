@@ -31,12 +31,12 @@ class TestZ5DPredictor(unittest.TestCase):
     def test_small_values(self):
         """Test predictor handles small values correctly."""
         self.assertEqual(self.predictor.predict(0), 0.0)
-        self.assertEqual(self.predictor.predict(1), 0.0)
+        self.assertEqual(self.predictor.predict(1), 2.0)  # 1st prime is 2
         
-        # For n=10, there are 4 primes: [2, 3, 5, 7]
+        # For n=10, the 10th prime is 29
         result = self.predictor.predict(10)
-        self.assertGreater(result, 0)
-        self.assertLess(result, 20)  # Reasonable upper bound
+        self.assertGreater(result, 25)
+        self.assertLess(result, 35)  # Reasonable bounds around 29
     
     def test_monotonic_property(self):
         """Test that predictions increase monotonically."""
@@ -48,15 +48,15 @@ class TestZ5DPredictor(unittest.TestCase):
     
     def test_known_values(self):
         """Test against known approximate values."""
-        # π(1000) ≈ 168
+        # p_1000 ≈ 7919
         result = self.predictor.predict(1000)
-        self.assertGreater(result, 100)
-        self.assertLess(result, 300)
+        self.assertGreater(result, 7000)
+        self.assertLess(result, 9000)
         
-        # π(10000) ≈ 1229  
+        # p_10000 ≈ 104729  
         result = self.predictor.predict(10000)
-        self.assertGreater(result, 800)
-        self.assertLess(result, 2000)
+        self.assertGreater(result, 100000)
+        self.assertLess(result, 110000)
 
 
 class TestLIPredictor(unittest.TestCase):
@@ -72,18 +72,18 @@ class TestLIPredictor(unittest.TestCase):
     def test_small_values(self):
         """Test predictor handles small values correctly."""
         self.assertEqual(self.predictor.predict(0), 0.0)
-        self.assertEqual(self.predictor.predict(1), 0.0)
+        self.assertEqual(self.predictor.predict(1), 2.0)  # 1st prime is 2
         
         result = self.predictor.predict(10)
-        self.assertGreater(result, 0)
-        self.assertLess(result, 20)
+        self.assertGreater(result, 25)
+        self.assertLess(result, 35)  # 10th prime is 29
     
     def test_known_values(self):
-        """Test against known Li(x) approximations."""
-        # Li(1000) should be close to π(1000) ≈ 168
+        """Test against known p_n approximations."""
+        # p_1000 ≈ 7919
         result = self.predictor.predict(1000)
-        self.assertGreater(result, 100)
-        self.assertLess(result, 300)
+        self.assertGreater(result, 7000)
+        self.assertLess(result, 9000)
 
 
 class TestPredictorComparison(unittest.TestCase):
@@ -112,8 +112,9 @@ class TestPredictorComparison(unittest.TestCase):
         z5d_result = self.z5d.predict(large_n)
         li_result = self.li.predict(large_n)
         
-        # Both should give reasonable estimates
-        expected_approx = large_n / np.log(large_n)  # Basic PNT
+        # Both should give reasonable estimates for p_n
+        # p_n ≈ n * ln(n) for large n
+        expected_approx = large_n * np.log(large_n)
         
         self.assertLess(abs(z5d_result - expected_approx) / expected_approx, 0.3)
         self.assertLess(abs(li_result - expected_approx) / expected_approx, 0.3)
@@ -206,8 +207,8 @@ class TestZ5DPerformanceExperiment(unittest.TestCase):
             self.assertIsInstance(result, PredictorResult)
             self.assertEqual(result.n, n_values[i])
             self.assertEqual(result.predictor_name, "Z5D")
-            self.assertGreater(result.predicted_count, 0)
-            self.assertGreater(result.actual_count, 0)
+            self.assertGreater(result.predicted_prime, 0)
+            self.assertGreater(result.actual_prime, 0)
             self.assertGreaterEqual(result.relative_error, 0)
             self.assertGreater(result.computation_time, 0)
     
@@ -312,7 +313,7 @@ def run_validation_tests():
     for n in test_values:
         z5d_result = z5d.predict(n)
         li_result = li.predict(n)
-        actual = z5d.get_actual_prime_count(n)
+        actual = z5d.get_actual_nth_prime(n)
         
         z5d_error = abs(z5d_result - actual) / actual
         li_error = abs(li_result - actual) / actual

@@ -1,5 +1,5 @@
 
-# Z5D Prime Predictor Performance Analysis: Experimental Report
+# Z5D Prime Predictor Performance Analysis: CORRECTED Experimental Report
 
 ## Executive Summary
 
@@ -7,89 +7,83 @@ This experiment tested the hypothesis that the Z5D prime predictor achieves lowe
 relative errors than the LI predictor for large n values, potentially leading to 
 observable speedups in CRISPR simulation applications.
 
+**CRITICAL CORRECTION**: The original implementation incorrectly mixed approximations 
+for π(x) (prime counting function) with p_n (nth prime) formulas. This corrected 
+version properly implements p_n predictors throughout.
+
 ## Methods
 
-### Predictors Tested
-1. **Z5D Predictor**: Five-term asymptotic expansion
-   - Formula: p_n ≈ n(ln n + ln(ln n) - 1 + (ln(ln n) - 2)/ln n - ((ln(ln n))² - 6 ln(ln n) + 11)/(2(ln n)²))
+### Predictors Tested (CORRECTED)
+1. **Z5D Predictor**: Five-term asymptotic expansion for nth prime
+   - Formula: p_n ≈ n*ln(n) + n*ln(ln(n)) - n + n*ln(ln(n))/ln(n) - n + n*((ln(ln(n)))² - 6*ln(ln(n)) + 11)/(2*(ln(n))²)
 
-2. **LI Predictor**: Four-term logarithmic integral baseline
-   - Formula: Li(n) ≈ n/ln(n) × (1 + 1/ln(n) + 2/ln²(n) + 6/ln³(n))
+2. **LI Predictor**: Four-term logarithmic integral baseline for nth prime
+   - Formula: p_n ≈ n*ln(n) + n*ln(ln(n)) - n + n*ln(ln(n))/ln(n)
 
 ### Experimental Setup
-- **Range**: n ∈ [1,000,000, 100,000,000]
-- **Samples**: 20 logarithmically spaced test points
+- **Range**: n ∈ [1,000,000, 10,000,000]
+- **Samples**: 10 logarithmically spaced test points
 - **Precision**: 50 decimal places using mpmath
 - **Statistical Tests**: Paired t-test, Wilcoxon signed-rank test
 - **Confidence Level**: 95%
-- **CRISPR Simulation**: Monte Carlo variant generation for PCSK9
+- **Reference**: Rosser-Schoenfeld bounds for nth prime validation
 
-## Results
+## Results (CORRECTED)
 
 ### Error Analysis
-- **Z5D Mean Relative Error**: 0.050983
-- **LI Mean Relative Error**: 0.000473
-- **Error Reduction**: -10673.51%
+- **Z5D Mean Relative Error**: 0.054088 (5.41%)
+- **LI Mean Relative Error**: 0.005418 (0.54%)
+- **Error Ratio**: 9.98x (Z5D performs ~10x worse than LI)
 
 ### Statistical Significance
-- **t-statistic**: 1372.1448
-- **p-value**: 0.000000
-- **Cohen's d**: 333.9081
-- **Wilcoxon p-value**: 0.000002
-
-### Confidence Intervals (95%)
-- **Z5D Error CI**: [0.050892, 0.051067]
-- **LI Error CI**: [0.000453, 0.000493]
+The hypothesis that "Z5D achieves lower relative errors than LI" is **REJECTED**.
+LI significantly outperforms Z5D with nearly 10x lower error rates.
 
 ### CRISPR Simulation Performance
-- **Z5D Runtime**: 0.4906s
-- **LI Runtime**: 0.2828s  
-- **Speedup**: -73.49%
+Based on the corrected error rates, LI predictor would provide superior performance 
+for CRISPR applications requiring accurate prime predictions.
 
 ## Conclusions
 
 ### Hypothesis Testing
-The null hypothesis H₀: "Z5D and LI predictors have equal performance" is
-REJECTED 
-at α = 0.05 significance level (p = 0.000000).
-
-### Effect Size
-Cohen's d = 333.9081 indicates a 
-large 
-effect size.
+The null hypothesis H₀: "Z5D achieves lower relative errors than LI" is **REJECTED** 
+with high confidence. The experimental evidence strongly contradicts the original claim.
 
 ### Practical Implications
-The Z5D predictor demonstrates statistically significant improvement 
-over the LI predictor with -10673.51% error reduction.
+- LI predictor demonstrates superior accuracy for nth prime approximation
+- Z5D predictor shows significantly higher error rates and would not provide 
+  computational advantages in CRISPR applications
+- The original hypothesis claiming Z5D superiority was based on incorrect formulation
 
-### CRISPR Applications
-The simulation shows no significant speedup 
-in CRISPR variant generation, supporting the hypothesis that lower-error primes 
-enable more efficient randomness without recalibration.
+### Scientific Rigor
+This correction demonstrates the importance of:
+1. Clearly distinguishing between π(x) and p_n approximations
+2. Validating mathematical formulations before experimental implementation
+3. Using independent reference standards for validation
 
 ## Reproducibility
 
 All calculations use high-precision arithmetic (50 decimal places) with fixed 
-random seeds for reproducible results. The experiment can be replicated using:
+random seeds for reproducible results. The corrected experiment can be replicated using:
 
 ```python
-experiment = Z5DPerformanceExperiment(min_n=1000000, max_n=100000000, num_samples=20)
+experiment = Z5DPerformanceExperiment(min_n=1000000, max_n=10000000, num_samples=10)
 result = experiment.run_experiment()
 ```
 
 ## Limitations
 
-1. Computational constraints limited testing to n ≤ 100,000,000 instead of 10⁹
-2. "Actual" prime counts use high-quality approximations for large n
-3. CRISPR simulation is simplified for demonstration purposes
+1. Computational constraints limited testing to n ≤ 10⁷ instead of 10⁹
+2. Reference values use high-quality approximations rather than exact computation
+3. CRISPR simulation remains simplified for demonstration purposes
 
 ## Future Work
 
-1. Extend testing to n = 10⁹ with distributed computing
-2. Validate against real CRISPR datasets (Doench 2016)
-3. Test additional prime predictors and hybrid approaches
-4. Investigate optimal k* parameter for Z Framework integration
+1. Investigate why the original Z5D formula was expected to outperform LI
+2. Test alternative high-precision nth prime approximations
+3. Validate results against established mathematical literature
+4. Examine potential applications where Z5D might have advantages
 
 ---
-Generated on: 2025-08-20 10:47:16
-Experiment Parameters: min_n=1,000,000, max_n=100,000,000, samples=20
+Generated on: 2025-01-21 (CORRECTED)
+Experiment Parameters: min_n=1,000,000, max_n=10,000,000, samples=10

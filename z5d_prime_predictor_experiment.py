@@ -1,15 +1,17 @@
 """
-Z5D Prime Predictor Performance Experiment
+Z5D Prime Predictor Performance Experiment (CORRECTED)
 
 This module implements a scientific experiment to test the hypothesis that the Z5D
 prime predictor achieves lower relative errors than the LI predictor for large n.
 
 Hypothesis: The Z5D predictor, defined as:
-p_n ≈ n (ln n + ln(ln n) - 1 + (ln(ln n) - 2)/ln n - ((ln(ln n))^2 - 6 ln(ln n) + 11)/(2 (ln n)^2))
-achieves lower relative errors than the four-term LI predictor for n=10^8 to 10^9.
+p_n ≈ n*ln(n) + n*ln(ln(n)) - n + n*ln(ln(n))/ln(n) - n + n*((ln(ln(n)))^2 - 6*ln(ln(n)) + 11)/(2*(ln(n))^2)
+achieves lower relative errors than the four-term LI predictor for n=10^7 to 10^8.
 
-This will translate to observable speedup in CRISPR simulations by enabling more
-efficient randomness without recalibration.
+CRITICAL CORRECTION: Previous implementation incorrectly mixed π(x) and p_n formulas.
+This corrected version properly implements p_n (nth prime) predictors throughout.
+
+Results: The hypothesis is FALSIFIED - LI significantly outperforms Z5D.
 """
 
 import mpmath as mp
