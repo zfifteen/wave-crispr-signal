@@ -1,7 +1,7 @@
 """
 Tools Package
 
-This package contains utility scripts for demonstration, preprocessing, 
+This package contains utility scripts for demonstration, preprocessing,
 postprocessing, and other support functions.
 """
 

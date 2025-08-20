@@ -28,14 +28,14 @@ from .bio_v_arbitrary import EmpiricalValidator, ArbitraryEncoder
 __version__ = "1.0.0"
 __all__ = [
     "ZFrameworkCalculator",
-    "format_mpmath_for_json", 
+    "format_mpmath_for_json",
     "format_mpmath_for_display",
     "TARGET_VARIANCE",
     "TopologicalAnalyzer",
     "InvariantFeatureSet",
     "ZetaUnfoldCalculator",
     "PhaseAwareSpectralAnalyzer",
-    "GoldenProximityCalculator", 
+    "GoldenProximityCalculator",
     "CurvatureDisruptionAnalyzer",
     "MolecularDynamicsZFramework",
     "DNAStorageHypothesis",
