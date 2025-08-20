@@ -13,7 +13,7 @@ repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, repo_root)
 
 from applications.crispr_guide_designer import CRISPRGuideDesigner
-from modules.invariant_features import InvariantFeatureSet
+from invariant_features import InvariantFeatureSet
 from experiments.invariant_validation import InvariantValidator, generate_test_sequences
 
 

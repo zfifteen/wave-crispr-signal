@@ -1,44 +1,22 @@
 """
-Core Modules Package
+Modules Package
 
-This package contains the core scientific modules for the wave-crispr-signal project,
-including Z Framework implementation, topological analysis, invariant features,
-and molecular dynamics framework.
+This package contains specialized modules for the wave-crispr-signal project,
+including molecular dynamics framework, DNA storage hypothesis, and biological validators.
+
+Note: Core modules (z_framework, topological_analysis, invariant_features) have been 
+moved to root level for direct import as per repository policy.
 """
 
-# Import key classes and functions explicitly to avoid * imports
-from .z_framework import (
-    ZFrameworkCalculator,
-    format_mpmath_for_json,
-    format_mpmath_for_display,
-    TARGET_VARIANCE,
-)
-from .topological_analysis import TopologicalAnalyzer
-from .invariant_features import (
-    InvariantFeatureSet,
-    ZetaUnfoldCalculator,
-    PhaseAwareSpectralAnalyzer,
-    GoldenProximityCalculator,
-    CurvatureDisruptionAnalyzer,
-)
+# Import specialized modules that remain in the modules directory
 from .molecular_dynamics_framework import MolecularDynamicsZFramework
 from .dna_storage_hypothesis import DNAStorageHypothesis
 from .bio_v_arbitrary import EmpiricalValidator, ArbitraryEncoder
 
 __version__ = "1.0.0"
 __all__ = [
-    "ZFrameworkCalculator",
-    "format_mpmath_for_json",
-    "format_mpmath_for_display",
-    "TARGET_VARIANCE",
-    "TopologicalAnalyzer",
-    "InvariantFeatureSet",
-    "ZetaUnfoldCalculator",
-    "PhaseAwareSpectralAnalyzer",
-    "GoldenProximityCalculator",
-    "CurvatureDisruptionAnalyzer",
     "MolecularDynamicsZFramework",
-    "DNAStorageHypothesis",
+    "DNAStorageHypothesis", 
     "EmpiricalValidator",
     "ArbitraryEncoder",
 ]
