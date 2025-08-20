@@ -26,8 +26,8 @@ import os
 import time
 import hashlib
 
-# Add the project root to path
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+# Add the repository root to path
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import mpmath as mp
 import numpy as np

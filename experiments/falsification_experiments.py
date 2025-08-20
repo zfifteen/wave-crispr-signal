@@ -28,7 +28,7 @@ import pandas as pd
 from scipy import stats
 import mpmath as mp
 from typing import List, Dict
-from z_framework import ZFrameworkCalculator
+from modules.z_framework import ZFrameworkCalculator
 import random
 
 # Configure high precision for validation

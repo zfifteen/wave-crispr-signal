@@ -43,23 +43,32 @@ def main():
     print("Z FRAMEWORK TEST SUITE")
     print("=" * 60)
 
-    # Test definitions
+    # Test definitions - updated paths for new structure
     tests = [
-        ("Z Framework Core", "test_z_framework.py"),
-        ("Invariant Features", "test_invariant_features.py"),
-        ("Geodesic Bridge", "test_geodesic_bridge.py"),
+        ("Z Framework Core", "tests/test_z_framework.py"),
+        ("Invariant Features", "tests/test_invariant_features.py"),
+        ("Geodesic Bridge", "tests/test_geodesic_bridge.py"),
     ]
 
     results = []
 
-    # Run each test
-    for test_name, test_file in tests:
-        if os.path.exists(test_file):
-            success = run_test(test_name, test_file)
-            results.append((test_name, success))
-        else:
-            print(f"⚠ {test_name} - File not found: {test_file}")
-            results.append((test_name, False))
+    # Change to repository root to ensure proper imports
+    repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    original_cwd = os.getcwd()
+    os.chdir(repo_root)
+
+    try:
+        # Run each test
+        for test_name, test_file in tests:
+            if os.path.exists(test_file):
+                success = run_test(test_name, test_file)
+                results.append((test_name, success))
+            else:
+                print(f"⚠ {test_name} - File not found: {test_file}")
+                results.append((test_name, False))
+    finally:
+        # Restore original working directory
+        os.chdir(original_cwd)
 
     # Summary
     print(f"\n{'='*60}")

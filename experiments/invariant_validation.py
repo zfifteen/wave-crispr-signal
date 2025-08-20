@@ -14,7 +14,7 @@ import os
 
 # Add parent directory for imports
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from invariant_features import InvariantFeatureSet
+from modules.invariant_features import InvariantFeatureSet
 from applications.crispr_guide_designer import CRISPRGuideDesigner
 
 

@@ -14,7 +14,7 @@ import mpmath as mp
 import numpy as np
 from typing import List, Dict
 import logging
-from z_framework import ZFrameworkCalculator, TARGET_VARIANCE
+from .z_framework import ZFrameworkCalculator, TARGET_VARIANCE
 
 # Configure high precision for molecular dynamics calculations
 mp.dps = 50

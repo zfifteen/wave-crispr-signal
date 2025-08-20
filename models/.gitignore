@@ -1,0 +1,27 @@
+# Model weights and checkpoints - do not commit large files
+*.pth
+*.pkl
+*.h5
+*.weights
+*.ckpt
+checkpoints/
+weights/
+
+# Large model exports
+*.onnx
+*.pb
+*.tflite
+
+# Training artifacts
+logs/
+runs/
+tensorboard/
+
+# Cache files
+*.cache
+__pycache__/
+
+# Keep directory structure but ignore large files
+!.gitkeep
+!README.md
+!*/README.md

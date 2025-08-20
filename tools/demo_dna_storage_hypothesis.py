@@ -16,7 +16,7 @@ Key Claims Tested:
 
 import sys
 import logging
-from dna_storage_hypothesis import DNAStorageHypothesis
+from modules.dna_storage_hypothesis import DNAStorageHypothesis
 
 
 def main():
