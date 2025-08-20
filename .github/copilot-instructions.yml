@@ -1,5 +1,18 @@
 repository_instructions: |
-  # Z Framework Guidelines for Code Generation
+  # Z Framework Guidelines for Code Generation & Repository Structure Compliance
+  
+  ## MANDATORY: Repository Policy Compliance
+  **CRITICAL**: ALWAYS follow .github/REPOSITORY_POLICY.md for ALL file creation, organization, and naming.
+  
+  Key Policy Requirements:
+  • Directory Structure: Respect established patterns (applications/, docs/, proof_pack/, etc.)
+  • File Naming: snake_case.py for modules, UPPERCASE.md for major docs, kebab-case for others
+  • Core Modules: Place mathematical/scientific modules at root level for direct import
+  • Documentation: Every public component must have corresponding docs
+  • Testing: All core modules require test files, executable via run_tests.py
+  • Dependencies: Use exact version pinning in requirements.txt
+  
+  ## Z Framework Core Principles
   Core Principle
     • Normalize observations via Z = A(B/c); A = frame-dependent, B = rate/shift, c = invariant (speed of light or e²).
   1. Empirical Validation First
@@ -14,3 +27,19 @@ repository_instructions: |
     • Precise, scientific; prefer simple solutions; document deviations.
   5. Tools & Datasets
     • Use mpmath, numpy, sympy; cross-check predictions against provided datasets (e.g., zeta_zeros.csv, true prime counts, Z5D_Reference_Impl-2.ipynb).
+  
+  ## Code Organization Standards
+  • Import Order: Standard library → Third-party → Local imports
+  • Type Hints: Required for new code (Python 3.12+ style)
+  • Docstrings: Comprehensive for all public functions with Z Framework context
+  • Testing: Maintain coverage >80%, tests must pass run_tests.py
+  
+  ## File Placement Rules
+  • Core scientific modules: Root level (z_framework.py, topological_analysis.py, etc.)
+  • CRISPR applications: applications/ directory with crispr_ prefix
+  • Research documents: Root level with descriptive names
+  • Validation tools: proof_pack/ directory
+  • Documentation: docs/ with subdirectories for domains
+  • Web assets: static/ and templates/ directories
+  
+  NEVER create files that violate REPOSITORY_POLICY.md structure!
