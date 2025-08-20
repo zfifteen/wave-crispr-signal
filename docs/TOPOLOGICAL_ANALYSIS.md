@@ -31,6 +31,8 @@ The hypothesis establishes that:
 3. **Geodesic mapping** provides a mathematical bridge between spaces
 4. **Optimal parameter** k* ≈ 0.3 emerges naturally in both systems (empirically supported for density enhancement ~15%, CI [14.6%, 15.4%])
 
+**IMPORTANT NOTE**: Alternative parameter values such as k* ≈ 0.04449 have been tested and **falsified** through comprehensive empirical analysis. See `docs/FALSIFICATION_HYPOTHESIS_K_PARAMETER.md` for complete falsification documentation. Only k* ≈ 0.3 provides statistically significant enhancement and mathematical consistency with the golden ratio framework.
+
 ## Implementation
 
 ### TopologicalAnalyzer Class
