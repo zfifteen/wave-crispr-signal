@@ -58,6 +58,12 @@ EXPECTED_SHA = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
 class GeodesicBridgeTest:
     """Comprehensive test suite for geodesic bridge validation."""
     
+    # Domain constants for f(x) = arcsin((x-1)/(2x+3))
+    # Valid domain: (-∞, -4] ∪ [-2/3, ∞)
+    DOMAIN_GAP_LOWER = -4.0
+    DOMAIN_GAP_UPPER = -2.0/3.0
+    DOMAIN_GAP_EPS = 1e-6
+    
     def __init__(self):
         """Initialize the test environment."""
         self.rng = np.random.default_rng(42)  # Fixed seed for reproducibility
@@ -138,7 +144,7 @@ class GeodesicBridgeTest:
                     # Fallback approximation: li(x) ≈ x / ln(x)
                     li_n = float(n / np.log(n)) if n > 1 else 1
         except:
-        li_n = self._compute_log_integral(n)
+            li_n = self._compute_log_integral(n)
         
         # Count values above threshold (hypothetical prime-like threshold)
         predicted = len(theta_vals[theta_vals > 1.0])
@@ -233,9 +239,9 @@ class GeodesicBridgeTest:
         
         # Use partial match for flexibility (full validation would require exact file)
         if not sha.startswith(EXPECTED_SHA[:7]):  # Relaxed check for test data
-        # Validate full SHA-256 hash for proper data integrity
-        if sha != EXPECTED_SHA:
-            print(f"Warning: CRISPR dataset SHA mismatch (got {sha})")
+            # Validate full SHA-256 hash for proper data integrity
+            if sha != EXPECTED_SHA:
+                print(f"Warning: CRISPR dataset SHA mismatch (got {sha})")
         
         # Load efficiency data
         df = pd.read_csv(file)
