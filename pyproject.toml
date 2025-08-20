@@ -1,0 +1,6 @@
+[tool.ruff]
+extend-exclude = ["notebooks/"]
+
+[tool.ruff.lint]
+# Allow star imports in specific files if needed
+per-file-ignores = {}

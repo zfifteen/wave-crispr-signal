@@ -12,8 +12,4 @@ from .crispr_visualization import CRISPRVisualizer
 __version__ = "1.0.0"
 __author__ = "Wave CRISPR Signal Team"
 
-__all__ = [
-    'CRISPRGuideDesigner',
-    'WaveCRISPRMetrics', 
-    'CRISPRVisualizer'
-]
+__all__ = ["CRISPRGuideDesigner", "WaveCRISPRMetrics", "CRISPRVisualizer"]

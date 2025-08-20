@@ -10,16 +10,18 @@ import subprocess
 import sys
 import os
 
+
 def run_test(test_name, test_file):
     """Run a single test and return result."""
     print(f"\n{'='*60}")
     print(f"RUNNING: {test_name}")
     print(f"{'='*60}")
-    
+
     try:
-        result = subprocess.run([sys.executable, test_file], 
-                               capture_output=True, text=True, timeout=300)
-        
+        result = subprocess.run(
+            [sys.executable, test_file], capture_output=True, text=True, timeout=300
+        )
+
         if result.returncode == 0:
             print(f"✓ {test_name} PASSED")
             return True
@@ -35,20 +37,21 @@ def run_test(test_name, test_file):
         print(f"❌ {test_name} ERROR: {e}")
         return False
 
+
 def main():
     """Run all tests."""
     print("Z FRAMEWORK TEST SUITE")
     print("=" * 60)
-    
+
     # Test definitions
     tests = [
         ("Z Framework Core", "test_z_framework.py"),
         ("Invariant Features", "test_invariant_features.py"),
         ("Geodesic Bridge", "test_geodesic_bridge.py"),
     ]
-    
+
     results = []
-    
+
     # Run each test
     for test_name, test_file in tests:
         if os.path.exists(test_file):
@@ -57,27 +60,28 @@ def main():
         else:
             print(f"⚠ {test_name} - File not found: {test_file}")
             results.append((test_name, False))
-    
+
     # Summary
     print(f"\n{'='*60}")
     print("TEST SUMMARY")
     print(f"{'='*60}")
-    
+
     passed = sum(1 for _, success in results if success)
     total = len(results)
-    
+
     for test_name, success in results:
         status = "✓ PASSED" if success else "❌ FAILED"
         print(f"{test_name}: {status}")
-    
+
     print(f"\nOVERALL: {passed}/{total} tests passed")
-    
+
     if passed == total:
         print("🎉 ALL TESTS PASSED!")
         return 0
     else:
         print("💥 SOME TESTS FAILED!")
         return 1
+
 
 if __name__ == "__main__":
     sys.exit(main())
