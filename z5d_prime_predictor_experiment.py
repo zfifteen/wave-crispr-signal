@@ -34,8 +34,8 @@ logger = logging.getLogger(__name__)
 class PredictorResult:
     """Results from a prime predictor."""
     n: int
-    predicted_count: float
-    actual_count: int
+    predicted_prime: float
+    actual_prime: int
     relative_error: float
     computation_time: float
     predictor_name: str
@@ -60,21 +60,34 @@ class PrimePredictorBase:
         self.name = name
     
     def predict(self, n: int) -> float:
-        """Predict the number of primes up to n."""
+        """Predict the nth prime p_n."""
         raise NotImplementedError
     
-    def get_actual_prime_count(self, n: int) -> int:
-        """Get actual prime count using efficient approximation for large n."""
-        # For very large n, use the prime number theorem approximation
-        # This is computationally feasible unlike actual prime counting
+    def get_actual_nth_prime(self, n: int) -> int:
+        """Get actual nth prime using efficient approximation for large n."""
+        # For very large n, use high-quality nth prime approximations
+        # This is computationally feasible unlike actual prime computation
         if n < 1000:
-            # For small n, we can compute exactly
-            return len([i for i in range(2, n+1) if self._is_prime(i)])
+            # For small n, we can compute exactly by generating primes
+            primes = []
+            candidate = 2
+            while len(primes) < n:
+                if self._is_prime(candidate):
+                    primes.append(candidate)
+                candidate += 1
+            return primes[-1]
         else:
-            # Use Meissel-Lehmer approximation for large n
-            # π(n) ≈ n/ln(n) * (1 + 1/ln(n) + 2.51/ln²(n))
-            ln_n = mp.log(n)
-            approximation = n / ln_n * (1 + 1/ln_n + 2.51/(ln_n**2))
+            # Use high-quality nth prime approximation for large n
+            # Using standard Rosser-Schoenfeld bounds as reference
+            # p_n < n * (ln(n) + ln(ln(n))) for n >= 6
+            n_mp = mp.mpf(n)
+            ln_n = mp.log(n_mp)
+            ln_ln_n = mp.log(ln_n)
+            
+            # Simple but accurate reference approximation (not Z5D)
+            # p_n ≈ n * (ln(n) + ln(ln(n)) - 1 + 0.5*ln(ln(n))/ln(n))
+            approximation = n_mp * (ln_n + ln_ln_n - 1 + 0.5 * ln_ln_n / ln_n)
+            
             return int(approximation)
     
     def _is_prime(self, n: int) -> bool:
@@ -95,35 +108,32 @@ class Z5DPredictor(PrimePredictorBase):
     """
     Z5D Prime Predictor implementation.
     
-    Five-term asymptotic expansion for prime counting function:
-    p_n ≈ n (ln n + ln(ln n) - 1 + (ln(ln n) - 2)/ln n - ((ln(ln n))^2 - 6 ln(ln n) + 11)/(2 (ln n)^2))
+    Five-term asymptotic expansion for the nth prime:
+    p_n ≈ n*ln(n) + n*ln(ln(n)) - n + n*ln(ln(n))/ln(n) - n + n*((ln(ln(n)))^2 - 6*ln(ln(n)) + 11)/(2*(ln(n))^2)
     """
     
     def __init__(self):
         super().__init__("Z5D")
     
     def predict(self, n: int) -> float:
-        """Predict prime count using Z5D five-term expansion."""
-        if n < 2:
+        """Predict nth prime using Z5D five-term expansion."""
+        if n < 1:
             return 0.0
+        if n == 1:
+            return 2.0  # First prime is 2
         
         # Use high-precision arithmetic
         n_mp = mp.mpf(n)
         ln_n = mp.log(n_mp)
         ln_ln_n = mp.log(ln_n)
         
-        # Z5D expansion - interpreting as a correction to the basic x/ln(x) approximation
-        # The formula appears to be a corrected logarithmic integral form
-        base = n_mp / ln_n
-        
-        # Five-term correction factor
-        correction = (1 + 
-                     1/ln_n + 
-                     (2 - ln_ln_n)/ln_n + 
-                     (ln_ln_n - 2)/(ln_n**2) + 
-                     ((ln_ln_n**2) - 6*ln_ln_n + 11)/(2 * (ln_n**3)))
-        
-        prediction = base * correction
+        # Z5D five-term expansion for p_n
+        prediction = (n_mp * ln_n +                                      # First term: n*ln(n)
+                     n_mp * ln_ln_n -                                    # Second term: n*ln(ln(n))
+                     n_mp +                                              # Third term: -n
+                     n_mp * ln_ln_n / ln_n -                            # Fourth term: n*ln(ln(n))/ln(n)
+                     n_mp +                                              # Fifth term: -n
+                     n_mp * ((ln_ln_n**2) - 6*ln_ln_n + 11) / (2 * (ln_n**2)))  # Correction term
         
         return float(prediction)
 
@@ -132,27 +142,30 @@ class LIPredictor(PrimePredictorBase):
     """
     LI (Logarithmic Integral) Prime Predictor implementation.
     
-    Four-term baseline predictor using the logarithmic integral:
-    Li(n) ≈ n/ln(n) * (1 + 1/ln(n) + 2/ln²(n) + 6/ln³(n))
+    Four-term baseline predictor for the nth prime:
+    p_n ≈ n*ln(n) + n*ln(ln(n)) - n + n*ln(ln(n))/ln(n)
     """
     
     def __init__(self):
         super().__init__("LI")
     
     def predict(self, n: int) -> float:
-        """Predict prime count using four-term LI expansion."""
-        if n < 2:
+        """Predict nth prime using four-term LI expansion."""
+        if n < 1:
             return 0.0
+        if n == 1:
+            return 2.0  # First prime is 2
         
         # Use high-precision arithmetic
         n_mp = mp.mpf(n)
         ln_n = mp.log(n_mp)
+        ln_ln_n = mp.log(ln_n)
         
-        # Four-term LI expansion
-        base = n_mp / ln_n
-        correction = 1 + 1/ln_n + 2/(ln_n**2) + 6/(ln_n**3)
-        
-        prediction = base * correction
+        # Four-term LI expansion for p_n
+        prediction = (n_mp * ln_n +          # First term: n*ln(n)
+                     n_mp * ln_ln_n -        # Second term: n*ln(ln(n))
+                     n_mp +                  # Third term: -n
+                     n_mp * ln_ln_n / ln_n)  # Fourth term: n*ln(ln(n))/ln(n)
         
         return float(prediction)
 
@@ -245,16 +258,16 @@ class Z5DPerformanceExperiment:
             predicted = predictor.predict(n)
             computation_time = time.time() - start_time
             
-            # Get "actual" count (approximation for large n)
-            actual = predictor.get_actual_prime_count(n)
+            # Get "actual" nth prime (approximation for large n)
+            actual = predictor.get_actual_nth_prime(n)
             
             # Calculate relative error
             relative_error = abs(predicted - actual) / actual if actual > 0 else 0
             
             result = PredictorResult(
                 n=n,
-                predicted_count=predicted,
-                actual_count=actual,
+                predicted_prime=predicted,
+                actual_prime=actual,
                 relative_error=relative_error,
                 computation_time=computation_time,
                 predictor_name=predictor.name
