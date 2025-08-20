@@ -291,7 +291,7 @@ This groundbreaking analysis establishes mathematical bridges between:
 - **Domain constraints** (-1 ≤ (x-1)/(2x+3) ≤ 1) creating "admissible universes"
 - **Invariant alignment** with c = e² ≈ 7.389 constant
 
-Key discoveries include optimal curvature parameter k* ≈ 0.3 and universal scaling through golden ratio φ.
+Key discoveries include optimal curvature parameter k* ≈ 0.3 and universal scaling through golden ratio φ. **Alternative parameter values (e.g., k* ≈ 0.04449) have been empirically falsified** - see `docs/FALSIFICATION_HYPOTHESIS_K_PARAMETER.md`.
 
 **Usage:**
 ```python
