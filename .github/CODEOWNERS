@@ -1,0 +1,25 @@
+# Repository Code Ownership for wave-crispr-signal
+# Ensures human review for critical structural changes
+
+# Core GitHub configuration and policies
+.github/* @zfifteen
+
+# Documentation requiring review
+docs/ @zfifteen
+*.md @zfifteen
+
+# Core scientific modules (root level)
+z_framework.py @zfifteen
+topological_analysis.py @zfifteen
+invariant_features.py @zfifteen
+molecular_dynamics_framework.py @zfifteen
+*_validation.py @zfifteen
+
+# Repository structure enforcement
+.github/REPOSITORY_POLICY.md @zfifteen
+.github/copilot-instructions.yml @zfifteen
+tools/check_repo_policy.py @zfifteen
+
+# Critical configuration files
+requirements.txt @zfifteen
+.pre-commit-config.yaml @zfifteen

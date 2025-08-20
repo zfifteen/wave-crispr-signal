@@ -30,6 +30,23 @@ python proof_pack/generate_synthetic_data.py
 python proof_pack/run_validation.py
 ```
 
+## 📁 Repository Structure & Contributing
+
+This repository follows established organizational standards documented in our [Repository Policy](/.github/REPOSITORY_POLICY.md). 
+
+### Quick Reference
+- **Core modules**: Root-level Python files (`z_framework.py`, `topological_analysis.py`, etc.)
+- **Applications**: Domain-specific tools in `applications/` directory  
+- **Documentation**: Comprehensive docs in `docs/` directory
+- **Tests**: Both root-level (`test_*.py`) and `tests/` directory
+- **Validation**: Standalone verification tools in `proof_pack/`
+
+### Contributing Guidelines
+Before contributing, please review:
+- [Repository Policy](/.github/REPOSITORY_POLICY.md) - Mandatory structure and quality standards
+- [PR Template](/.github/pull_request_template.md) - Submission checklist
+- Run `python tools/check_repo_policy.py` to verify compliance
+
 ---
 
 ### 🧬 Overview
