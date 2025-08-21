@@ -50,7 +50,7 @@ def demonstrate_biopython_feasibility():
     # Demonstrate sequence creation without network dependency
     print("\n2. Local Sequence Creation (Network Independent)")
     demo_sequences = {
-        'PCSK9_sample': 'ATGCTGCGGAGACCTGGAGAGAAAGCAGTGGCCGGGGCAGTGGGAGGAGGAGGAGCTGGAAGAGGAGAGAAAGGAGGAGCTGCAGGAGGAGAGGAGG',
+        'PCSK9_sample': PCSK9_SAMPLE_SEQ,
         'p53_sample': 'ATGGAGGAGCCGCAGTCAGATCCTAGCGTCGAGCCCCCTCTGAGTCAGGAAACATTTTCAGACCTATGGAAACTACTTCCTGAAAACAACGTTCTGTCC',
         'synthetic_guide': 'ATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCG'
     }
