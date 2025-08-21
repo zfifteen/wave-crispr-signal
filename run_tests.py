@@ -53,7 +53,7 @@ def main():
     results = []
 
     # Change to repository root to ensure proper imports
-    repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    repo_root = os.path.dirname(os.path.abspath(__file__))
     original_cwd = os.getcwd()
     os.chdir(repo_root)
 

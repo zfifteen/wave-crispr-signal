@@ -25,7 +25,7 @@ import sys
 # Add current directory to path for imports
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from modules.z_framework import ZFrameworkCalculator, format_mpmath_for_json
+from z_framework import ZFrameworkCalculator, format_mpmath_for_json
 from applications.crispr_guide_designer import CRISPRGuideDesigner
 from applications.wave_crispr_metrics import WaveCRISPRMetrics
 

@@ -15,7 +15,7 @@ from typing import List, Dict, Tuple, Optional
 
 # Add parent directory for invariant features import
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from modules.invariant_features import InvariantFeatureSet
+from invariant_features import InvariantFeatureSet
 
 
 class CRISPRGuideDesigner:

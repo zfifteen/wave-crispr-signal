@@ -19,7 +19,7 @@ Date: 2025
 import numpy as np
 from scipy import stats
 from typing import List, Dict
-from modules.z_framework import ZFrameworkCalculator
+from z_framework import ZFrameworkCalculator
 import random
 
 
