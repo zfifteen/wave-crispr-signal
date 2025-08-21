@@ -1,0 +1,56 @@
+{
+  "demo_metadata": {
+    "timestamp": "2025-01-20",
+    "parameter_validated": 0.3,
+    "parameter_falsified": 0.04449,
+    "correction_status": "APPLIED"
+  },
+  "small_scale_analysis": {
+    "n_points": "1000.0000",
+    "k_parameter_used": "0.3000",
+    "k_parameter_falsified": "0.0445",
+    "analysis_radius": "23.7171",
+    "baseline_density": "0.4244",
+    "lattice_density": "0.3180",
+    "density_enhancement_percent": "-25.0667",
+    "quasiperiodic_order": "0.0827",
+    "entanglement_entropy": "4.5009",
+    "correlation_strength": "0.0353",
+    "decoherence_time": "12435.1797",
+    "geodesic_curvature_avg": "0.0130",
+    "quantum_phase_coherence": "0.0324"
+  },
+  "stability_analysis": {
+    "baseline_entropy": "3.7983",
+    "baseline_correlation": "0.0353",
+    "num_perturbations": "10",
+    "avg_entropy_variation": "0.0000",
+    "avg_correlation_variation": "0.0000",
+    "avg_stability_score": "1.0000",
+    "entropy_variations": [
+      "0.0000",
+      "0.0000",
+      "0.0000",
+      "0.0000",
+      "0.0000",
+      "... (10 total values)"
+    ],
+    "correlation_variations": [
+      "0.0000",
+      "0.0000",
+      "0.0000",
+      "0.0000",
+      "0.0000",
+      "... (10 total values)"
+    ],
+    "stability_scores": [
+      "1.0000",
+      "1.0000",
+      "1.0000",
+      "1.0000",
+      "1.0000",
+      "... (10 total values)"
+    ],
+    "is_stable": "True"
+  }
+}

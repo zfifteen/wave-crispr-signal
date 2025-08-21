@@ -48,6 +48,7 @@ def main():
         ("Z Framework Core", "tests/test_z_framework.py"),
         ("Invariant Features", "tests/test_invariant_features.py"),
         ("Geodesic Bridge", "tests/test_geodesic_bridge.py"),
+        ("Quantum Entanglement Quasicrystal", "tests/test_quantum_entanglement_quasicrystal.py"),
     ]
 
     results = []
