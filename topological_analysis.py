@@ -32,6 +32,10 @@ class TopologicalAnalyzer:
         # Critical points of f(x) = arcsin((x-1)/(2x+3))
         self.pole_x = mp.mpf(-3) / mp.mpf(2)  # x = -3/2, where denominator = 0
         self.boundary_arg_minus1 = mp.mpf(-2) / mp.mpf(3)  # x = -2/3, domain boundary
+        
+        # Domain analysis constants
+        self.DOMAIN_X_START = mp.mpf(0.01)  # Safe start point for analysis
+        self.geodesic_n0_offset = mp.mpf(1e-10)  # Small offset for n=0 case
 
         logger.info(
             f"Initialized TopologicalAnalyzer with {precision_dps} decimal precision"
@@ -290,21 +294,10 @@ class TopologicalAnalyzer:
         }
 
         logger.info("Density enhancement analysis:")
-        logger.info(f"  Baseline variance: {float(baseline_variance)}")
-        logger.info(f"  Enhanced variance (k=0.3): {float(enhanced_variance)}")
-        logger.info(f"  Enhancement: {float(enhancement_percentage)}%")
-        logger.info(
-            f"  Baseline variance: {self._format_mpf_for_log(baseline_variance)}"
-        )
-        logger.info(
-            f"  Enhanced variance (k=0.3): {self._format_mpf_for_log(enhanced_variance)}"
-        )
-        logger.info(
-            f"  Enhancement: {self._format_mpf_for_log(enhancement_percentage, precision=2)}%"
-        )
-        logger.info(
-            f"  Target achievement: {self._format_mpf_for_log(results['achievement_ratio'], precision=2)}"
-        )
+        logger.info(f"  Baseline variance: {float(baseline_variance):.6f}")
+        logger.info(f"  Enhanced variance (k=0.3): {float(enhanced_variance):.6f}")
+        logger.info(f"  Enhancement: {float(enhancement_percentage):.2f}%")
+        logger.info(f"  Target achievement: {float(results['achievement_ratio']):.2f}")
 
         return results
 

@@ -5,7 +5,7 @@ Simple test runner to validate CRISPR functionality
 import sys
 import os
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "applications"))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "applications"))
 
 from crispr_guide_designer import CRISPRGuideDesigner
 from wave_crispr_metrics import WaveCRISPRMetrics

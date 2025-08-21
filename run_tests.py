@@ -18,8 +18,16 @@ def run_test(test_name, test_file):
     print(f"{'='*60}")
 
     try:
+        # Set up environment for proper imports
+        env = os.environ.copy()
+        env['PYTHONPATH'] = os.getcwd()
+        
         result = subprocess.run(
-            [sys.executable, test_file], capture_output=True, text=True, timeout=300
+            [sys.executable, test_file], 
+            capture_output=True, 
+            text=True, 
+            timeout=300,
+            env=env
         )
 
         if result.returncode == 0:
@@ -43,12 +51,25 @@ def main():
     print("Z FRAMEWORK TEST SUITE")
     print("=" * 60)
 
-    # Test definitions - updated paths for new structure
-    tests = [
+    # Test Setup 1: Core Framework Tests
+    core_tests = [
         ("Z Framework Core", "tests/test_z_framework.py"),
         ("Invariant Features", "tests/test_invariant_features.py"),
         ("Geodesic Bridge", "tests/test_geodesic_bridge.py"),
     ]
+    
+    # Test Setup 2: Mathematical Analysis Tests
+    analysis_tests = [
+        ("Topological Analysis", "tests/test_topological_analysis.py"),
+    ]
+    
+    # Test Setup 3: Extended Test Coverage (Application Tests)
+    application_tests = [
+        ("CRISPR Simple", "tests/test_crispr_simple.py"),
+    ]
+    
+    # Combine all test configurations
+    tests = core_tests + analysis_tests + application_tests
 
     results = []
 
@@ -70,17 +91,29 @@ def main():
         # Restore original working directory
         os.chdir(original_cwd)
 
-    # Summary
+    # Summary with test setup breakdown
     print(f"\n{'='*60}")
     print("TEST SUMMARY")
     print(f"{'='*60}")
 
     passed = sum(1 for _, success in results if success)
     total = len(results)
-
-    for test_name, success in results:
-        status = "✓ PASSED" if success else "❌ FAILED"
-        print(f"{test_name}: {status}")
+    
+    # Detailed breakdown by test setup
+    setup_results = {
+        "Core Framework Tests": results[:3],
+        "Mathematical Analysis Tests": results[3:4] if len(results) > 3 else [],
+        "Application Tests": results[4:] if len(results) > 4 else []
+    }
+    
+    for setup_name, setup_tests in setup_results.items():
+        if setup_tests:
+            setup_passed = sum(1 for _, success in setup_tests if success)
+            setup_total = len(setup_tests)
+            print(f"\n{setup_name}: {setup_passed}/{setup_total}")
+            for test_name, success in setup_tests:
+                status = "✓ PASSED" if success else "❌ FAILED"
+                print(f"  {test_name}: {status}")
 
     print(f"\nOVERALL: {passed}/{total} tests passed")
 
