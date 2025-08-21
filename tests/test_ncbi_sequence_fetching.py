@@ -44,7 +44,9 @@ class TestNCBISequenceFetching(unittest.TestCase):
             Entrez.email = "test@example.com"
             Entrez.api_key = None  # Use without API key for testing
         
-        # Known test sequences and their NCBI accession numbers
+        # Example test sequences and their NCBI accession numbers.
+        # NOTE: These accession numbers are provided as examples for testing purposes.
+        # NCBI may update or deprecate accessions over time; periodic validation is recommended.
         self.test_accessions = {
             # PCSK9 gene (mentioned in project documentation)
             'PCSK9_sample': 'NM_174936.4',  # Human PCSK9 mRNA
