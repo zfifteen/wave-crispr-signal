@@ -1,0 +1,45 @@
+{
+  "experiment_metadata": {
+    "timestamp": "2025-08-21T22:57:12.989578",
+    "random_seed": 42,
+    "scales": [
+      100,
+      1000,
+      10000
+    ],
+    "k_values": [
+      0.05,
+      0.1,
+      0.3,
+      0.5,
+      0.8
+    ],
+    "n_bootstrap": 1000,
+    "n_permutations": 1000
+  },
+  "hypothesis_tests": {
+    "h1_scale_30": {
+      "bio_band": {
+        "rmr_mean": 0.5148056072301055,
+        "rmr_ci_lower": 0.3759681803022926,
+        "rmr_ci_upper": 0.6527790230360905,
+        "mse_spectral_mean": 0.04023391822915398,
+        "mse_baseline_mean": 0.08292329595868822,
+        "p_value": 9.719602183687786e-05,
+        "passes_h1": "True",
+        "n_cv_folds": 10
+      },
+      "arbitrary_band": {
+        "rmr_mean": 0.6083542563245207,
+        "rmr_ci_lower": 0.5595211275484478,
+        "rmr_ci_upper": 0.6568834874606716,
+        "mse_spectral_mean": 0.03247655591376232,
+        "mse_baseline_mean": 0.08292329595868822,
+        "p_value": 4.508058507748684e-09,
+        "passes_h1": "True",
+        "n_cv_folds": 10
+      }
+    }
+  },
+  "raw_data": []
+}
