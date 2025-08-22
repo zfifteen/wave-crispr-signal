@@ -18,6 +18,7 @@ from bin_resonance_test import (
     calculate_gc_content,
     pearson_correlation,
     bootstrap_correlation,
+    bootstrap_correlation_with_pvalue,
     benjamini_hochberg_correction,
     load_doench_data,
     perform_bin_resonance_analysis
@@ -152,6 +153,33 @@ def test_bootstrap_correlation():
     print("✓ Bootstrap correlation tests passed")
 
 
+def test_bootstrap_correlation_with_pvalue():
+    """Test bootstrap correlation with p-value calculation."""
+    print("Testing bootstrap correlation with p-value...")
+    
+    # Test with data that has some noise
+    x = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    y = [2.1, 3.9, 6.2, 7.8, 10.1, 11.9, 14.1, 15.8, 18.2, 19.9]  # Slightly noisy
+    
+    r, ci_low, ci_high, p_boot = bootstrap_correlation_with_pvalue(x, y, n_boot=100, seed=42)
+    
+    # Should get strong positive correlation
+    assert r > 0.8
+    
+    # Confidence interval should be reasonable
+    assert ci_low <= r <= ci_high
+    assert ci_high >= ci_low  # CI should be valid
+    
+    # P-value should be reasonable (between 0 and 1)
+    assert 0.0 <= p_boot <= 1.0
+    
+    # Test with insufficient data
+    r2, ci_low2, ci_high2, p2 = bootstrap_correlation_with_pvalue([1], [2])
+    assert r2 == 0.0 and ci_low2 == 0.0 and ci_high2 == 0.0 and p2 == 1.0
+    
+    print("✓ Bootstrap correlation with p-value tests passed")
+
+
 def test_benjamini_hochberg():
     """Test Benjamini-Hochberg FDR correction."""
     print("Testing Benjamini-Hochberg correction...")
@@ -260,6 +288,7 @@ def run_all_tests():
         test_gc_content_calculation()
         test_pearson_correlation()
         test_bootstrap_correlation()
+        test_bootstrap_correlation_with_pvalue()
         test_benjamini_hochberg()
         test_doench_data_loading()
         test_bin_resonance_analysis()

@@ -20,6 +20,7 @@ import math
 import cmath
 import random
 import statistics
+import argparse
 from typing import List, Tuple, Dict, Any
 
 
@@ -118,9 +119,9 @@ def pearson_correlation(x: List[float], y: List[float]) -> float:
     return numerator / denominator
 
 
-def bootstrap_correlation(x: List[float], y: List[float], n_boot: int = 1000, 
-                         seed: int = 42) -> Tuple[float, float, float]:
-    """Calculate bootstrap confidence interval for correlation coefficient.
+def bootstrap_correlation_with_pvalue(x: List[float], y: List[float], n_boot: int = 1000, 
+                                    seed: int = 42) -> Tuple[float, float, float, float]:
+    """Calculate bootstrap confidence interval and p-value for correlation coefficient.
     
     Args:
         x: First variable values
@@ -129,10 +130,10 @@ def bootstrap_correlation(x: List[float], y: List[float], n_boot: int = 1000,
         seed: Random seed for reproducibility
         
     Returns:
-        Tuple of (correlation, ci_low, ci_high)
+        Tuple of (correlation, ci_low, ci_high, p_boot)
     """
     if len(x) != len(y) or len(x) < 2:
-        return 0.0, 0.0, 0.0
+        return 0.0, 0.0, 0.0, 1.0
     
     random.seed(seed)
     n = len(x)
@@ -140,7 +141,7 @@ def bootstrap_correlation(x: List[float], y: List[float], n_boot: int = 1000,
     # Original correlation
     original_r = pearson_correlation(x, y)
     
-    # Bootstrap resampling
+    # Bootstrap resampling - single pass for both CI and p-value
     boot_correlations = []
     for _ in range(n_boot):
         # Resample with replacement
@@ -156,7 +157,30 @@ def bootstrap_correlation(x: List[float], y: List[float], n_boot: int = 1000,
     ci_low = boot_correlations[int(0.025 * n_boot)]
     ci_high = boot_correlations[int(0.975 * n_boot)]
     
-    return original_r, ci_low, ci_high
+    # Calculate p-value (proportion of bootstrap samples <= observed r)
+    # Calculate p-value (proportion of bootstrap samples >= observed r; one-tailed test for positive correlation)
+    p_boot = sum(1 for br in boot_correlations if br >= original_r) / len(boot_correlations)
+    
+    return original_r, ci_low, ci_high, p_boot
+
+
+def bootstrap_correlation(x: List[float], y: List[float], n_boot: int = 1000, 
+                         seed: int = 42) -> Tuple[float, float, float]:
+    """Calculate bootstrap confidence interval for correlation coefficient.
+    
+    Deprecated: Use bootstrap_correlation_with_pvalue for better efficiency.
+    
+    Args:
+        x: First variable values
+        y: Second variable values  
+        n_boot: Number of bootstrap samples
+        seed: Random seed for reproducibility
+        
+    Returns:
+        Tuple of (correlation, ci_low, ci_high)
+    """
+    r, ci_low, ci_high, _ = bootstrap_correlation_with_pvalue(x, y, n_boot, seed)
+    return r, ci_low, ci_high
 
 
 def benjamini_hochberg_correction(p_values: List[float], q: float = 0.10) -> List[bool]:
@@ -229,7 +253,8 @@ def load_doench_data(filepath: str = "doench_2016.csv") -> List[Dict[str, Any]]:
     return data
 
 
-def perform_bin_resonance_analysis(data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+def perform_bin_resonance_analysis(data: List[Dict[str, Any]], n_boot: int = 1000, 
+                                   seed: int = 42) -> List[Dict[str, Any]]:
     """Perform bin-resonance analysis on sgRNA efficiency data.
     
     Splits data into GC content quartiles and analyzes phase-coherence 
@@ -238,12 +263,17 @@ def perform_bin_resonance_analysis(data: List[Dict[str, Any]]) -> List[Dict[str,
     
     Args:
         data: List of sequence data with calculated features
+        n_boot: Number of bootstrap samples for confidence intervals
+        seed: Random seed for reproducibility
         
     Returns:
         List of analysis results for each GC quartile bin
     """
     if not data:
         return []
+    
+    # Set random seed for reproducibility
+    random.seed(seed)
     
     # Extract GC contents for quartile calculation
     gc_contents = [item['gc_content'] for item in data]
@@ -286,19 +316,11 @@ def perform_bin_resonance_analysis(data: List[Dict[str, Any]]) -> List[Dict[str,
         phase_coherences = [item['phase_coherence'] for item in bin_data]
         efficiencies = [item['efficiency'] for item in bin_data]
         
-        # Calculate correlation with bootstrap CI
-        r, ci_low, ci_high = bootstrap_correlation(phase_coherences, efficiencies)
+        # Calculate correlation with bootstrap CI and p-value in one pass
+        r, ci_low, ci_high, p_boot = bootstrap_correlation_with_pvalue(
+            phase_coherences, efficiencies, n_boot=n_boot, seed=seed + sum(ord(c) for c in bin_name)
+        )
         
-        # Calculate p-value (proportion of bootstrap samples <= 0)
-        boot_rs = []
-        n_samples = len(bin_data)
-        for _ in range(1000):
-            indices = [random.randint(0, n_samples - 1) for _ in range(n_samples)]
-            boot_pc = [phase_coherences[i] for i in indices]
-            boot_eff = [efficiencies[i] for i in indices]
-            boot_rs.append(pearson_correlation(boot_pc, boot_eff))
-        
-        p_boot = sum(1 for br in boot_rs if br <= r) / len(boot_rs)
         p_values.append(p_boot)
         
         results.append({
@@ -332,11 +354,12 @@ def perform_bin_resonance_analysis(data: List[Dict[str, Any]]) -> List[Dict[str,
     return results
 
 
-def sanity_check_with_shuffled_labels(data: List[Dict[str, Any]]) -> float:
+def sanity_check_with_shuffled_labels(data: List[Dict[str, Any]], seed: int = 42) -> float:
     """Perform sanity check by analyzing correlation with shuffled efficiency labels.
     
     Args:
         data: List of sequence data with calculated features
+        seed: Random seed for reproducibility
         
     Returns:
         Global correlation with shuffled labels (should be ~0)
@@ -348,7 +371,7 @@ def sanity_check_with_shuffled_labels(data: List[Dict[str, Any]]) -> float:
     efficiencies = [item['efficiency'] for item in data]
     
     # Shuffle efficiency labels
-    random.seed(42)
+    random.seed(seed)
     shuffled_efficiencies = efficiencies.copy()
     random.shuffle(shuffled_efficiencies)
     
@@ -390,12 +413,48 @@ def save_results_csv(results: List[Dict[str, Any]], filepath: str = "bin_resonan
 
 def main():
     """Main execution function for bin-resonance test."""
+    parser = argparse.ArgumentParser(
+        description="Minimal Bin-Resonance Test for Human CRISPR Efficiency",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
+    parser.add_argument(
+        "--n_boot", 
+        type=int, 
+        default=1000,
+        help="Number of bootstrap samples for confidence intervals"
+    )
+    parser.add_argument(
+        "--seed", 
+        type=int, 
+        default=42,
+        help="Random seed for reproducibility"
+    )
+    parser.add_argument(
+        "--data_file", 
+        type=str, 
+        default="doench_2016.csv",
+        help="Path to CSV file with sequence and efficiency data"
+    )
+    parser.add_argument(
+        "--output", 
+        type=str, 
+        default="bin_resonance_results.csv",
+        help="Output CSV file path"
+    )
+    
+    args = parser.parse_args()
+    
+    # Set global random seed for reproducibility
+    random.seed(args.seed)
+    
     print("Minimal Bin-Resonance Test (Human CRISPR)")
     print("=" * 50)
+    print(f"Bootstrap samples: {args.n_boot}")
+    print(f"Random seed: {args.seed}")
     
     # Load data
-    print("Loading Doench 2016 data...")
-    data = load_doench_data()
+    print(f"Loading data from {args.data_file}...")
+    data = load_doench_data(args.data_file)
     
     if not data:
         print("Error: No data loaded. Exiting.")
@@ -405,7 +464,7 @@ def main():
     
     # Perform analysis
     print("Performing bin-resonance analysis...")
-    results = perform_bin_resonance_analysis(data)
+    results = perform_bin_resonance_analysis(data, n_boot=args.n_boot, seed=args.seed)
     
     # Display results
     print("\nResults by GC Quartile:")
@@ -418,17 +477,18 @@ def main():
     
     # Sanity check
     print("\nSanity check with shuffled labels...")
-    shuffled_r = sanity_check_with_shuffled_labels(data)
+    shuffled_r = sanity_check_with_shuffled_labels(data, seed=args.seed)
     print(f"Global correlation with shuffled labels: {shuffled_r:.4f} (should be ~0)")
     
     # Save results
-    save_results_csv(results)
+    save_results_csv(results, args.output)
     
     # Overall assessment
     any_passed = any(result['passed'] for result in results)
     print(f"\nOverall result: {'PASS' if any_passed else 'FAIL'}")
     if any_passed:
-        print("At least one GC quartile shows significant positive correlation.")
+        passed_bins = [r['bin'] for r in results if r['passed']]
+        print(f"Significant bins: {', '.join(passed_bins)}")
     else:
         print("No GC quartile meets the success criteria.")
 
