@@ -318,7 +318,7 @@ def perform_bin_resonance_analysis(data: List[Dict[str, Any]], n_boot: int = 100
         
         # Calculate correlation with bootstrap CI and p-value in one pass
         r, ci_low, ci_high, p_boot = bootstrap_correlation_with_pvalue(
-            phase_coherences, efficiencies, n_boot=n_boot, seed=seed + hash(bin_name)
+            phase_coherences, efficiencies, n_boot=n_boot, seed=seed + sum(ord(c) for c in bin_name)
         )
         
         p_values.append(p_boot)
