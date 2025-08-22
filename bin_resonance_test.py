@@ -158,7 +158,8 @@ def bootstrap_correlation_with_pvalue(x: List[float], y: List[float], n_boot: in
     ci_high = boot_correlations[int(0.975 * n_boot)]
     
     # Calculate p-value (proportion of bootstrap samples <= observed r)
-    p_boot = sum(1 for br in boot_correlations if br <= original_r) / len(boot_correlations)
+    # Calculate p-value (proportion of bootstrap samples >= observed r; one-tailed test for positive correlation)
+    p_boot = sum(1 for br in boot_correlations if br >= original_r) / len(boot_correlations)
     
     return original_r, ci_low, ci_high, p_boot
 
