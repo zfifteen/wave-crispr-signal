@@ -290,7 +290,6 @@ def perform_bin_resonance_analysis(data: List[Dict[str, Any]]) -> List[Dict[str,
         r, ci_low, ci_high = bootstrap_correlation(phase_coherences, efficiencies)
         
         # Calculate p-value (proportion of bootstrap samples <= 0)
-        random.seed(42)
         boot_rs = []
         n_samples = len(bin_data)
         for _ in range(1000):
