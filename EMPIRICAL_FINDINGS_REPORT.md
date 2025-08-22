@@ -142,4 +142,19 @@ The work establishes a robust methodological framework for testing biological an
 
 ---
 
+## Pre-Registration: GC-Quartile Resonance Test (Q1–Q4)
+
+> **Study:** GC-Quartile Resonance Test (Q1–Q4)  
+> **Primary Endpoint:** Within GC-content quartiles (Q1–Q4), test correlation between phase-coherence (PC) and measured efficiency.  
+> **Effect Size:** Pearson r.  
+> **Uncertainty:** 95% bootstrap CI over paired \((x,y)\).  
+> **Significance:** Permutation test p-value (two-tailed by default; one-tailed variants allowed if explicitly stated).  
+> **Multiple Testing:** Benjamini–Hochberg FDR across 4 quartiles at α=0.05.  
+> **Decision Rule:** A quartile is significant if its FDR-adjusted p (q) ≤ 0.05 and its 95% CI excludes 0. The study is successful if ≥1 quartile is significant.  
+> **Determinism:** Fixed global seed and fixed per-bin offsets `{Q1:0,Q2:1,Q3:2,Q4:3}`.  
+> **Controls:** Negative control using shuffled `y` should not pass FDR.  
+> **Reporting:** Always report all quartiles: `n, r, 95% CI, p_perm, q_pass, bh_cutoff`.
+
+---
+
 *Analysis conducted using DiscreteZetaShift framework with geodesic resolution and comprehensive statistical validation. All code and data available in repository.*

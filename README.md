@@ -33,7 +33,31 @@ python proof_pack/run_validation.py
 python bin_resonance_test.py                    # Default: 1000 bootstrap samples
 python bin_resonance_test.py --n_boot 2000     # Custom bootstrap count
 python bin_resonance_test.py --seed 123        # Custom random seed
+
+# GC-Quartile Resonance Test (Minimal, Reproducible)
+python bin/bin_resonance_test.py --input data/doench2016.csv \
+  --output results/bin_resonance_results.csv \
+  --n_boot 4000 --n_perm 20000 --seed 42 --tail two
 ```
+
+### GC-Quartile Resonance Test (Minimal, Reproducible)
+
+Run the dependency-light resonance analysis across GC quartiles (Q1–Q4):
+
+```bash
+python bin/bin_resonance_test.py --input data/doench2016.csv \
+  --output results/bin_resonance_results.csv \
+  --n_boot 4000 --n_perm 20000 --seed 42 --tail two
+```
+
+**Output columns:** `bin, n, r, ci_low, ci_high, p_perm, q_pass, bh_cutoff`  
+- `q_pass`: `True` if BH-FDR (α=0.05) passes for this quartile.  
+- `bh_cutoff`: global BH \(p^*\) threshold for this run.
+
+**Notes:**  
+- Deterministic seeding across quartiles; results are identical across runs with same inputs and `--seed`.  
+- Use `--tail greater` if testing a one-tailed positive association per prior.  
+- For a negative control, rerun with shuffled efficiencies; expect no quartiles to pass.
 
 ## 📁 Repository Structure & Contributing
 

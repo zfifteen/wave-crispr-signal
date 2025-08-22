@@ -1,27 +1,6 @@
 #!/usr/bin/env python3
-"""
-Minimal Bin-Resonance Test for Human CRISPR Efficiency
-
-This module implements a simple spectral phase-coherence feature analysis
-for sgRNA efficiency prediction using the Z Framework methodology. The test
-examines phase-coherence correlation with on-target efficiency within
-GC-content quartile bins.
-
-Mathematical Foundation:
-- Phase-coherence: PC = (1/L) * |∑(n=1 to L) w_n * e^(2πin/L)|
-- Complex base mapping: A=1+0j, T=-1+0j, C=0+1j, G=0-1j
-- Statistical validation: Bootstrap confidence intervals with multiple testing correction
-
-Dependencies: Python stdlib only (csv, math, cmath, random, statistics)
-"""
-
-import csv
-import math
-import cmath
-import random
-import statistics
-import argparse
-from typing import List, Tuple, Dict, Any
+import csv, math, random, argparse, statistics as stats
+from typing import List, Tuple, Dict
 
 
 def complex_base_mapping(base: str) -> complex:
