@@ -429,7 +429,7 @@ def test_reproducibility_validation():
     print("Testing reproducibility validation...")
     
     # Test with the actual doench2016.csv data  
-    data_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "doench2016.csv")
+    data_path = str(Path(__file__).parent.parent / "data" / "doench2016.csv")
     
     if not os.path.exists(data_path):
         print("⚠️  doench2016.csv not found, skipping validation")
