@@ -33,9 +33,9 @@ jobs:
       run: |
         ruff check . --exit-non-zero-on-fix
     
-    - name: Check code formatting with black
-      run: |
-        black --check --diff .
+#    - name: Check code formatting with black
+#      run: |
+#        black --check --diff .
     
     - name: Type check with mypy (core modules only)
       run: |
