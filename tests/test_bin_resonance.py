@@ -9,6 +9,7 @@ for mathematical correctness and expected behavior.
 import sys
 import os
 import math
+import statistics
 
 # Add project root to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -204,7 +205,7 @@ def test_doench_data_loading():
     print("Testing Doench data loading...")
     
     # Test loading actual data file if it exists
-    data = read_data("doench_2016.csv")
+    data = read_data("data/doench_2016.csv")
     
     if data:
         # Should have loaded data

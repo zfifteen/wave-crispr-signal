@@ -17,7 +17,7 @@ def main():
     print()
     
     # Check if doench data exists
-    doench_path = "doench_2016.csv"
+    doench_path = "../data/doench_2016.csv"
     if not os.path.exists(doench_path):
         print(f"❌ Doench data not found at {doench_path}")
         print("This demo requires the Doench 2016 CRISPR efficiency dataset.")
@@ -29,7 +29,7 @@ def main():
     
     # Run the enhanced analysis
     cmd = [
-        sys.executable, "bin/bin_resonance_test.py",
+        sys.executable, "../bin/bin_resonance_test.py",
         "--input", doench_path,
         "--output", "/tmp/z_enhancement_demo.csv",
         "--n_boot", "200",  # More bootstrap samples for better precision

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import csv, math, random, argparse, statistics as stats
+from math import sqrt, erfc
 from typing import List, Tuple, Dict
 
 # ---------- Phase-coherence on DNA (A/T/C/G) ----------
@@ -134,6 +135,14 @@ def fisher_z_transform(r: float) -> float:
         return float("nan")
     return 0.5 * math.log((1 + r) / (1 - r))
 
+def _chi2_sf_wh(Q: float, df: int) -> float:
+    """Wilson-Hilferty approximation of chi-square tail (survival function)."""
+    if df <= 0:
+        return 1.0
+    z = ((Q/df)**(1/3) - (1 - 2/(9*df))) / sqrt(2/(9*df))
+    # SF = 1 - Phi(z) = 0.5 * erfc(z / sqrt(2))
+    return 0.5 * erfc(z / sqrt(2.0))
+
 def calculate_heterogeneity_stats(correlations: List[float], sample_sizes: List[int]) -> Dict[str, float]:
     """Calculate Cochran's Q and I² for heterogeneity testing."""
     # Filter out NaN correlations and corresponding sample sizes
@@ -165,19 +174,8 @@ def calculate_heterogeneity_stats(correlations: List[float], sample_sizes: List[
     # I² statistic
     I2 = max(0.0, (Q - df) / Q * 100.0) if Q > 0 else 0.0
     
-    # p-value (chi-square distribution)
-    # Using approximation: p ≈ 1 - F_chi2(Q, df) where F is CDF
-    # For large Q, p ≈ 0; for small Q, p ≈ 1
-    if Q <= df:
-        p_heterogeneity = 1.0
-    else:
-        # Rough approximation using chi-square critical values
-        # For df=3: 95% = 7.815, 99% = 11.345
-        critical_95 = 3.84 + 2.71 * max(0, df - 1)  # Approximate
-        if Q > critical_95:
-            p_heterogeneity = 0.01  # Significant heterogeneity
-        else:
-            p_heterogeneity = 0.1   # Non-significant
+    # p-value using Wilson-Hilferty approximation
+    p_heterogeneity = _chi2_sf_wh(Q, df)
     
     return {
         "Q": Q,
