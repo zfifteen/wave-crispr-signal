@@ -493,7 +493,7 @@ def test_negative_control_validation():
     print("Testing negative control validation...")
     
     # Test with the actual doench2016.csv data  
-    data_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "doench2016.csv")
+    data_path = os.path.join(PROJECT_ROOT, "data", "doench2016.csv")
     
     if not os.path.exists(data_path):
         print("⚠️  doench2016.csv not found, skipping validation")
