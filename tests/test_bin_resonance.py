@@ -165,7 +165,7 @@ def test_benjamini_hochberg():
     
     # First few should be significant, last should not
     assert len(significant) == len(p_values)
-    assert significant[0] == True  # 0.01 should be significant
+    assert significant[0]  # 0.01 should be significant
     
     # Test empty list
     assert benjamini_hochberg_correction([]) == []
