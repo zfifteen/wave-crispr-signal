@@ -28,6 +28,11 @@ python proof_pack/generate_synthetic_data.py
 
 # Full validation suite (longer runtime)
 python proof_pack/run_validation.py
+
+# CRISPR efficiency analysis with spectral phase-coherence
+python bin_resonance_test.py                    # Default: 1000 bootstrap samples
+python bin_resonance_test.py --n_boot 2000     # Custom bootstrap count
+python bin_resonance_test.py --seed 123        # Custom random seed
 ```
 
 ## 📁 Repository Structure & Contributing
