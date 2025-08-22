@@ -430,7 +430,6 @@ def test_lift_calculation():
     """Test lift@k% calculation."""
     print("Testing lift@k% calculation...")
     
-    import statistics
     
     # Test case: high PC should correlate with high efficiency for positive lift
     x = [0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.05]  # PC descending
