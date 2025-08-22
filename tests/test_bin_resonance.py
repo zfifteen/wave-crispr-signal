@@ -458,7 +458,6 @@ def test_fisher_z_transform():
     """Test Fisher z-transformation."""
     print("Testing Fisher z-transformation...")
     
-    import math
     
     # Test known values
     z_zero = fisher_z_transform(0.0)
