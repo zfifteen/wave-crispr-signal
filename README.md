@@ -45,19 +45,27 @@ python bin/bin_resonance_test.py --input data/doench2016.csv \
 Run the dependency-light resonance analysis across GC quartiles (Q1–Q4):
 
 ```bash
+# Primary analysis (two-tailed tests)
 python bin/bin_resonance_test.py --input data/doench2016.csv \
   --output results/bin_resonance_results.csv \
   --n_boot 4000 --n_perm 20000 --seed 42 --tail two
+
+# With negative control generation
+python bin/bin_resonance_test.py --input data/doench2016.csv \
+  --output results/bin_resonance_results.csv \
+  --n_boot 4000 --n_perm 20000 --seed 42 --tail two --save_control
 ```
 
-**Output columns:** `bin, n, r, ci_low, ci_high, p_perm, q_pass, bh_cutoff`  
+**Enhanced Output columns:** `bin, n, r, ci_low, ci_high, p_perm, q_pass, bh_cutoff, q1_edge, q2_edge, q3_edge`  
 - `q_pass`: `True` if BH-FDR (α=0.05) passes for this quartile.  
 - `bh_cutoff`: global BH \(p^*\) threshold for this run.
+- `q1_edge, q2_edge, q3_edge`: actual quartile boundary values for auditability.
 
 **Notes:**  
 - Deterministic seeding across quartiles; results are identical across runs with same inputs and `--seed`.  
 - Use `--tail greater` if testing a one-tailed positive association per prior.  
-- For a negative control, rerun with shuffled efficiencies; expect no quartiles to pass.
+- Use `--save_control` to generate negative control with shuffled efficiencies (saved as `*_control.csv`).
+- All quartile edges are recorded in CSV for complete auditability and reproducibility.
 
 ## 📁 Repository Structure & Contributing
 

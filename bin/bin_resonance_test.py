@@ -98,7 +98,7 @@ def quartile_edges(values: List[float]) -> Tuple[float,float,float]:
     q3 = vs[int(0.75*(len(vs)-1))]
     return q1, q2, q3
 
-def run(path: str, n_boot=2000, n_perm=10000, seed=42, tail="two", out=None):
+def run(path: str, n_boot=2000, n_perm=10000, seed=42, tail="two", out=None, save_control=False):
     data = read_data(path)
     if not data: 
         raise SystemExit("No valid rows found. Need columns: sequence, efficiency")
@@ -138,11 +138,13 @@ def run(path: str, n_boot=2000, n_perm=10000, seed=42, tail="two", out=None):
         pvals.append(p)
 
     passed, cutoff = bh_fdr(pvals, alpha=0.05)
-    header = ["bin","n","r","ci_low","ci_high","p_perm","q_pass","bh_cutoff"]
+    # Updated header to include quartile edges for auditability
+    header = ["bin","n","r","ci_low","ci_high","p_perm","q_pass","bh_cutoff","q1_edge","q2_edge","q3_edge"]
 
     # Print table
     print("\nGC-quartile resonance test (bootstrap CI + permutation p, BH-FDR @ α=0.05)")
     print(f"Input: {path} | n_boot={n_boot} n_perm={n_perm} seed={seed} tail={tail}")
+    print(f"Quartile edges: Q1≤{q1:.4f}, Q2≤{q2:.4f}, Q3≤{q3:.4f}, Q4>{q3:.4f}")
     print("{:>3} {:>5} {:>8} {:>10} {:>10} {:>10} {:>7}".format("bin","n","r","ci_low","ci_high","p_perm","q_pass"))
     for (bn,n,r,lo,hi,p), ok in zip(results, passed):
         print("{:>3} {:>5} {:>8.4f} {:>10.4f} {:>10.4f} {:>10.4g} {:>7}".format(bn,n,r,lo,hi,p,str(ok)))
@@ -154,7 +156,53 @@ def run(path: str, n_boot=2000, n_perm=10000, seed=42, tail="two", out=None):
             w = csv.writer(f)
             w.writerow(header)
             for (bn,n,r,lo,hi,p), ok in zip(results, passed):
-                w.writerow([bn,n,r,lo,hi,p, ok, cutoff])
+                w.writerow([bn,n,r,lo,hi,p, ok, cutoff, q1, q2, q3])
+
+    # Optional negative control (shuffled efficiencies)
+    if save_control and out:
+        control_path = out.replace('.csv', '_control.csv')
+        print(f"\nGenerating negative control with shuffled efficiencies: {control_path}")
+        
+        # Shuffle efficiency values for negative control
+        control_ys = ys[:]
+        control_rnd = random.Random(seed + 1000)  # Different seed for control
+        control_rnd.shuffle(control_ys)
+        
+        # Re-run analysis with shuffled efficiencies
+        control_grouped = {f"Q{i}":[[],[]] for i in range(1,5)}
+        for pc,gc,y in zip(pcs,gcs,control_ys):
+            if math.isnan(pc) or math.isnan(gc) or math.isnan(y): 
+                continue
+            if gc <= q1:        control_grouped["Q1"][0].append(pc); control_grouped["Q1"][1].append(y)
+            elif gc <= q2:      control_grouped["Q2"][0].append(pc); control_grouped["Q2"][1].append(y)
+            elif gc <= q3:      control_grouped["Q3"][0].append(pc); control_grouped["Q3"][1].append(y)
+            else:               control_grouped["Q4"][0].append(pc); control_grouped["Q4"][1].append(y)
+
+        control_results = []
+        control_pvals = []
+        for bn in ["Q1","Q2","Q3","Q4"]:
+            x, y = control_grouped[bn]
+            n = len(x)
+            if n < 10:
+                control_results.append((bn, n, float("nan"), float("nan"), float("nan"), float("nan")))
+                control_pvals.append(1.0)
+                continue
+            r = pearson_r(x,y)
+            ci_lo, ci_hi = bootstrap_ci_r(x, y, n_boot=n_boot, seed=seed + 1100 + bin_seed_offset[bn])
+            p = permutation_pvalue(x, y, r, n_perm=n_perm, seed=seed + 1200 + bin_seed_offset[bn], tail=tail)
+            control_results.append((bn, n, r, ci_lo, ci_hi, p))
+            control_pvals.append(p)
+
+        control_passed, control_cutoff = bh_fdr(control_pvals, alpha=0.05)
+        
+        # Save control results
+        with open(control_path, "w", newline="") as f:
+            w = csv.writer(f)
+            w.writerow(header)
+            for (bn,n,r,lo,hi,p), ok in zip(control_results, control_passed):
+                w.writerow([bn,n,r,lo,hi,p, ok, control_cutoff, q1, q2, q3])
+        
+        print(f"Control analysis saved: {control_path}")
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="Q1–Q4 resonance test with bootstrap CI, permutation p, BH-FDR.")
@@ -164,5 +212,6 @@ if __name__ == "__main__":
     ap.add_argument("--n_perm", type=int, default=10000)
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--tail", choices=["two","greater","less"], default="two")
+    ap.add_argument("--save_control", action="store_true", help="Generate and save negative control with shuffled efficiencies")
     args = ap.parse_args()
-    run(args.input, n_boot=args.n_boot, n_perm=args.n_perm, seed=args.seed, tail=args.tail, out=(args.output or None))
+    run(args.input, n_boot=args.n_boot, n_perm=args.n_perm, seed=args.seed, tail=args.tail, out=(args.output or None), save_control=args.save_control)

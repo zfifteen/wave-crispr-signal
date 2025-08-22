@@ -252,13 +252,13 @@ def test_deterministic_output():
         # Capture output from first run
         f1 = io.StringIO()
         with redirect_stdout(f1):
-            run(temp_file, n_boot=100, n_perm=100, seed=42, tail="two")
+            run(temp_file, n_boot=100, n_perm=100, seed=42, tail="two", save_control=False)
         output1 = f1.getvalue()
         
         # Capture output from second run
         f2 = io.StringIO()
         with redirect_stdout(f2):
-            run(temp_file, n_boot=100, n_perm=100, seed=42, tail="two")
+            run(temp_file, n_boot=100, n_perm=100, seed=42, tail="two", save_control=False)
         output2 = f2.getvalue()
         
         # Outputs should be identical
@@ -270,6 +270,154 @@ def test_deterministic_output():
         os.unlink(temp_file)
     
     print("✓ Deterministic output tests passed")
+
+
+def test_csv_output_with_quartile_edges():
+    """Test CSV output includes quartile edges for auditability."""
+    print("Testing CSV output with quartile edges...")
+    
+    import tempfile
+    import csv
+    
+    # Create test dataset with varying GC content
+    test_data = [
+        ("AAAAAAAAAAAAAAAA", 0.1),  # Low GC
+        ("ATATATATATATATAT", 0.2),  # Low GC
+        ("ATCGATCGATCGATCG", 0.5),  # Medium GC
+        ("GCGCGCGCGCGCGCGC", 0.8),  # High GC
+        ("GGGGGGGGGGGGGGGG", 0.9),  # High GC
+        ("CCCCCCCCCCCCCCCC", 0.7),  # High GC
+        ("TTTTGGGGCCCCAAAA", 0.6),  # Medium GC
+        ("AAATTTCCCGGGAAAA", 0.3),  # Medium GC
+    ]
+    
+    # Write to temporary file
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
+        writer = csv.writer(f)
+        writer.writerow(['sequence', 'efficiency'])
+        writer.writerows(test_data)
+        temp_file = f.name
+    
+    # Create temporary output file
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
+        output_file = f.name
+    
+    try:
+        # Run analysis with CSV output
+        run(temp_file, n_boot=50, n_perm=50, seed=42, tail="two", out=output_file, save_control=False)
+        
+        # Read and verify CSV output
+        with open(output_file, 'r') as f:
+            reader = csv.reader(f)
+            header = next(reader)
+            rows = list(reader)
+        
+        # Check that new columns are present
+        assert "q1_edge" in header
+        assert "q2_edge" in header
+        assert "q3_edge" in header
+        
+        # Check that data has the right number of columns
+        expected_cols = len(header)
+        for row in rows:
+            assert len(row) == expected_cols
+        
+        # Check that quartile edges are consistent across rows
+        q1_values = set(row[header.index("q1_edge")] for row in rows)
+        q2_values = set(row[header.index("q2_edge")] for row in rows)
+        q3_values = set(row[header.index("q3_edge")] for row in rows)
+        
+        # All rows should have the same quartile edges
+        assert len(q1_values) == 1
+        assert len(q2_values) == 1  
+        assert len(q3_values) == 1
+        
+    finally:
+        # Clean up
+        import os
+        os.unlink(temp_file)
+        os.unlink(output_file)
+    
+    print("✓ CSV output with quartile edges tests passed")
+
+
+def test_negative_control_generation():
+    """Test negative control generation with --save_control flag."""
+    print("Testing negative control generation...")
+    
+    import tempfile
+    import csv
+    import os
+    
+    # Create test dataset
+    test_data = [
+        ("AAAAAAAAAAAAAAAA", 0.1),
+        ("ATATATATATATATAT", 0.2),
+        ("ATCGATCGATCGATCG", 0.5),
+        ("GCGCGCGCGCGCGCGC", 0.8),
+        ("GGGGGGGGGGGGGGGG", 0.9),
+        ("CCCCCCCCCCCCCCCC", 0.7),
+        ("TTTTGGGGCCCCAAAA", 0.6),
+        ("AAATTTCCCGGGAAAA", 0.3),
+    ]
+    
+    # Write to temporary file
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
+        writer = csv.writer(f)
+        writer.writerow(['sequence', 'efficiency'])
+        writer.writerows(test_data)
+        temp_file = f.name
+    
+    # Create temporary output file
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
+        output_file = f.name
+    
+    try:
+        # Run analysis with control generation
+        run(temp_file, n_boot=50, n_perm=50, seed=42, tail="two", out=output_file, save_control=True)
+        
+        # Check that both files were created
+        assert os.path.exists(output_file), "Primary output file should exist"
+        
+        control_file = output_file.replace('.csv', '_control.csv')
+        assert os.path.exists(control_file), "Control output file should exist"
+        
+        # Read both files and verify they have the same structure
+        with open(output_file, 'r') as f:
+            primary_reader = csv.reader(f)
+            primary_header = next(primary_reader)
+            primary_rows = list(primary_reader)
+        
+        with open(control_file, 'r') as f:
+            control_reader = csv.reader(f)
+            control_header = next(control_reader)
+            control_rows = list(control_reader)
+        
+        # Headers should be identical
+        assert primary_header == control_header
+        
+        # Should have same number of rows (same quartile structure)
+        assert len(primary_rows) == len(control_rows)
+        
+        # Quartile edges should be the same (same input sequences)
+        q1_idx = primary_header.index("q1_edge")
+        q2_idx = primary_header.index("q2_edge") 
+        q3_idx = primary_header.index("q3_edge")
+        
+        for p_row, c_row in zip(primary_rows, control_rows):
+            assert p_row[q1_idx] == c_row[q1_idx]
+            assert p_row[q2_idx] == c_row[q2_idx]
+            assert p_row[q3_idx] == c_row[q3_idx]
+        
+        # Clean up control file
+        os.unlink(control_file)
+        
+    finally:
+        # Clean up
+        os.unlink(temp_file)
+        os.unlink(output_file)
+    
+    print("✓ Negative control generation tests passed")
 
 
 def run_all_tests():
@@ -287,6 +435,8 @@ def run_all_tests():
         test_benjamini_hochberg()
         test_doench_data_loading()
         test_deterministic_output()
+        test_csv_output_with_quartile_edges()
+        test_negative_control_generation()
         
         print("\n" + "=" * 40)
         print("🎉 ALL TESTS PASSED!")
