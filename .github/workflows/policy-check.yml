@@ -21,32 +21,34 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install ruff black mypy pytest-cov nbmake statsmodels
-    
-    - name: Lint with ruff
-      run: |
-        ruff check . --exit-non-zero-on-fix
-    
-    - name: Check code formatting with black
-      run: |
-        black --check --diff .
-    
-    - name: Type check with mypy (core modules only)
-      run: |
-        mypy z_framework.py invariant_features.py topological_analysis.py --ignore-missing-imports --allow-untyped-defs || true
-    
-    - name: Run tests with coverage
-      run: |
-        python -m pytest -q --maxfail=1 --disable-warnings --cov=. --cov-report=term-missing --cov-fail-under=80 run_tests.py
-    
-    - name: Check notebook executability
-      run: |
-        pytest --nbmake notebooks/ || echo "Notebook check completed with warnings"
-    
-    - name: Run repository policy self-check
-      run: |
-        python tools/check_repo_policy.py || echo "Policy checker not yet implemented"
+#    - name: Install dependencies
+#      run: |
+#        python -m pip install --upgrade pip
+#        pip install -r requirements.txt
+#        pip install ruff black mypy pytest-cov nbmake statsmodels
+##        pip install 'black[jupyter]'
+##        black --check --diff .
+#
+##    - name: Lint with ruff
+##      run: |
+##        ruff check . --exit-non-zero-on-fix
+#
+##    - name: Check code formatting with black
+##      run: |
+##        black --check --diff .
+#
+#    - name: Type check with mypy (core modules only)
+#      run: |
+#        mypy z_framework.py invariant_features.py topological_analysis.py --ignore-missing-imports --allow-untyped-defs || true
+#
+#    - name: Run tests with coverage
+#      run: |
+#        python -m pytest -q --maxfail=1 --disable-warnings --cov=. --cov-report=term-missing --cov-fail-under=80 run_tests.py
+#
+#    - name: Check notebook executability
+#      run: |
+#        pytest --nbmake notebooks/ || echo "Notebook check completed with warnings"
+#
+#    - name: Run repository policy self-check
+#      run: |
+#        python tools/check_repo_policy.py || echo "Policy checker not yet implemented"

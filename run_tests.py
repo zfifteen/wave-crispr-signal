@@ -48,6 +48,7 @@ def main():
         ("Z Framework Core", "tests/test_z_framework.py"),
         ("Invariant Features", "tests/test_invariant_features.py"),
         ("Geodesic Bridge", "tests/test_geodesic_bridge.py"),
+        ("Bin-Resonance Test", "tests/test_bin_resonance.py"),
     ]
 
     results = []
