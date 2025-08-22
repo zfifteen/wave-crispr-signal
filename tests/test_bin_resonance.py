@@ -8,6 +8,7 @@ for mathematical correctness and expected behavior.
 
 import sys
 import os
+import math
 
 # Add project root to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -25,6 +26,11 @@ from bin_resonance_test import (
     bh_fdr,
     read_data,
     quartile_edges,
+    calculate_gc_midpoints,
+    calculate_lift_at_k,
+    bootstrap_lift_ci,
+    fisher_z_transform,
+    calculate_heterogeneity_stats,
     run
 )
 
@@ -420,6 +426,192 @@ def test_negative_control_generation():
     print("✓ Negative control generation tests passed")
 
 
+def test_lift_calculation():
+    """Test lift@k% calculation."""
+    print("Testing lift@k% calculation...")
+    
+    import statistics
+    
+    # Test case: high PC should correlate with high efficiency for positive lift
+    x = [0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.05]  # PC descending
+    y = [0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.05]  # Eff matching
+    
+    lift10 = calculate_lift_at_k(x, y, 10.0)  # Top 10% = 1 guide
+    lift20 = calculate_lift_at_k(x, y, 20.0)  # Top 20% = 2 guides
+    
+    # Top 10% mean = 0.9, overall mean = 0.5, lift = 0.9/0.5 - 1 = 0.8
+    expected_lift10 = (0.9 / statistics.mean(y)) - 1
+    assert abs(lift10 - expected_lift10) < 0.01
+    
+    # Top 20% mean = (0.9 + 0.8)/2 = 0.85, lift = 0.85/0.5 - 1 = 0.7  
+    expected_lift20 = (statistics.mean([0.9, 0.8]) / statistics.mean(y)) - 1
+    assert abs(lift20 - expected_lift20) < 0.01
+    
+    # Test empty case
+    lift_empty = calculate_lift_at_k([], [], 10.0)
+    assert math.isnan(lift_empty)
+    
+    print("✓ Lift@k% calculation tests passed")
+
+
+def test_fisher_z_transform():
+    """Test Fisher z-transformation."""
+    print("Testing Fisher z-transformation...")
+    
+    import math
+    
+    # Test known values
+    z_zero = fisher_z_transform(0.0)
+    assert abs(z_zero) < 1e-10
+    
+    # Fisher z of 0.5 should be about 0.549
+    z_half = fisher_z_transform(0.5)
+    expected = 0.5 * math.log(1.5 / 0.5)  # 0.5 * ln(3) ≈ 0.549
+    assert abs(z_half - expected) < 0.01
+    
+    # Test edge cases
+    z_nan = fisher_z_transform(float("nan"))
+    assert math.isnan(z_nan)
+    
+    z_one = fisher_z_transform(1.0)
+    assert math.isnan(z_one)  # Should be NaN at |r| = 1
+    
+    print("✓ Fisher z-transformation tests passed")
+
+
+def test_heterogeneity_stats():
+    """Test heterogeneity statistics calculation."""
+    print("Testing heterogeneity statistics...")
+    
+    # Test with no heterogeneity (similar correlations)
+    correlations = [0.5, 0.52, 0.48, 0.51]
+    sample_sizes = [50, 60, 55, 45]
+    
+    stats_result = calculate_heterogeneity_stats(correlations, sample_sizes)
+    
+    # Should have low Q and I² for homogeneous correlations
+    assert not math.isnan(stats_result["Q"])
+    assert not math.isnan(stats_result["I2"])
+    assert stats_result["df"] == 3
+    
+    # Test with high heterogeneity
+    het_correlations = [0.8, -0.2, 0.1, 0.7]
+    het_stats = calculate_heterogeneity_stats(het_correlations, sample_sizes)
+    
+    # Should have higher Q for heterogeneous correlations
+    assert het_stats["Q"] > stats_result["Q"]
+    
+    # Test edge cases
+    empty_stats = calculate_heterogeneity_stats([], [])
+    assert math.isnan(empty_stats["Q"])
+    
+    single_stats = calculate_heterogeneity_stats([0.5], [50])
+    assert math.isnan(single_stats["Q"])  # Need at least 2 for heterogeneity test
+    
+    print("✓ Heterogeneity statistics tests passed")
+
+
+def test_gc_midpoints():
+    """Test GC midpoint calculation."""
+    print("Testing GC midpoint calculation...")
+    
+    # Test with known quartile edges
+    gc_values = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+    q1, q2, q3 = 0.25, 0.5, 0.75
+    
+    midpoints = calculate_gc_midpoints(q1, q2, q3, gc_values)
+    
+    # Q1: values ≤ 0.25 -> [0.1, 0.2] -> midpoint 0.15
+    # Q2: values 0.25 < x ≤ 0.5 -> [0.3, 0.4, 0.5] -> midpoint 0.4
+    # Q3: values 0.5 < x ≤ 0.75 -> [0.6, 0.7] -> midpoint 0.65
+    # Q4: values > 0.75 -> [0.8, 0.9, 1.0] -> midpoint 0.9
+    
+    assert len(midpoints) == 4
+    assert abs(midpoints[0] - 0.15) < 0.01  # Q1
+    assert abs(midpoints[1] - 0.4) < 0.01   # Q2  
+    assert abs(midpoints[2] - 0.65) < 0.01  # Q3
+    assert abs(midpoints[3] - 0.9) < 0.01   # Q4
+    
+    print("✓ GC midpoint calculation tests passed")
+
+
+def test_enhanced_csv_output():
+    """Test CSV output includes all new enhancement metrics."""
+    print("Testing enhanced CSV output...")
+    
+    import tempfile
+    import csv
+    
+    # Create test dataset with sufficient data
+    test_data = []
+    for i in range(20):
+        # Create sequences with varying GC content and some correlation structure
+        gc = i / 19.0  # GC from 0 to 1
+        if gc < 0.3:
+            seq_base = "AAATTTAAATTTAAAT"
+            eff = 0.2 + 0.3 * (i % 3)  # Some variation
+        elif gc < 0.6:
+            seq_base = "ATCGATCGATCGATCG"
+            eff = 0.4 + 0.2 * (i % 4)
+        else:
+            seq_base = "GGCCGGCCGGCCGGCC"
+            eff = 0.6 + 0.3 * (i % 3)
+        
+        test_data.append((seq_base, eff))
+    
+    # Write to temporary file
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
+        writer = csv.writer(f)
+        writer.writerow(['sequence', 'efficiency'])
+        writer.writerows(test_data)
+        temp_file = f.name
+    
+    # Create temporary output file
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
+        output_file = f.name
+    
+    try:
+        # Run analysis with CSV output
+        run(temp_file, n_boot=20, n_perm=20, seed=42, tail="two", out=output_file, save_control=False)
+        
+        # Read and verify CSV output
+        with open(output_file, 'r') as f:
+            reader = csv.reader(f)
+            header = next(reader)
+            rows = list(reader)
+        
+        # Check that new columns are present
+        required_cols = [
+            "lift_top10", "lift10_ci_low", "lift10_ci_high",
+            "lift_top20", "lift20_ci_low", "lift20_ci_high", 
+            "gc_midpoint", "Fisher_Q", "I2", "p_heterogeneity"
+        ]
+        
+        for col in required_cols:
+            assert col in header, f"Missing column: {col}"
+        
+        # Check that data has the right number of columns
+        expected_cols = len(header)
+        for row in rows:
+            assert len(row) == expected_cols
+        
+        # Check that heterogeneity stats are consistent across rows
+        q_values = set(row[header.index("Fisher_Q")] for row in rows)
+        i2_values = set(row[header.index("I2")] for row in rows)
+        
+        # All rows should have the same heterogeneity statistics
+        assert len(q_values) == 1
+        assert len(i2_values) == 1
+        
+    finally:
+        # Clean up
+        import os
+        os.unlink(temp_file)
+        os.unlink(output_file)
+    
+    print("✓ Enhanced CSV output tests passed")
+
+
 def run_all_tests():
     """Run all tests for bin-resonance module."""
     print("Bin-Resonance Test Suite")
@@ -437,6 +629,13 @@ def run_all_tests():
         test_deterministic_output()
         test_csv_output_with_quartile_edges()
         test_negative_control_generation()
+        
+        # New Z-style enhancement tests
+        test_lift_calculation()
+        test_fisher_z_transform()
+        test_heterogeneity_stats()
+        test_gc_midpoints()
+        test_enhanced_csv_output()
         
         print("\n" + "=" * 40)
         print("🎉 ALL TESTS PASSED!")
