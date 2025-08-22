@@ -471,7 +471,11 @@ def test_reproducibility_validation():
         
         assert abs(r_q2 - expected_r) < tolerance_r, f"Q2 correlation {r_q2} not close to expected {expected_r}"
         assert abs(ci_low_q2 - expected_ci_low) < tolerance_ci, f"Q2 CI low {ci_low_q2} not close to expected {expected_ci_low}"
-        assert abs(ci_high_q2 - expected_ci_high) < tolerance_ci, f"Q2 CI high {ci_high_q2} not close to expected {expected_ci_high}"
+        # Use module-level constants for tolerances
+        
+        assert abs(r_q2 - expected_r) < TOLERANCE_R, f"Q2 correlation {r_q2} not close to expected {expected_r}"
+        assert abs(ci_low_q2 - expected_ci_low) < TOLERANCE_CI, f"Q2 CI low {ci_low_q2} not close to expected {expected_ci_low}"
+        assert abs(ci_high_q2 - expected_ci_high) < TOLERANCE_CI, f"Q2 CI high {ci_high_q2} not close to expected {expected_ci_high}"
         assert p_perm_q2 <= expected_p_threshold, f"Q2 permutation p-value {p_perm_q2} not <= {expected_p_threshold}"
         assert q_pass_q2, "Q2 should pass BH-FDR correction"
         
