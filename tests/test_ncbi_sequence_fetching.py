@@ -87,7 +87,11 @@ class TestNCBISequenceFetching(unittest.TestCase):
         print("\n--- Testing Mock NCBI Sequence Fetching ---")
         
         # Create mock sequence data
-        mock_sequence = "ATGCTGCGGAGACCTGGAGAGAAAGCAGTGGCCGGGGCAGTGGGAGGAGGAGGAGCTGGAAGAGGAGAGAAAGGAGGAGCTGCAGGAGGAGAGGAGGAGGAGGGAGAGGAGGAGCTGGAGCTGAAGCTGGAGCTGGAGCTGGAGAGGAGAGAGGG"
+        mock_sequence = (
+            "ATGCTGCGGAGACCTGGAGAGAAAGCAGTGGCCGGGGCAGTGGGAGGAGGAGGAGCTGGAAG"
+            "AGGAGAGAAAGGAGGAGCTGCAGGAGGAGAGGAGGAGGAGGGAGAGGAGGAGCTGGAGCTGA"
+            "AGCTGGAGCTGGAGCTGGAGAGGAGAGAGGG"
+        )
         mock_record = SeqRecord(
             Seq(mock_sequence),
             id="test_id",
