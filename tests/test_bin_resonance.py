@@ -8,9 +8,6 @@ for mathematical correctness and expected behavior.
 
 import sys
 import os
-import math
-import tempfile
-import csv
 
 # Add project root to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
