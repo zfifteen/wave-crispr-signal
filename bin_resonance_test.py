@@ -299,7 +299,7 @@ def perform_bin_resonance_analysis(data: List[Dict[str, Any]]) -> List[Dict[str,
             boot_eff = [efficiencies[i] for i in indices]
             boot_rs.append(pearson_correlation(boot_pc, boot_eff))
         
-        p_boot = sum(1 for br in boot_rs if br <= 0) / len(boot_rs)
+        p_boot = sum(1 for br in boot_rs if br <= r) / len(boot_rs)
         p_values.append(p_boot)
         
         results.append({
