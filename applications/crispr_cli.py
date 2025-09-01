@@ -8,16 +8,20 @@ using signal-theoretic DNA analysis.
 import argparse
 import sys
 import json
+import numpy as np
+import mpmath as mp
 from typing import List, Dict, Optional
 
 try:
     from .crispr_guide_designer import CRISPRGuideDesigner
+    from .crispr_physical_z_metrics import PhysicalZMetricsCalculator
 except ImportError:
     # Handle relative import for direct execution
     import sys
 
     sys.path.append(".")
     from crispr_guide_designer import CRISPRGuideDesigner
+    from crispr_physical_z_metrics import PhysicalZMetricsCalculator
 
 
 def read_fasta(filepath: str) -> Dict[str, str]:
@@ -52,6 +56,19 @@ def read_fasta(filepath: str) -> Dict[str, str]:
     return sequences
 
 
+def json_serializer(obj):
+    """Custom JSON serializer for numpy and mpmath types."""
+    if isinstance(obj, np.integer):
+        return int(obj)
+    elif isinstance(obj, np.floating):
+        return float(obj)
+    elif isinstance(obj, np.ndarray):
+        return obj.tolist()
+    elif isinstance(obj, mp.mpf):
+        return float(obj)
+    raise TypeError(f"Object of type {type(obj)} is not JSON serializable")
+
+
 def write_output(
     results: List[Dict], output_file: Optional[str] = None, format: str = "json"
 ):
@@ -64,7 +81,7 @@ def write_output(
         format: Output format ('json', 'csv', 'tsv')
     """
     if format == "json":
-        output = json.dumps(results, indent=2)
+        output = json.dumps(results, indent=2, default=json_serializer)
     elif format == "csv":
         output = format_csv(results)
     elif format == "tsv":
@@ -95,6 +112,11 @@ def format_csv(results: List[Dict]) -> str:
         "nhej_prob",
         "mmej_prob",
         "hdr_eff",
+        "z_opening",
+        "z_stacking", 
+        "z_twist",
+        "z_melting",
+        "z_mean"
     ]
 
     lines = [",".join(headers)]
@@ -102,6 +124,22 @@ def format_csv(results: List[Dict]) -> str:
     for result in results:
         for guide in result.get("guides", []):
             repair = guide.get("repair_outcomes", {})
+            z_metrics = guide.get("physical_z_metrics", {})
+            
+            # Extract Z-metrics if available
+            z_opening = ""
+            z_stacking = ""
+            z_twist = ""
+            z_melting = ""
+            z_mean = ""
+            
+            if z_metrics:
+                z_opening = f"{z_metrics.get('opening_kinetics', {}).get('z_opening', '')}"
+                z_stacking = f"{z_metrics.get('stacking_dissociation', {}).get('z_stacking', '')}"
+                z_twist = f"{z_metrics.get('twist_fluctuation', {}).get('z_twist', '')}"
+                z_melting = f"{z_metrics.get('melting_kinetics', {}).get('z_melting', '')}"
+                z_mean = f"{z_metrics.get('summary', {}).get('z_mean', '')}"
+            
             row = [
                 result["sequence_name"],
                 guide["sequence"],
@@ -112,6 +150,11 @@ def format_csv(results: List[Dict]) -> str:
                 f"{repair.get('nhej_probability', 0):.3f}",
                 f"{repair.get('mmej_probability', 0):.3f}",
                 f"{repair.get('hdr_efficiency', 0):.3f}",
+                z_opening,
+                z_stacking,
+                z_twist, 
+                z_melting,
+                z_mean
             ]
             lines.append(",".join(row))
 
@@ -126,10 +169,20 @@ def format_tsv(results: List[Dict]) -> str:
 def design_guides_command(args):
     """Handle guide design command."""
     designer = CRISPRGuideDesigner(pam_pattern=args.pam, guide_length=args.length)
+    
+    # Initialize physical Z-metrics calculator if requested
+    z_metrics_calc = None
+    if args.physical_z_metrics:
+        z_metrics_calc = PhysicalZMetricsCalculator()
 
     # Read input sequences
     if args.input.endswith(".fa") or args.input.endswith(".fasta"):
-        sequences = read_fasta(args.input)
+        try:
+            from crispr_physical_z_metrics import read_fasta_with_validation
+            sequences = read_fasta_with_validation(args.input)
+        except Exception as e:
+            print(f"Warning: FASTA validation failed: {e}", file=sys.stderr)
+            sequences = read_fasta(args.input)
     else:
         # Treat as raw sequence
         sequences = {"input_sequence": args.input.upper()}
@@ -156,6 +209,17 @@ def design_guides_command(args):
                     guide["sequence"], context_seq
                 )
                 guide["repair_outcomes"] = repair
+        
+        # Add physical Z-metrics if requested
+        if args.physical_z_metrics and z_metrics_calc:
+            for guide in guides:
+                try:
+                    z_metrics = z_metrics_calc.calculate_all_physical_z_metrics(
+                        guide["sequence"], seq_name, validate=not args.skip_validation
+                    )
+                    guide["physical_z_metrics"] = z_metrics
+                except Exception as e:
+                    print(f"Warning: Z-metrics calculation failed for guide {guide['sequence']}: {e}", file=sys.stderr)
 
         results.append(
             {
@@ -166,7 +230,7 @@ def design_guides_command(args):
         )
 
     # Write output
-    write_output(results, args.output, args.format)
+    write_output(results, args.output, getattr(args, 'format', 'json'))
 
 
 def score_guide_command(args):
@@ -295,6 +359,18 @@ Examples:
     )
     design_parser.add_argument(
         "--predict-repair", action="store_true", help="Predict repair outcomes"
+    )
+    design_parser.add_argument(
+        "--physical-z-metrics", action="store_true", 
+        help="Calculate physical Z-metrics (opening kinetics, stacking dissociation, etc.)"
+    )
+    design_parser.add_argument(
+        "--skip-validation", action="store_true",
+        help="Skip human DNA validation (use with caution)"
+    )
+    design_parser.add_argument(
+        "--format", "-f", choices=["json", "csv", "tsv"], default="json",
+        help="Output format (default: json)"
     )
 
     # Score command
