@@ -14,14 +14,14 @@ from typing import List, Dict, Optional
 
 try:
     from .crispr_guide_designer import CRISPRGuideDesigner
-    from .crispr_physical_z_metrics import PhysicalZMetricsCalculator
+    from .crispr_physical_z_metrics import PhysicalZMetricsCalculator, read_fasta_with_validation
 except ImportError:
     # Handle relative import for direct execution
     import sys
 
     sys.path.append(".")
     from crispr_guide_designer import CRISPRGuideDesigner
-    from crispr_physical_z_metrics import PhysicalZMetricsCalculator
+    from crispr_physical_z_metrics import PhysicalZMetricsCalculator, read_fasta_with_validation
 
 
 def read_fasta(filepath: str) -> Dict[str, str]:
@@ -177,12 +177,10 @@ def design_guides_command(args):
 
     # Read input sequences
     if args.input.endswith(".fa") or args.input.endswith(".fasta"):
-        try:
-            from crispr_physical_z_metrics import read_fasta_with_validation
-            sequences = read_fasta_with_validation(args.input)
-        except Exception as e:
-            print(f"Warning: FASTA validation failed: {e}", file=sys.stderr)
+        if args.skip_validation:
             sequences = read_fasta(args.input)
+        else:
+            sequences = read_fasta_with_validation(args.input)
     else:
         # Treat as raw sequence
         sequences = {"input_sequence": args.input.upper()}
