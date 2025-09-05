@@ -71,7 +71,8 @@ def create_ref_alt_sequences(ref_window: str, snp_position: Optional[int] = None
     current_allele = ref_window[snp_position]
     
     # Choose an alternative allele (different from current)
-    allele_map = {"A": "G", "T": "C", "G": "A", "C": "T"}
+    # Use biologically realistic complementary base pairs for substitution (A↔T, G↔C)
+    allele_map = {"A": "T", "T": "A", "G": "C", "C": "G"}
     alt_allele = allele_map.get(current_allele, "A")
     
     # Create ALT sequence by substituting at the position
