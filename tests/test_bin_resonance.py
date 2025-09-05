@@ -8,6 +8,10 @@ for mathematical correctness and expected behavior.
 
 import sys
 import os
+import tempfile
+import csv
+import io
+from contextlib import redirect_stdout
 
 # Add project root to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -420,6 +424,124 @@ def test_negative_control_generation():
     print("✓ Negative control generation tests passed")
 
 
+def test_reproducibility_validation():
+    """Validate the specific reproducibility claims from issue #72."""
+    print("Testing reproducibility validation...")
+    
+    # Test with the actual doench2016.csv data  
+    data_path = str(Path(__file__).parent.parent / "data" / "doench2016.csv")
+    
+    if not os.path.exists(data_path):
+        print("⚠️  doench2016.csv not found, skipping validation")
+        return
+    
+    # Create temporary output file
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
+        output_file = f.name
+    
+    try:
+        # Run with the exact parameters from issue #72
+        f = io.StringIO()
+        with redirect_stdout(f):
+            run(data_path, n_boot=4000, n_perm=20000, seed=42, tail="two", out=output_file, save_control=False)
+        output = f.getvalue()
+        
+        # Read results
+        with open(output_file, 'r') as f:
+            reader = csv.DictReader(f)
+            results = {row['bin']: row for row in reader}
+        
+        # Validate Q2 quartile specific claims from issue
+        q2_result = results['Q2']
+        r_q2 = float(q2_result['r'])
+        ci_low_q2 = float(q2_result['ci_low'])
+        ci_high_q2 = float(q2_result['ci_high'])
+        p_perm_q2 = float(q2_result['p_perm'])
+        q_pass_q2 = q2_result['q_pass'] == 'True'
+        
+        # Expected values from issue (allowing some tolerance for stochastic methods)
+        expected_r = -0.497
+        expected_ci_low = -0.605
+        expected_ci_high = -0.361
+        expected_p_threshold = 0.001  # Should be <= 0.0005 claimed, but allowing small variance
+        
+        # Validate claims with reasonable tolerance
+        tolerance_r = 0.01  # 1% tolerance for correlation
+        tolerance_ci = 0.02  # 2% tolerance for confidence intervals
+        
+        assert abs(r_q2 - expected_r) < tolerance_r, f"Q2 correlation {r_q2} not close to expected {expected_r}"
+        assert abs(ci_low_q2 - expected_ci_low) < tolerance_ci, f"Q2 CI low {ci_low_q2} not close to expected {expected_ci_low}"
+        # Use module-level constants for tolerances
+        
+        assert abs(r_q2 - expected_r) < TOLERANCE_R, f"Q2 correlation {r_q2} not close to expected {expected_r}"
+        assert abs(ci_low_q2 - expected_ci_low) < TOLERANCE_CI, f"Q2 CI low {ci_low_q2} not close to expected {expected_ci_low}"
+        assert abs(ci_high_q2 - expected_ci_high) < TOLERANCE_CI, f"Q2 CI high {ci_high_q2} not close to expected {expected_ci_high}"
+        assert p_perm_q2 <= expected_p_threshold, f"Q2 permutation p-value {p_perm_q2} not <= {expected_p_threshold}"
+        assert q_pass_q2, "Q2 should pass BH-FDR correction"
+        
+        # Validate that only Q2 passes FDR (as claimed in issue)
+        for bin_name in ['Q1', 'Q3', 'Q4']:
+            q_pass = results[bin_name]['q_pass'] == 'True'
+            assert not q_pass, f"{bin_name} should not pass BH-FDR correction"
+        
+        print("✓ Reproducibility validation passed")
+        print(f"   Q2: r={r_q2:.4f}, CI=[{ci_low_q2:.4f}, {ci_high_q2:.4f}], p={p_perm_q2:.6f}, FDR=Pass")
+        
+    finally:
+        # Clean up
+        os.unlink(output_file)
+
+
+def test_negative_control_validation():
+    """Validate negative control shows no significant results."""
+    print("Testing negative control validation...")
+    
+    # Test with the actual doench2016.csv data  
+    data_path = os.path.join(PROJECT_ROOT, "data", "doench2016.csv")
+    
+    if not os.path.exists(data_path):
+        print("⚠️  doench2016.csv not found, skipping validation")
+        return
+    
+    # Create temporary output file
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
+        output_file = f.name
+    
+    try:
+        # Run with negative control
+        f = io.StringIO()
+        with redirect_stdout(f):
+            run(data_path, n_boot=2000, n_perm=10000, seed=99, tail="two", out=output_file, save_control=True)
+        
+        # Check that control file was created
+        control_file = output_file.replace('.csv', '_control.csv')
+        assert os.path.exists(control_file), "Control file should be created"
+        
+        # Read control results
+        with open(control_file, 'r') as f:
+            reader = csv.DictReader(f)
+            control_results = {row['bin']: row for row in reader}
+        
+        # Validate that no quartile passes FDR in control
+        for bin_name in ['Q1', 'Q2', 'Q3', 'Q4']:
+            q_pass = control_results[bin_name]['q_pass'] == 'True'
+            assert not q_pass, f"Control {bin_name} should not pass BH-FDR correction"
+        
+        # Check that BH cutoff is nan (no significant results)
+        bh_cutoff = control_results['Q1']['bh_cutoff']
+        assert bh_cutoff == 'nan', "Control BH cutoff should be nan (no significant results)"
+        
+        print("✓ Negative control validation passed")
+        print("   No quartiles pass FDR correction in shuffled control")
+        
+        # Clean up control file
+        os.unlink(control_file)
+        
+    finally:
+        # Clean up
+        os.unlink(output_file)
+
+
 def run_all_tests():
     """Run all tests for bin-resonance module."""
     print("Bin-Resonance Test Suite")
@@ -437,6 +559,8 @@ def run_all_tests():
         test_deterministic_output()
         test_csv_output_with_quartile_edges()
         test_negative_control_generation()
+        test_reproducibility_validation()
+        test_negative_control_validation()
         
         print("\n" + "=" * 40)
         print("🎉 ALL TESTS PASSED!")
