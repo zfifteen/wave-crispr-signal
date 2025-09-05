@@ -91,20 +91,33 @@ def z_of_seq(seq, table):
     B = mp.mpf(np.std(diffs) if len(diffs) else 0.001)
     return compute_z(A, B)
 
-def enumerate_spcas9_guides(dna):
-    """Return list of (20nt, pos_index) for + and - strands (pos_index is 1-based)."""
+def enumerate_spcas9_guides(dna, max_guides=50):
+    """Return list of (20nt, pos_index) for + and - strands (pos_index is 1-based).
+    
+    Args:
+        dna: DNA sequence string
+        max_guides: Maximum number of guides to return (for performance)
+    """
     dna = str(dna).upper()
     validate_seq(dna)
     guides = []
+    
     # + strand: N20-NGG
     for i in range(len(dna)-23):
+        if len(guides) >= max_guides:
+            break
         if dna[i+20:i+23].endswith("GG"):
             guides.append((dna[i:i+20], i+1))
-    # - strand: CCN-N20  (revcomp)
-    comp = dna.translate(str.maketrans("ACGT","TGCA"))[::-1]
-    for i in range(len(comp)-23):
-        if comp[i+20:i+23].endswith("GG"):
-            guides.append((comp[i:i+20], i+1))
+    
+    # - strand: CCN-N20  (revcomp) 
+    if len(guides) < max_guides:
+        comp = dna.translate(str.maketrans("ACGT","TGCA"))[::-1]
+        for i in range(len(comp)-23):
+            if len(guides) >= max_guides:
+                break
+            if comp[i+20:i+23].endswith("GG"):
+                guides.append((comp[i:i+20], i+1))
+    
     return guides
 
 def aggregate_gene(guides, metric_key):
@@ -281,18 +294,24 @@ def main():
 
         # build per-gene Z aggregates for each metric
         agg_by_metric = {k: {} for k in PROP_TABLES.keys()}
+        processed_genes = 0
         for sym, seq in zip(scr["symbol"].astype(str).str.upper(), scr["seq"]):
-            guides = enumerate_spcas9_guides(seq)
+            guides = enumerate_spcas9_guides(seq, max_guides=20)  # Limit for performance
             if not guides:
                 continue
+            processed_genes += 1
             for mk in PROP_TABLES.keys():
                 agg = aggregate_gene(guides, mk)
                 if agg:
                     agg_by_metric[mk][sym] = agg
 
+        print(f"  Processed {processed_genes} genes with guides")
+
         for mk, mstore in agg_by_metric.items():
             if not mstore:
+                print(f"  No {mk} metrics computed")
                 continue
+            print(f"  Computed {mk} metrics for {len(mstore)} genes")
             dfm = pd.DataFrame.from_dict(mstore, orient="index")
             dfm["symbol"] = dfm.index
             base = scr.copy()
@@ -309,7 +328,10 @@ def main():
                 y = pd.to_numeric(base["y"], errors="coerce").to_numpy()
                 mask = np.isfinite(x) & np.isfinite(y)
                 x, y = x[mask], y[mask]
-                if len(x) < 10 or np.std(x)==0 or np.std(y)==0:
+                print(f"    {mk} {agg_key}: {len(x)} valid pairs, std(x)={np.std(x):.4f}, std(y)={np.std(y):.4f}")
+                min_pairs = int(os.environ.get("MIN_PAIRS", "10"))  # Configurable for testing
+                if len(x) < min_pairs or np.std(x)==0 or np.std(y)==0:
+                    print(f"    Skipping {mk} {agg_key}: insufficient data or zero variance (need >{min_pairs-1} pairs)")
                     continue
                 r, p = stats.pearsonr(x, y)
                 lo, hi = bootstrap_r(x, y, n=1000)

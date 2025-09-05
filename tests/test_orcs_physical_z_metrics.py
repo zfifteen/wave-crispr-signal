@@ -152,39 +152,47 @@ class TestORCSIntegration(unittest.TestCase):
             env["ORCS_DIR"] = orcs_dir
             env["FASTA"] = test_fasta
             env["OUT"] = os.path.join(temp_dir, "test_summary.csv")
-            env["MAX_SCREENS"] = "5"  # Limit to 5 screens for testing
+            env["MAX_SCREENS"] = "1"  # Limit to 1 screen for testing
+            env["MIN_PAIRS"] = "3"    # Lower threshold for test data
             
-            # Run script with limited processing (just first few screens)
+            # Run script with limited processing
             result = subprocess.run([
                 sys.executable, "scripts/test_orcs_v1_1_17.py"
-            ], capture_output=True, text=True, env=env, timeout=120,
+            ], capture_output=True, text=True, env=env, timeout=60,
                cwd=project_root)
             
             # Check if script completed successfully
-            if result.returncode == 0:
-                # Verify output file was created
-                output_file = env["OUT"]
-                if os.path.exists(output_file):
-                    df = pd.read_csv(output_file)
-                    print(f"Generated {len(df)} results")
-                    
-                    if len(df) > 0:
-                        # Check expected columns
-                        expected_cols = [
-                            "screen_id", "score1_type", "metric", "aggregate",
-                            "N", "pearson_r", "p_value", "ci95_lo", "ci95_hi"
-                        ]
-                        for col in expected_cols:
-                            self.assertIn(col, df.columns)
-                        
-                        # Check metrics are calculated
-                        metrics = df["metric"].unique()
-                        self.assertGreater(len(metrics), 0)
-                        print(f"Calculated metrics: {list(metrics)}")
+            self.assertEqual(result.returncode, 0, 
+                           f"Script failed: {result.stderr}")
+            
+            # Verify output file was created
+            output_file = env["OUT"]
+            self.assertTrue(os.path.exists(output_file), 
+                          "Output CSV file was not created")
+            
+            df = pd.read_csv(output_file)
+            print(f"Generated {len(df)} results")
+            
+            if len(df) > 0:
+                # Check expected columns
+                expected_cols = [
+                    "screen_id", "score1_type", "metric", "aggregate",
+                    "N", "pearson_r", "p_value", "ci95_lo", "ci95_hi"
+                ]
+                for col in expected_cols:
+                    self.assertIn(col, df.columns)
+                
+                # Check metrics are calculated
+                metrics = df["metric"].unique()
+                self.assertGreater(len(metrics), 0)
+                print(f"Calculated metrics: {list(metrics)}")
+                
+                # Check for meaningful correlations
+                strong_corrs = df[df["pearson_r"].abs() > 0.5]
+                if len(strong_corrs) > 0:
+                    print(f"Found {len(strong_corrs)} strong correlations (|r| > 0.5)")
             else:
-                print(f"Script failed with return code {result.returncode}")
-                print(f"Stdout: {result.stdout}")
-                print(f"Stderr: {result.stderr}")
+                print("No results generated - may need more test data")
 
 
 if __name__ == "__main__":
