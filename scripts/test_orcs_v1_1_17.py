@@ -175,7 +175,14 @@ def load_orcs_index(orcs_dir):
 def select_screens(idx):
     """Select qualifying screens from ORCS index."""
     # Column positions based on actual index format (0-based):
-    SCREEN_ID = 0; ORG_OFF = 34; ENZ = 23; LIBTYPE = 21; SCTYPE = 14; THR = 12; COUNT = 27; SCORE1_TYPE = 28
+    SCREEN_ID = 0
+    ORG_OFF = 34
+    ENZ = 23
+    LIBTYPE = 21
+    SCTYPE = 14
+    THR = 12
+    COUNT = 27
+    SCORE1_TYPE = 28
     
     # Convert columns to string and handle NaN values
     org_col = idx[ORG_OFF].fillna("").astype(str)
