@@ -25,7 +25,7 @@
     - **Discrete/biological (DEFAULT)**: `Z = A(B / e^2)`; guard divide-by-zero; document A and B.
     <!-- Physical domain constraint removed: not applicable to CRISPR/biological analysis. -->
     <!-- Only the discrete/biological domain is supported. -->
-- **Geometric resolution**: θ′(n,k) = φ·((n mod φ)/φ)^k (where φ is the geometric period, e.g., φ = 21 for 21-nt guides; see Z Framework documentation) with default `k ≈ 0.3`. Document any deviation.
+- **Geometric resolution**: θ′(n,k) = φ·((n mod φ)/φ)^k (where φ is the geometric period, e.g., φ = 21 for 21-nt guides; see [docs/Z_FRAMEWORK.md#geometric-resolution](docs/Z_FRAMEWORK.md#geometric-resolution)) with default `k ≈ 0.3`. Document any deviation.
 
 ---
 
