@@ -49,6 +49,7 @@ def main():
         ("Invariant Features", "tests/test_invariant_features.py"),
         ("Geodesic Bridge", "tests/test_geodesic_bridge.py"),
         ("Bin-Resonance Test", "tests/test_bin_resonance.py"),
+        ("ORCS Physical Z-Metrics", "tests/test_orcs_physical_z_metrics.py"),
     ]
 
     results = []
