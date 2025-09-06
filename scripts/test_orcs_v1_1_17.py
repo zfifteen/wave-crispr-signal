@@ -207,7 +207,7 @@ def load_screen_rows(orcs_dir, screen_id):
     rows = []
     for f in glob.glob(os.path.join(orcs_dir, "*.screen.tab.txt")):
         df = pd.read_csv(f, sep="\t", comment="#", header=None, dtype=str)
-        df = df[df[1-1]==screen_id]
+        df = df[df[0]==screen_id]
         if not df.empty:
             rows.append(df)
     if not rows:
