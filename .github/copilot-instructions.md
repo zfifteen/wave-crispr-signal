@@ -24,7 +24,7 @@
     - **Discrete/biological (DEFAULT)**: `Z = A(B / e^2)`; guard divide-by-zero; document A and B.
     - **Physical**: `Z = A(B / c)` with `c = 299,792,458 m/s`; **raise** `ValueError` if `|B| ≥ c`; document units.  
       Provide `--domain {discrete,physical}` (default `discrete`).
-- **Geometric resolution**: θ′(n,k) = φ·((n mod φ)/φ)^k with default `k ≈ 0.3`. Document any deviation.
+- **Geometric resolution**: θ′(n,k) = φ·((n mod φ)/φ)^k (where φ is the geometric period, e.g., φ = 21 for 21-nt guides; see Z Framework documentation) with default `k ≈ 0.3`. Document any deviation.
 
 ---
 
