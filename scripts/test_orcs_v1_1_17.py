@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 """
-ORCS v1.1.17 Physical Z-Metrics Testing Script
+ORCS v1.1.17 Discrete Biological Z-Metrics Testing Script
 
-Tests four physical Z-metrics (base-pair opening, base-stacking dissociation, 
+Tests four discrete biological Z-metrics (base-pair opening, base-stacking dissociation, 
 helical-twist fluctuation, denaturation/melting proxy) on real human CRISPR 
 screen outcomes from BioGRID-ORCS 1.1.17.
+
+Uses discrete/biological Z-form: Z = A * (B / c) with c = e² ≈ 7.389
+where A is sequence-dependent mean and B is rate of change between adjacent bases.
 
 Requirements: Python 3.12, numpy, scipy, biopython, mpmath (dps=50), pandas
 Inputs:
@@ -30,17 +33,22 @@ import mpmath as mp
 from scipy import stats
 from pathlib import Path
 import sys
+import argparse
+import random
+import hashlib
+import subprocess
 
 # Add project root to path for imports
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
 from z_framework import ZFrameworkCalculator
-from applications.crispr_physical_z_metrics import (
-    PhysicalZMetricsCalculator,
-    validate_human_dna_sequence,
-    DNAValidationError
-)
+# Temporarily disable import that requires many dependencies
+# from applications.crispr_physical_z_metrics import (
+#     PhysicalZMetricsCalculator,
+#     validate_human_dna_sequence,
+#     DNAValidationError
+# )
 
 # Configure high precision
 mp.mp.dps = 50
@@ -54,10 +62,10 @@ def validate_seq(s):
     return s
 
 def compute_z(A, B, c=C_E2):
-    """Compute Z-metric with causality check."""
+    """Compute discrete biological Z-metric with domain validation."""
     B = mp.fabs(B)
     if B >= c:
-        raise ValueError(f"Causality violation: |B| >= c (B={B})")
+        raise ValueError(f"Domain violation: |B| >= c in discrete domain (B={B})")
     return A * (B / c)
 
 # Golden ratio and geodesic resolution
@@ -69,7 +77,7 @@ def theta_prime(n, k=KSTAR, phi=phi):
     n = mp.mpf(n)
     return phi * ((n % phi) / phi) ** k
 
-# === Physical per-base tables (deterministic; replace with your calibrated set) ===
+# === Discrete biological per-base tables (deterministic; replace with your calibrated set) ===
 HBONDS = {'A':2,'C':3,'G':3,'T':2,'N':2}
 STACK  = {'A':-1.0,'C':-1.5,'G':-2.0,'T':-0.6,'N':-1.0}
 TWIST  = {'A':34.5,'C':34.0,'G':36.0,'T':35.5,'N':35.0}
@@ -83,7 +91,7 @@ PROP_TABLES = {
 }
 
 def z_of_seq(seq, table):
-    """Calculate Z-metric for sequence using property table."""
+    """Calculate discrete biological Z-metric for sequence using property table."""
     # A = mean property; B = std of adjacent differences
     props = [table[b] for b in seq]
     A = mp.mpf(np.mean(props))
@@ -138,9 +146,12 @@ def aggregate_gene(guides, metric_key):
         "var": float(np.var(z_arr))
     }
 
-def bootstrap_r(x, y, n=1000):
+def bootstrap_r(x, y, n=1000, seed=None):
     """Bootstrap confidence intervals for Pearson correlation."""
-    rng = np.random.default_rng(42)
+    if seed is not None:
+        rng = np.random.default_rng(seed)
+    else:
+        rng = np.random.default_rng(42)
     idx = np.arange(len(x))
     corrs = []
     for _ in range(n):
@@ -152,7 +163,103 @@ def bootstrap_r(x, y, n=1000):
     lo, hi = np.percentile(corrs, [2.5, 97.5])
     return float(lo), float(hi)
 
+def permutation_test(x, y, n_permutations=1000, seed=None):
+    """Permutation test for correlation significance."""
+    if seed is not None:
+        rng = np.random.default_rng(seed)
+    else:
+        rng = np.random.default_rng()
+    
+    # Observed correlation
+    observed_r, _ = stats.pearsonr(x, y)
+    
+    # Permutation correlations
+    null_corrs = []
+    for _ in range(n_permutations):
+        y_shuffled = rng.permutation(y)
+        if np.std(x) > 0 and np.std(y_shuffled) > 0:
+            r, _ = stats.pearsonr(x, y_shuffled)
+            null_corrs.append(r)
+    
+    if not null_corrs:
+        return 1.0  # No valid permutations
+    
+    # Two-tailed p-value
+    null_corrs = np.array(null_corrs)
+    p_value = np.mean(np.abs(null_corrs) >= np.abs(observed_r))
+    return float(p_value)
+
+def partial_correlation(x, y, z):
+    """Calculate partial correlation between x and y controlling for z."""
+    try:
+        # Convert to numpy arrays
+        x, y, z = np.array(x), np.array(y), np.array(z)
+        
+        # Check for valid data
+        mask = np.isfinite(x) & np.isfinite(y) & np.isfinite(z)
+        if mask.sum() < 3:  # Need at least 3 points
+            return np.nan, np.nan
+        
+        x, y, z = x[mask], y[mask], z[mask]
+        
+        # Check for zero variance
+        if np.std(x) == 0 or np.std(y) == 0 or np.std(z) == 0:
+            return np.nan, np.nan
+        
+        # Calculate partial correlation
+        rxy, _ = stats.pearsonr(x, y)
+        rxz, _ = stats.pearsonr(x, z)
+        ryz, _ = stats.pearsonr(y, z)
+        
+        numerator = rxy - rxz * ryz
+        denominator = np.sqrt((1 - rxz**2) * (1 - ryz**2))
+        
+        if denominator == 0:
+            return np.nan, np.nan
+        
+        partial_r = numerator / denominator
+        
+        # Calculate p-value using t-distribution
+        n = len(x)
+        if n <= 3:
+            return partial_r, np.nan
+        
+        t_stat = partial_r * np.sqrt((n - 3) / (1 - partial_r**2))
+        p_value = 2 * (1 - stats.t.cdf(np.abs(t_stat), n - 3))
+        
+        return float(partial_r), float(p_value)
+    except:
+        return np.nan, np.nan
+
 def cohen_d(x, y):
+    """Cohen's d effect size between two groups."""
+    # x,y are arrays for Hit=YES vs NO on Z aggregate
+    nx, ny = len(x), len(y)
+    if nx < 1 or ny < 1:
+        return np.nan
+    vx, vy = np.var(x, ddof=1), np.var(y, ddof=1)
+    pooled_std = np.sqrt(((nx-1)*vx + (ny-1)*vy) / (nx+ny-2))
+    if pooled_std == 0:
+        return np.nan
+    return float((np.mean(x) - np.mean(y)) / pooled_std)
+
+def calculate_gc_content(seq):
+    """Calculate GC content of a DNA sequence."""
+    if not seq:
+        return 0.0
+    gc_count = seq.count('G') + seq.count('C')
+    return gc_count / len(seq)
+
+def get_git_commit_hash():
+    """Get current git commit hash for reproducibility."""
+    try:
+        result = subprocess.run(['git', 'rev-parse', 'HEAD'], 
+                              capture_output=True, text=True, timeout=5)
+        if result.returncode == 0:
+            return result.stdout.strip()[:7]  # Short hash
+    except:
+        pass
+    return "unknown"
     """Cohen's d effect size between two groups."""
     # x,y are arrays for Hit=YES vs NO on Z aggregate
     nx, ny = len(x), len(y)
@@ -254,10 +361,53 @@ def seqs_by_symbol_from_fasta(fasta_path):
 
 def main():
     """Main execution function."""
-    ORCS_DIR = os.environ.get("ORCS_DIR","data/BIOGRID-ORCS-ALL-homo_sapiens-1.1.17.screens")
-    FASTA = os.environ.get("FASTA", "data/hg38_cdna.fasta.gz")  # must be human DNA
-    out_csv = os.environ.get("OUT", "results/orcs_v1.1.17/summary.csv")
-    max_screens = int(os.environ.get("MAX_SCREENS", "0"))  # 0 = no limit
+    parser = argparse.ArgumentParser(description='ORCS v1.1.17 Discrete Biological Z-Metrics Testing')
+    parser.add_argument('--orcs-dir', default=None, 
+                       help='ORCS data directory (default: ORCS_DIR env var)')
+    parser.add_argument('--fasta', default=None,
+                       help='Human DNA sequences FASTA file (default: FASTA env var)')
+    parser.add_argument('--output', default=None,
+                       help='Output CSV file (default: OUT env var)')
+    parser.add_argument('--max-screens', type=int, default=0,
+                       help='Maximum screens to process (0=no limit)')
+    parser.add_argument('--min-pairs', type=int, default=10,
+                       help='Minimum gene pairs for correlation analysis')
+    parser.add_argument('--seed', type=int, default=None,
+                       help='Random seed for reproducibility')
+    parser.add_argument('--bootstrap', type=int, default=1000,
+                       help='Number of bootstrap samples for confidence intervals')
+    parser.add_argument('--domain', choices=['discrete', 'biological'], default='discrete',
+                       help='Z-metrics domain (default: discrete)')
+    
+    args = parser.parse_args()
+    
+    # Set random seed for reproducibility
+    if args.seed is not None:
+        np.random.seed(args.seed)
+        random.seed(args.seed)
+        print(f"Random seed set to: {args.seed}")
+    
+    # Get configuration from args or environment variables
+    ORCS_DIR = args.orcs_dir or os.environ.get("ORCS_DIR","data/BIOGRID-ORCS-ALL-homo_sapiens-1.1.17.screens")
+    FASTA = args.fasta or os.environ.get("FASTA", "data/hg38_cdna.fasta.gz")  # must be human DNA
+    out_csv = args.output or os.environ.get("OUT", "results/orcs_v1.1.17/summary.csv")
+    max_screens = args.max_screens or int(os.environ.get("MAX_SCREENS", "0"))  # 0 = no limit
+    min_pairs = args.min_pairs or int(os.environ.get("MIN_PAIRS", "10"))
+    
+    # Print configuration header
+    commit_hash = get_git_commit_hash()
+    print(f"ORCS Discrete Biological Z-Metrics Testing")
+    print(f"==========================================")
+    print(f"Version: {commit_hash}")
+    print(f"Seed: {args.seed}")
+    print(f"Bootstrap samples: {args.bootstrap}")
+    print(f"Domain: {args.domain}")
+    print(f"ORCS directory: {ORCS_DIR}")
+    print(f"FASTA file: {FASTA}")
+    print(f"Output: {out_csv}")
+    print(f"Max screens: {max_screens if max_screens > 0 else 'unlimited'}")
+    print(f"Min pairs: {min_pairs}")
+    print()
     
     # Ensure output directory exists
     os.makedirs(os.path.dirname(out_csv), exist_ok=True)
@@ -335,25 +485,50 @@ def main():
                 y = pd.to_numeric(base["y"], errors="coerce").to_numpy()
                 mask = np.isfinite(x) & np.isfinite(y)
                 x, y = x[mask], y[mask]
+                
+                # Calculate GC content and guide length for control variables
+                sequences = base.loc[mask, "seq"].tolist()
+                gc_content = np.array([calculate_gc_content(seq) for seq in sequences])
+                guide_lengths = np.array([len(seq) for seq in sequences])
+                
                 print(f"    {mk} {agg_key}: {len(x)} valid pairs, std(x)={np.std(x):.4f}, std(y)={np.std(y):.4f}")
-                min_pairs = int(os.environ.get("MIN_PAIRS", "10"))  # Configurable for testing
                 if len(x) < min_pairs or np.std(x)==0 or np.std(y)==0:
                     print(f"    Skipping {mk} {agg_key}: insufficient data or zero variance (need >{min_pairs-1} pairs)")
                     continue
+                    
+                # Basic correlation
                 r, p = stats.pearsonr(x, y)
-                lo, hi = bootstrap_r(x, y, n=1000)
+                lo, hi = bootstrap_r(x, y, n=args.bootstrap, seed=args.seed)
+                
+                # Permutation test
+                perm_p = permutation_test(x, y, n_permutations=1000, seed=args.seed)
+                
+                # Partial correlations controlling for GC content and guide length
+                partial_r_gc, partial_p_gc = partial_correlation(x, y, gc_content)
+                partial_r_len, partial_p_len = partial_correlation(x, y, guide_lengths)
+                
                 # Cohen's d on Z aggregate split by ORCS Hit
                 hits = base.loc[mask, "hit"].astype(str).str.upper()=="YES"
                 d = cohen_d(x[hits], x[~hits]) if hits.any() and (~hits).any() else np.nan
-                records.append({
+                
+                record = {
                     "screen_id": sid, "score1_type": stype,
                     "metric": mk, "aggregate": agg_key,
                     "N": int(len(x)),
                     "pearson_r": float(r), "p_value": float(p),
                     "ci95_lo": lo, "ci95_hi": hi,
+                    "permutation_p": perm_p,
+                    "partial_r_gc": partial_r_gc, "partial_p_gc": partial_p_gc,
+                    "partial_r_length": partial_r_len, "partial_p_length": partial_p_len,
                     "var_Z": float(np.var(pd.to_numeric(base["mean"], errors="coerce").to_numpy())),
-                    "cohens_d_hit_vs_non": d
-                })
+                    "cohens_d_hit_vs_non": d,
+                    "mean_gc_content": float(np.mean(gc_content)),
+                    "mean_guide_length": float(np.mean(guide_lengths)),
+                    "seed": args.seed,
+                    "bootstrap_n": args.bootstrap,
+                    "commit_hash": commit_hash
+                }
+                records.append(record)
 
     # Save results
     results_df = pd.DataFrame.from_records(records)
