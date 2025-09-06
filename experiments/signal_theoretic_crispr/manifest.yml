@@ -37,11 +37,6 @@ datasets:
       type: "on_target_efficiency"
       organism: "homo_sapiens"
       validation_required: true
-    - name: "biogrid_orcs"
-      path: "data/BIOGRID-ORCS-ALL-homo-sapiens-1.1.17.screens"
-      type: "gene_level_screens"
-      organism: "homo_sapiens"
-      version: "1.1.17"
   reference:
     - name: "hg38"
       path: "data/get_hg38/"
