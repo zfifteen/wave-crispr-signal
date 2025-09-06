@@ -1,14 +1,14 @@
 """
-Wave-CRISPR Physical Z-Metrics Implementation
+Wave-CRISPR Discrete Biological Z-Metrics Implementation
 
-This module implements four sequence-derivable physical Z-metrics for Wave-CRISPR:
+This module implements four sequence-derivable discrete biological Z-metrics for Wave-CRISPR:
 1. Base-pair opening kinetics
 2. Base stacking dissociation  
 3. Helical twist fluctuation rate
 4. Denaturation/melting kinetics near Tm
 
-Uses the physical Z form: Z = A * (B / c) with c = e² ≈ 7.389
-where A is frame-dependent and B is a rate of change.
+Uses the discrete biological Z form: Z = A * (B / c) with c = e² ≈ 7.389
+where A is sequence-dependent mean and B is a rate of change between adjacent bases.
 """
 
 import mpmath as mp
@@ -21,7 +21,7 @@ import logging
 # Configure high precision
 mp.dps = 50
 
-# Physical constants
+# Discrete biological constants
 E_SQUARED = mp.e ** 2  # c = e² ≈ 7.389
 BOLTZMANN_KB = mp.mpf('1.380649e-23')  # J/K
 ROOM_TEMP = mp.mpf('298.15')  # K
