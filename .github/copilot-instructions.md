@@ -75,3 +75,5 @@
 ## 7) Refusal Policy (what Copilot must do if a gate can’t be met)
 If any gate cannot be satisfied, respond with:
 
+## 8) Human Genome Data (hg38)
+For experiments requiring the human genome reference (hg38), refer to the instructions in `data/get_hg38/get_hg38_README.md`. This document explains how to use the `get_hg38.sh` script to download, verify, and structure the necessary FASTA files and annotations.
