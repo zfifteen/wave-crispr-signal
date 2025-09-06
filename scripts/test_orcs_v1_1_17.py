@@ -254,13 +254,6 @@ def get_git_commit_hash():
     except:
         pass
     return "unknown"
-    """Cohen's d effect size between two groups."""
-    # x,y are arrays for Hit=YES vs NO on Z aggregate
-    nx, ny = len(x), len(y)
-    sx2, sy2 = np.var(x, ddof=1), np.var(y, ddof=1)
-    sp = math.sqrt(((nx-1)*sx2 + (ny-1)*sy2) / (nx+ny-2)) if (nx+ny-2)>0 else 0.0
-    return float((np.mean(x)-np.mean(y)) / sp) if sp>0 else 0.0
-
 def load_orcs_index(orcs_dir):
     """Load ORCS index files."""
     idx_files = glob.glob(os.path.join(orcs_dir, "*index.tab.txt"))
