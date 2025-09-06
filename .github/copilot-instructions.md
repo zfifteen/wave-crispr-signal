@@ -17,7 +17,8 @@
 
 ## 1) Absolute Scientific Gates (no exceptions)
 - **Human DNA only**: Use **human nucleotide FASTA** (GRCh38/hg38 or curated CRISPR sets).  
-  Validate **A/C/G/T/N only** (case-insensitive). **Reject** `U` and IUPAC ambiguity codes beyond `N`.
+  For **DNA sequences**: Validate **A/C/G/T/N only** (case-insensitive). **Reject** `U` and IUPAC ambiguity codes beyond `N`.  
+  For **RNA sequences** (e.g., guide RNA, sgRNA): Validate **A/C/G/U/N only** (case-insensitive). **Reject** `T` and IUPAC ambiguity codes beyond `N`.
 - **No fabrication**: Never derive DNA from protein/RNA or fabricate nucleotides.
 - **Fail-fast validation**: Start every pipeline with nucleotide-only checks; raise clear `ValueError` on violation.
 - **Z invariants (domain-correct)**
