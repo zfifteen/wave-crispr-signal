@@ -514,7 +514,7 @@ def main():
                     "permutation_p": perm_p,
                     "partial_r_gc": partial_r_gc, "partial_p_gc": partial_p_gc,
                     "partial_r_length": partial_r_len, "partial_p_length": partial_p_len,
-                    "var_Z": float(np.var(pd.to_numeric(base["mean"], errors="coerce").to_numpy())),
+                    "var_Z": float(np.var(x)),
                     "cohens_d_hit_vs_non": d,
                     "mean_gc_content": float(np.mean(gc_content)),
                     "mean_guide_length": float(np.mean(guide_lengths)),
