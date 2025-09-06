@@ -214,7 +214,7 @@ def load_screen_rows(orcs_dir, screen_id):
         return None
     screen = pd.concat(rows, ignore_index=True)
     # Keep Official Symbol (4), Hit (13), Score.1 (8)
-    screen = screen.loc[:, [4-1, 13-1, 8-1]].rename(columns={4-1:"symbol",13-1:"hit",8-1:"score1"})
+    screen = screen.loc[:, [3, 12, 7]].rename(columns={3:"symbol", 12:"hit", 7:"score1"})
     return screen
 
 def seqs_by_symbol_from_fasta(fasta_path):
