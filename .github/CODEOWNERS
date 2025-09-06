@@ -2,24 +2,24 @@
 # Ensures human review for critical structural changes
 
 # Core GitHub configuration and policies
-.github/* @zfifteen
+.github/* @zfifteen Dionisio Alberto Lopez III
 
 # Documentation requiring review
-docs/ @zfifteen
-*.md @zfifteen
+docs/ @zfifteen Dionisio Alberto Lopez III
+*.md @zfifteen Dionisio Alberto Lopez III
 
 # Core scientific modules (root level)
-z_framework.py @zfifteen
-topological_analysis.py @zfifteen
-invariant_features.py @zfifteen
-molecular_dynamics_framework.py @zfifteen
-*_validation.py @zfifteen
+z_framework.py @zfifteen Dionisio Alberto Lopez III
+topological_analysis.py @zfifteen Dionisio Alberto Lopez III
+invariant_features.py @zfifteen Dionisio Alberto Lopez III
+molecular_dynamics_framework.py @zfifteen Dionisio Alberto Lopez III
+*_validation.py @zfifteen Dionisio Alberto Lopez III
 
 # Repository structure enforcement
-.github/REPOSITORY_POLICY.md @zfifteen
-.github/copilot-instructions.yml @zfifteen
-tools/check_repo_policy.py @zfifteen
+.github/REPOSITORY_POLICY.md @zfifteen Dionisio Alberto Lopez III
+.github/copilot-instructions.yml @zfifteen Dionisio Alberto Lopez III
+tools/check_repo_policy.py @zfifteen Dionisio Alberto Lopez III
 
 # Critical configuration files
-requirements.txt @zfifteen
-.pre-commit-config.yaml @zfifteen
+requirements.txt @zfifteen Dionisio Alberto Lopez III
+.pre-commit-config.yaml @zfifteen Dionisio Alberto Lopez III

@@ -1,62 +1,78 @@
-# Z Framework Guidelines for Code Generation & Repository Structure Compliance
+# Z Framework — Copilot Repository Instructions (wave-crispr-signal)
 
-## MANDATORY: Repository Policy Compliance
-**CRITICAL**: ALWAYS follow `.github/REPOSITORY_POLICY.md` for ALL file creation, organization, and naming.
-
-Key policy requirements
-- Directory Structure: Respect established patterns (`applications/`, `docs/`, `proof_pack/`, etc.).
-- File Naming:
-  - Python modules: `snake_case.py`
-  - Major documents: `UPPERCASE.md`
-  - Other assets: `kebab-case` (where appropriate)
-- Core Modules: Place mathematical/scientific modules at repository root for direct import.
-- Documentation: Every public component must have corresponding documentation.
-- Testing: All core modules require test files, executable via `run_tests.py`.
-- Dependencies: Use exact version pinning in `requirements.txt`.
+> Purpose: Steer Copilot so it **only** creates experiment designs and code that pass our scientific gates and repo policy.
 
 ---
 
-## Z Framework Core Principles
+## 0) Repository Policy (MANDATORY)
+**Always** follow `.github/REPOSITORY_POLICY.md` for file layout, naming, tests, and version pinning.
 
-Core Principle  
-• Normalize observations via `Z = A(B/c)`; where `A` is frame-dependent, `B` is a rate/shift, and `c` is an invariant (speed of light or `e²`).
-
-1. Empirical Validation First
-   - Include reproducible tests (use `mpmath` with precision < 1e-16).
-   - Label hypotheses clearly when unverified.
-
-2. Domain-Specific Forms
-   - Physical: `Z = T(v/c)` with causality checks and explicit error handling (raise `ValueError` for `|v| ≥ c`).
-   - Discrete: `Z = n(Δₙ/Δₘₐₓ)`, `κ(n) = d(n)·ln(n+1)/e²`; guard against division by zero.
-
-3. Geometric Resolution
-   - Use `θ′(n,k) = φ · ((n mod φ)/φ)^k` with `k ≈ 0.3` for prime-density mapping.
-
-4. Style & Tone
-   - Precise, scientific; prefer simple solutions and document any deviations.
-
-5. Tools & Datasets
-   - Use `mpmath`, `numpy`, `sympy`.
-   - Cross-check predictions against provided datasets (e.g., `zeta_zeros.csv`, true prime counts, `Z5D_Reference_Impl-2.ipynb`).
+- **Dirs**: keep to established structure (`applications/`, `docs/`, `proof_pack/`, `experiments/`, `src/`, etc.).
+- **Names**: Python `snake_case.py`, major docs `UPPERCASE.md`, other assets `kebab-case`.
+- **Docs**: every public component must have documentation.
+- **Tests**: create tests for each core module; runnable in CI.
+- **Deps**: exact pins in `requirements.txt`.
 
 ---
 
-## Code Organization Standards
-- Import order: Standard library → Third-party → Local imports.
-- Type hints: Required for new code (target Python 3.12+ style).
-- Docstrings: Comprehensive for all public functions and should include Z Framework context.
-- Testing: Maintain coverage > 80%. Tests must pass `run_tests.py`.
+## 1) Absolute Scientific Gates (no exceptions)
+- **Human DNA only**: Use **human nucleotide FASTA** (GRCh38/hg38 or curated CRISPR sets).  
+  For **DNA sequences**: Validate **A/C/G/T/N only** (case-insensitive). **Reject** `U` and IUPAC ambiguity codes beyond `N`.  
+  For **RNA sequences** (e.g., guide RNA, sgRNA): Validate **A/C/G/U/N only** (case-insensitive). **Reject** `T` and IUPAC ambiguity codes beyond `N`.
+- **No fabrication**: Never derive DNA from protein/RNA or fabricate nucleotides.
+- **Fail-fast validation**: Start every pipeline with nucleotide-only checks; raise clear `ValueError` on violation.
+- **Z invariants (domain-correct)**
+    - **Discrete/biological (DEFAULT)**: `Z = A(B / e^2)`; guard divide-by-zero; document A and B.
+    <!-- Physical domain constraint removed: not applicable to CRISPR/biological analysis. -->
+    <!-- Only the discrete/biological domain is supported. -->
+- **Geometric resolution**: θ′(n,k) = φ·((n mod φ)/φ)^k (where φ is the geometric period, e.g., φ = 21 for 21-nt guides; see docs/Z_FRAMEWORK.md, section "Geometric resolution") with default `k ≈ 0.3`. Document any deviation.
 
 ---
 
-## File Placement Rules
-- Core scientific modules: Root level (examples: `z_framework.py`, `topological_analysis.py`).
-- CRISPR applications: `applications/` directory with `crispr_` prefix filenames.
-- Research documents: Root level with descriptive names (no ambiguous abbreviations).
-- Validation tools: `proof_pack/` directory.
-- Documentation: `docs/` with subdirectories per domain.
-- Web assets: `static/` and `templates/` directories.
+## 2) Dataset Provenance Gates
+- Record **dataset name, version, URL, license, taxonomy**, and **SHA256** of local file(s).
+- **Human filter required**: Ensure **Homo sapiens**; print the dataset version at runtime.
+- Default dataset allowed: **BioGRID-ORCS Homo sapiens v1.1.17** (with citation in docs).
 
 ---
 
-**NEVER create files that violate `.github/REPOSITORY_POLICY.md` structure!**
+## 3) Statistical Validity & Leakage Gates
+- **Pre-register endpoints**:
+    - Pearson **r** with **95% bootstrap CI** (≥1,000 resamples).
+    - **Partial r** controlling for **GC%**, **guide length**, **guide position**.
+    - **Effect size** (Cohen’s d with CI) for defined contrasts.
+- **Null model**: ≥1,000× **permutation/shuffle** for empirical p-values.
+- **Leakage control**: **split-by-screen** and **split-by-gene**; no entity appears in both train/eval.
+- **Multiple comparisons**: apply **Benjamini–Hochberg FDR** when comparing ≥3 metrics.
+- **Power/sample size**: include a brief justification (or cite prior power analysis).
+
+---
+
+## 4) Reproducibility & Environment Gates
+- **CLI contract** (required flags):  
+  `--seed`, `--bootstrap`, `--permutation`, `--splits`, `--domain`, `--pam`
+- **Persist metadata** to results: **seed**, **git commit**, **dataset name/version**, **SHA256**, **runtime**, and **pip freeze** as `results/env.txt`.
+- **Precision**: use `mpmath` with `mp.dps = 50` where high precision is required.
+- **Pinned env**: Python 3.12.*, exact `requirements.txt` pins.
+
+---
+
+## 5) CI & Layout Gates
+- Provide a **smoke** dataset + golden outputs so CI completes **<5s**.
+- CI runs: `pytest -q` (validators, domain guards, stats wrappers) **and** `make smoke`.
+- Directory & artifacts:
+    - `experiments/<exp_id>/README.md` (copy-exact commands, timing, endpoints).
+    - `experiments/<exp_id>/manifest.yml` (see template below).
+    - `results/<exp_id>/run-YYYYMMDD-HHMMSS/` → `results.json`, `results.csv`, `env.txt`, `log.txt`.
+
+---
+
+## 6) Licensing & Citation Gates
+- Include proper **citation** and **license** for BioGRID-ORCS (v1.1.17) and any other sources.
+- Print dataset **version** at runtime.
+
+---
+
+## 7) Refusal Policy (what Copilot must do if a gate can’t be met)
+If any gate cannot be satisfied, respond with:
+
