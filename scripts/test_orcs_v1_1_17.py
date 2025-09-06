@@ -43,12 +43,6 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
 from z_framework import ZFrameworkCalculator
-# Temporarily disable import that requires many dependencies
-# from applications.crispr_physical_z_metrics import (
-#     PhysicalZMetricsCalculator,
-#     validate_human_dna_sequence,
-#     DNAValidationError
-# )
 
 # Configure high precision
 mp.mp.dps = 50
