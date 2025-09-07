@@ -28,6 +28,51 @@ from .spectral import SpectralFeatureExtractor, SpectralModels
 from .statistics import ExperimentalStatistics
 from .hg38_reference import extract_genomic_context, get_hg38_reference
 
+# Import pyfaidx for hg38 validation
+try:
+    from pyfaidx import Fasta
+    PYFAIDX_AVAILABLE = True
+except ImportError:
+    PYFAIDX_AVAILABLE = False
+
+HG38_ENV = "HG38_FA"
+
+
+def require_hg38() -> str:
+    """
+    Fail-fast validation for hg38 reference availability.
+    
+    Returns:
+        Path to validated hg38 FASTA file
+        
+    Raises:
+        RuntimeError: If hg38 is not available or invalid
+    """
+    if not PYFAIDX_AVAILABLE:
+        raise RuntimeError("pyfaidx not available. Install with: pip install pyfaidx")
+    
+    hg38_path = os.environ.get(HG38_ENV)
+    if not hg38_path:
+        raise RuntimeError(f"{HG38_ENV} environment variable not set. Provide path to hg38 FASTA.")
+    
+    hg38_file = Path(hg38_path)
+    if not (hg38_file.exists() and hg38_file.is_file()):
+        raise RuntimeError(f"{HG38_ENV} points to missing file: {hg38_file}")
+    
+    try:
+        # Probe open/index to ensure file is valid
+        fasta = Fasta(str(hg38_file))
+        # Check that we have some chromosomes
+        chroms = list(fasta.keys())
+        if not chroms:
+            raise RuntimeError(f"No chromosomes found in hg38 file: {hg38_file}")
+        # Close the file
+        fasta.close()
+    except Exception as e:
+        raise RuntimeError(f"Failed to open/index hg38 at {hg38_file}: {e}")
+    
+    return str(hg38_file)
+
 
 class SignalTheoreticExperiment:
     """Main experiment controller."""
@@ -299,6 +344,11 @@ class SignalTheoreticExperiment:
                         'guide_sequence': row['sequence'],
                         'original_index': idx
                     }
+                    
+                    # Add genomic coordinates if available
+                    if 'chromosome' in row and 'position' in row:
+                        guide_data['chromosome'] = row['chromosome']
+                        guide_data['position'] = row['position']
                     
                     # Extract genomic context using hg38 reference
                     try:
@@ -608,6 +658,10 @@ def main():
     parser.add_argument('--pam', default='NGG', help='PAM sequence pattern')
     
     args = parser.parse_args()
+    
+    # Fail-fast hg38 validation
+    hg38_path = require_hg38()
+    print(f"✓ hg38 reference validated: {hg38_path}")
     
     # Run experiment
     experiment = SignalTheoreticExperiment(

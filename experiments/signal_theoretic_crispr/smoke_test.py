@@ -3,6 +3,7 @@
 Smoke test for signal-theoretic CRISPR experiment.
 
 Quick validation that all components work correctly with minimal data.
+FAIL-FAST: Requires hg38 reference to be available.
 """
 
 import sys
@@ -22,11 +23,55 @@ from experiments.signal_theoretic_crispr import (
     SpectralFeatureExtractor,
     ExperimentalStatistics
 )
+from experiments.signal_theoretic_crispr.main import require_hg38
+
+
+def main():
+    """Run all smoke tests."""
+    print("Signal-Theoretic CRISPR Experiment - Smoke Test")
+    print("=" * 60)
+    
+    # Fail fast if hg38 not present
+    try:
+        hg38_path = require_hg38()
+        print(f"✓ hg38 reference validated: {hg38_path}")
+    except Exception as e:
+        print(f"[FAIL-FAST] hg38 not available: {e}", file=sys.stderr)
+        print("Set HG38_FA environment variable to path of hg38 FASTA file.", file=sys.stderr)
+        sys.exit(2)
+    
+    tests = [
+        ("Validation", test_validation),
+        ("Baseline Pipeline", test_baseline_pipeline),
+        ("Spectral Pipeline", test_spectral_pipeline),
+        ("Statistics", test_statistics),
+        ("Integration", test_integration)
+    ]
+    
+    passed = 0
+    total = len(tests)
+    
+    for test_name, test_func in tests:
+        print(f"\n{test_name}:")
+        if test_func():
+            passed += 1
+        else:
+            print(f"  ✗ {test_name} FAILED")
+    
+    print("\n" + "=" * 60)
+    print(f"SMOKE TEST SUMMARY: {passed}/{total} tests passed")
+    
+    if passed == total:
+        print("✓ All smoke tests PASSED - Experiment ready for deployment")
+        return True
+    else:
+        print("✗ Some smoke tests FAILED - Review implementation")
+        return False
 
 
 def create_test_data():
     """Create minimal test dataset."""
-    # Create test sequences with known patterns
+    # Create test sequences with known patterns and genomic coordinates
     test_data = pd.DataFrame({
         'sequence': [
             'ATCGATCGATCGATCGATGG',  # 20mer + NGG PAM-like ending
@@ -36,7 +81,9 @@ def create_test_data():
             'TATATATATATATATATATAT',  # Alternating
             'CGCGCGCGCGCGCGCGCGCG',  # Alternating high GC
         ],
-        'efficiency': [0.72, 0.85, 0.45, 0.91, 0.59, 0.83]
+        'efficiency': [0.72, 0.85, 0.45, 0.91, 0.59, 0.83],
+        'chromosome': ['chr1', 'chr1', 'chr1', 'chr2', 'chr2', 'chr2'],
+        'position': [1000, 1500, 2000, 1000, 1500, 2000]
     })
     
     return test_data
@@ -145,10 +192,11 @@ def test_spectral_pipeline():
     extractor = SpectralFeatureExtractor(seed=42)
     
     try:
-        # Test feature extraction
+        # Test feature extraction with coordinates
         test_guide = {
             'guide_sequence': test_data.iloc[0]['sequence'],
-            'context_sequence': test_data.iloc[0]['sequence'] * 5  # Longer context
+            'chromosome': test_data.iloc[0]['chromosome'],
+            'position': test_data.iloc[0]['position']
         }
         
         features = extractor.extract_features(test_guide)
@@ -266,40 +314,6 @@ def test_integration():
             import traceback
             traceback.print_exc()
             return False
-
-
-def main():
-    """Run all smoke tests."""
-    print("Signal-Theoretic CRISPR Experiment - Smoke Test")
-    print("=" * 60)
-    
-    tests = [
-        ("Validation", test_validation),
-        ("Baseline Pipeline", test_baseline_pipeline),
-        ("Spectral Pipeline", test_spectral_pipeline),
-        ("Statistics", test_statistics),
-        ("Integration", test_integration)
-    ]
-    
-    passed = 0
-    total = len(tests)
-    
-    for test_name, test_func in tests:
-        print(f"\n{test_name}:")
-        if test_func():
-            passed += 1
-        else:
-            print(f"  ✗ {test_name} FAILED")
-    
-    print("\n" + "=" * 60)
-    print(f"SMOKE TEST SUMMARY: {passed}/{total} tests passed")
-    
-    if passed == total:
-        print("✓ All smoke tests PASSED - Experiment ready for deployment")
-        return True
-    else:
-        print("✗ Some smoke tests FAILED - Review implementation")
-        return False
 
 
 if __name__ == "__main__":
