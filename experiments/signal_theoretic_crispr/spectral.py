@@ -275,9 +275,9 @@ class SpectralAnalyzer:
         waveform = []
         
         for i, (base_encoding, pos) in enumerate(zip(encoded_seq, positions)):
-            # Use mpmath for high-precision phase calculations
-            phase_factor = mpmath.exp(2j * mpmath.pi * pos)
-            waveform_component = complex(base_encoding) * complex(phase_factor)
+            # Use numpy for efficient phase calculations
+            phase_factor = np.exp(2j * np.pi * pos)
+            waveform_component = base_encoding * phase_factor
             waveform.append(waveform_component)
             
         return np.array(waveform, dtype=complex)
