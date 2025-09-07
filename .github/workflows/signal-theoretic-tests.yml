@@ -1,6 +1,6 @@
 name: Signal-Theoretic CRISPR Experiment Tests
 
-on:
+"on":
   push:
     paths:
       - 'experiments/signal_theoretic_crispr/**'

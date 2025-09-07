@@ -1,6 +1,6 @@
 name: Repository Policy Enforcement
 
-on:
+"on":
   pull_request:
     branches: [ main ]
   push:
