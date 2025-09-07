@@ -283,15 +283,27 @@ class HumanFASTAValidator:
         Returns:
             True if path is compliant
         """
-        # Allow paths within the data/ directory (public datasets) or temp directories for testing
-        allowed_prefixes = [
-            'data/',
-            './data/',
-            '/home/runner/work/wave-crispr-signal/wave-crispr-signal/data/',
-            '/tmp/',  # Allow temp directories for testing
-        ]
-        
-        return any(dataset_path.startswith(prefix) for prefix in allowed_prefixes)
+        # Allow only files within the public data directory or temp directories for testing
+        from pathlib import Path
+        import os
+        # Allow data directory to be set via environment variable, default to 'data'
+        data_dir = os.environ.get("WAVE_CRISPR_DATA_DIR", "data")
+        data_dir_path = Path(data_dir).resolve()
+        dataset_path_obj = Path(dataset_path).resolve()
+        # Allow /tmp for testing
+        tmp_dir = Path("/tmp").resolve()
+        try:
+            # Python 3.9+: use is_relative_to
+            if hasattr(dataset_path_obj, "is_relative_to"):
+                in_data = dataset_path_obj.is_relative_to(data_dir_path)
+                in_tmp = dataset_path_obj.is_relative_to(tmp_dir)
+            else:
+                # For Python <3.9, fallback to manual check
+                in_data = str(dataset_path_obj).startswith(str(data_dir_path) + os.sep)
+                in_tmp = str(dataset_path_obj).startswith(str(tmp_dir) + os.sep)
+        except Exception:
+            return False
+        return in_data or in_tmp
 
 
 class DeterminismValidator:
