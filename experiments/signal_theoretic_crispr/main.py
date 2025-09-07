@@ -369,13 +369,30 @@ class SignalTheoreticExperiment:
             
             try:
                 # Get true labels
-                dataset_name = pred_key.split('_')[0]
-                task_type = pred_key.split('_')[1]
+                # Parse prediction key: 'dataset_name_task_type'
+                parts = pred_key.split('_')
+                if len(parts) >= 3:
+                    dataset_name = '_'.join(parts[:-2])  # Everything except last two parts
+                    task_type = '_'.join(parts[-2:])     # Last two parts: e.g., 'on_target'
+                else:
+                    # Fallback for simpler naming
+                    dataset_name = parts[0]
+                    task_type = '_'.join(parts[1:]) if len(parts) > 1 else ''
                 
-                if task_type == 'on' and 'target' in pred_key:
+                self.logger.info(f"Processing dataset: {dataset_name}, task: {task_type}")
+                
+                if task_type == 'on_target':
                     # On-target regression comparison
-                    baseline_df = baseline_results[f'{dataset_name}_processed']
-                    y_true = baseline_df['efficiency'].values
+                    # Get processed data from either baseline or spectral results
+                    processed_data_key = f'{dataset_name}_processed'
+                    if processed_data_key in baseline_results:
+                        processed_df = baseline_results[processed_data_key]
+                    elif processed_data_key in spectral_results:
+                        processed_df = spectral_results[processed_data_key]
+                    else:
+                        raise ValueError(f"No processed data found for {dataset_name}")
+                    
+                    y_true = processed_df['efficiency'].values
                     y_pred_baseline = np.array(baseline_results['predictions'][pred_key])
                     y_pred_spectral = np.array(spectral_results['predictions'][pred_key])
                     
@@ -398,6 +415,8 @@ class SignalTheoreticExperiment:
                 
             except Exception as e:
                 self.logger.error(f"Comparison failed for {pred_key}: {e}")
+                import traceback
+                self.logger.error(traceback.format_exc())
                 continue
         
         # Generate improvement summary
