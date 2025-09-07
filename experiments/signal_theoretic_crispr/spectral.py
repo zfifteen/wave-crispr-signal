@@ -396,14 +396,14 @@ class ZFrameworkNormalizer:
         """
         z_features = {}
         
-        for feature_name in features_dict:
+        for idx, feature_name in enumerate(features_dict, start=1):
             if feature_name in reference_features:
                 delta_n = features_dict[feature_name] - reference_features[feature_name]
                 delta_max = max(abs(features_dict[feature_name]), abs(reference_features[feature_name]))
                 
                 # Guard against division by zero
                 if delta_max != 0:
-                    z_value = len(str(feature_name)) * (delta_n / delta_max)  # n * (Δₙ/Δₘₐₓ)
+                    z_value = idx * (delta_n / delta_max)  # n * (Δₙ/Δₘₐₓ), where n is the feature index (1-based)
                     z_features[f'z_{feature_name}'] = z_value
                 else:
                     z_features[f'z_{feature_name}'] = 0.0
