@@ -26,6 +26,7 @@ from .validation import HumanFASTAValidator, DeterminismValidator, validate_expe
 from .baseline import BaselinePipeline, BaselineModels
 from .spectral import SpectralFeatureExtractor, SpectralModels
 from .statistics import ExperimentalStatistics
+from .hg38_reference import extract_genomic_context, get_hg38_reference
 
 
 class SignalTheoreticExperiment:
@@ -79,6 +80,10 @@ class SignalTheoreticExperiment:
             permutation_iterations=self.config['parameters']['permutation_iterations'],
             seed=seed
         )
+        
+        # Initialize hg38 reference for G3 anchoring
+        self.hg38_ref = get_hg38_reference()
+        self.logger.info(f"hg38 reference status: {self.hg38_ref.get_reference_info()}")
         
         # Results storage
         self.results = {
@@ -295,9 +300,24 @@ class SignalTheoreticExperiment:
                         'original_index': idx
                     }
                     
-                    # Add context window if available (in practice, would extract from hg38)
-                    # For now, use the sequence itself
-                    guide_data['context_sequence'] = row['sequence']
+                    # Extract genomic context using hg38 reference
+                    try:
+                        context_sequence = extract_genomic_context(
+                            guide_data, 
+                            window_size=self.config['parameters']['window_size']
+                        )
+                        guide_data['context_sequence'] = context_sequence
+                        
+                        # Log successful anchoring
+                        if len(context_sequence) == self.config['parameters']['window_size']:
+                            self.logger.debug(f"Successfully anchored guide {idx} to hg38 context")
+                        else:
+                            self.logger.warning(f"Context window size mismatch for guide {idx}: got {len(context_sequence)}, expected {self.config['parameters']['window_size']}")
+                    
+                    except Exception as e:
+                        self.logger.error(f"Failed to extract hg38 context for guide {idx}: {e}")
+                        # Fail-fast on anchoring errors as required by G3
+                        raise ValueError(f"G3 anchoring failed for guide {idx}: {e}")
                     
                     # Extract spectral features
                     features = self.spectral_extractor.extract_features(guide_data)
@@ -503,6 +523,13 @@ class SignalTheoreticExperiment:
             f.write(f"Timestamp: {datetime.now().isoformat()}\n")
             f.write(f"Git commit: {self.det_validator.git_commit}\n")
             f.write(f"Random seed: {self.seed}\n")
+            f.write(f"Geodesic k parameter: {self.config['parameters']['geodesic_k']}\n")
+            
+            # Add runtime config if available
+            if 'runtime_config' in self.config:
+                f.write(f"N-mode selection: {self.config['runtime_config'].get('n_mode', 'index')}\n")
+                f.write(f"Kappa features enabled: {self.config['runtime_config'].get('kappa_features', False)}\n")
+            
             f.write("\n# Python Environment\n")
             for key, value in self.det_validator.environment_info.items():
                 f.write(f"{key}: {value}\n")

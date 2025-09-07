@@ -10,7 +10,7 @@
 All 8 scientific gates successfully enforced:
 - **G1**: Human source only (Homo sapiens) ✓
 - **G2**: Alphabet validation (A/C/G/T/N only) ✓  
-- **G3**: hg38 anchoring framework ✓
+- **G3**: hg38 anchoring with 201-bp window extraction (fallback mode active) ✓
 - **G4**: Determinism (seed=42, pinned dependencies) ✓
 - **G5**: Bootstrap metrics (95% CI, 50 iterations) ✓
 - **G6**: Numeric stability ✓
@@ -90,8 +90,8 @@ All 8 scientific gates successfully enforced:
 4. **Cross-Validation**: Implement more sophisticated validation strategies
 
 ### For Production Use
-1. **hg38 Integration**: Complete 201-bp window extraction from reference genome
-2. **Off-Target Module**: Add classification for off-target discrimination
+1. **hg38 Integration**: Download full hg38 reference genome using `data/get_hg38/get_hg38.sh`
+2. **Off-Target Module**: Planned for future release - add classification for off-target discrimination  
 3. **Visualization**: Create publication-ready figures
 4. **Performance**: Optimize for larger datasets (>10K sequences)
 

@@ -1,0 +1,77 @@
+name: Signal-Theoretic CRISPR Experiment Tests
+
+on:
+  push:
+    paths:
+      - 'experiments/signal_theoretic_crispr/**'
+      - 'requirements.txt'
+  pull_request:
+    paths:
+      - 'experiments/signal_theoretic_crispr/**'
+      - 'requirements.txt'
+
+jobs:
+  smoke-tests:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Verify environment determinism
+      run: |
+        echo "Verifying deterministic environment..."
+        pip freeze > actual_env.txt
+        echo "Expected packages from requirements.txt:"
+        cat requirements.txt | grep -v "^#" | grep -v "^$"
+        echo "Actual installed packages:"
+        cat actual_env.txt
+        # Check that core packages match (allowing for additional dependencies)
+        for pkg in mpmath numpy biopython scikit-learn pandas matplotlib scipy; do
+          if ! grep -q "^${pkg}==" actual_env.txt; then
+            echo "ERROR: ${pkg} not found in environment"
+            exit 1
+          fi
+        done
+        echo "✓ Core packages verified"
+    
+    - name: Run smoke tests
+      run: |
+        cd ${{ github.workspace }}
+        python experiments/signal_theoretic_crispr/smoke_test.py
+    
+    - name: Run minimal experiment
+      run: |
+        cd ${{ github.workspace }}
+        python -m experiments.signal_theoretic_crispr.main \
+          --seed 42 \
+          --bootstrap 10 \
+          --permutation 10 \
+          --output results/ci-test
+    
+    - name: Upload experiment results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: signal-theoretic-results
+        path: |
+          results/ci-test/**
+        retention-days: 7
+    
+    - name: Upload environment snapshot
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: environment-snapshot
+        path: |
+          actual_env.txt
+        retention-days: 7

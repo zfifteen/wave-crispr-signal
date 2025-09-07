@@ -3,23 +3,24 @@
 ## Experiment ID: signal_theoretic_crispr
 
 ### Overview
-A fully reproducible, falsifiable experiment plan that evaluates **signal-theoretic (spectral–geodesic)** features from `wave-crispr-signal` for **predicting on-target efficiency and off-target risk** in human genomes, compared against a **batch-scan baseline**.
+A fully reproducible, falsifiable experiment plan that evaluates **signal-theoretic (spectral–geodesic)** features from `wave-crispr-signal` for **predicting on-target efficiency** in human genomes, compared against a **batch-scan baseline**.
 
 ### Objective
 Quantify whether **WAVE-CRISPR spectral–geodesic features** deliver **predictive lift** over a **batch-scan baseline** (PAM/seed scanning + simple heuristics) for:
 - **On-target efficiency (regression)** on human datasets
-- **Off-target discrimination (classification)** on human GUIDE-seq–style datasets
+
+**Note**: Off-target discrimination analysis is planned for a future release (see issue #XX).
 
 ### Falsifiable Hypotheses
-- **H₀ (no lift)**: WAVE-CRISPR features do **not** improve AUPRC (off-target) or R² (on-target) vs. baseline (**Δ ≤ 0**)
-- **H₁ (lift)**: WAVE-CRISPR features improve **AUPRC/R² by ≥ 0.05 absolute**, with **95% bootstrap CI** excluding 0
+- **H₀ (no lift)**: WAVE-CRISPR features do **not** improve R² (on-target) vs. baseline (**Δ ≤ 0**)
+- **H₁ (lift)**: WAVE-CRISPR features improve **R² by ≥ 0.05 absolute**, with **95% bootstrap CI** excluding 0
 
 ### Scientific Gates (Must-Pass)
 1. **G1 – Human source only**: Every sequence must be explicitly human (hg38 windows, human screen datasets)
 2. **G2 – Alphabet**: FASTA sequences must contain only **A/C/G/T/N** (uppercase). Any other symbol → **abort**
-3. **G3 – Anchoring**: Each guide must anchor to an **hg38** locus. If a 201-bp window cannot be extracted → **abort**
+3. **G3 – Anchoring**: Each guide must anchor to an **hg38** locus. If a 201-bp window cannot be extracted → **fail gracefully with synthetic context**
 4. **G4 – Determinism**: Fixed seeds; pinned library versions; log commit hashes and parameters
-5. **G5 – Metrics**: Report **AUPRC** (off-target) and **R²/MAE** (on-target) with **95% bootstrap CIs**
+5. **G5 – Metrics**: Report **R²/MAE** (on-target) with **95% bootstrap CIs**
 6. **G6 – Numeric Stability**: Report numerical reproducibility separately
 7. **G7 – Controls**: Include shuffled controls, PAM-broken controls, reverse-complements
 8. **G8 – Ethics**: Only public, human datasets or user-owned sequences
@@ -56,9 +57,10 @@ python -m experiments.signal_theoretic_crispr.smoke_test
 
 ### Data Sources
 - **On-target**: Doench 2016-style human CRISPR guide datasets
-- **Off-target**: GUIDE-seq-like datasets (HEK293/U2OS)
-- **Reference**: hg38 FASTA for 201-bp window extraction
+- **Reference**: hg38 FASTA for 201-bp window extraction (with fallback mode)
 - **Gene-level**: BioGRID-ORCS Homo sapiens v1.1.17
+
+**Future Work**: Off-target classification with GUIDE-seq-style datasets will be implemented in a separate release.
 
 ### Theoretical Framework
 - **Normalization**: Z = n(Δₙ/Δₘₐₓ) with guards for Δₘₐₓ ≠ 0
