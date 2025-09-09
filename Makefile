@@ -21,8 +21,13 @@ test:
 	python run_tests.py
 
 # Run smoke tests for CI
-smoke: mve-smoke
+smoke: mve-smoke test-z-framework-import
 	@echo "✓ All smoke tests completed"
+
+# Test Z Framework import compatibility
+test-z-framework-import:
+	@echo "Testing Z Framework import compatibility..."
+	@python -c "from z_framework import ZFrameworkCalculator; calc = ZFrameworkCalculator(); print('✓ Z Framework import successful')"
 
 # Run focused ultrasound MVE smoke test
 mve-smoke:

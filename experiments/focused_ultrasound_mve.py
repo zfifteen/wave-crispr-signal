@@ -33,6 +33,7 @@ import argparse
 import json
 import logging
 import random
+import subprocess
 import sys
 import time
 from dataclasses import dataclass
@@ -74,6 +75,33 @@ logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
+
+
+def get_git_commit_sha() -> str:
+    """
+    Get the current git commit SHA.
+    
+    Returns:
+        40-character hex string of current commit SHA, or 'unknown' if git unavailable
+    """
+    try:
+        result = subprocess.run(
+            ['git', 'rev-parse', '--verify', 'HEAD'],
+            capture_output=True,
+            text=True,
+            check=True,
+            cwd=Path(__file__).parent.parent  # Repository root
+        )
+        sha = result.stdout.strip()
+        # Validate it's a 40-character hex string
+        if len(sha) == 40 and all(c in '0123456789abcdef' for c in sha.lower()):
+            return sha
+        else:
+            logger.warning(f"Invalid git SHA format: {sha}")
+            return 'unknown'
+    except (subprocess.CalledProcessError, FileNotFoundError) as e:
+        logger.warning(f"Could not get git commit SHA: {e}")
+        return 'unknown'
 
 
 @dataclass
@@ -572,7 +600,7 @@ def save_results(results: List[TargetingResult], analysis: Dict,
             "base_velocity": BASE_ACOUSTIC_VELOCITY,
             "velocity_variance": VELOCITY_VARIANCE
         },
-        "git_commit": "HEAD",  # Would be populated by CI
+        "git_commit": get_git_commit_sha(),
         "runtime_seconds": analysis.get("runtime_seconds", 0)
     }
     

@@ -23,7 +23,8 @@ from experiments.focused_ultrasound_mve import (
     BaselineTargetingModel,
     ZFrameworkTargetingModel,
     FocusedUltrasoundExperiment,
-    StatisticalAnalysis
+    StatisticalAnalysis,
+    get_git_commit_sha
 )
 
 
@@ -181,6 +182,33 @@ class TestFocusedUltrasoundMVE(unittest.TestCase):
             with open(run_dir / 'analysis.json') as f:
                 analysis_data = json.load(f)
                 self.assertIn('statistically_significant', analysis_data)
+                
+    def test_git_commit_format(self):
+        """Test that git commit SHA is captured in correct format."""
+        sha = get_git_commit_sha()
+        
+        # Should be either 'unknown' or a 40-character hex string
+        if sha != 'unknown':
+            self.assertEqual(len(sha), 40, f"Git SHA should be 40 characters, got {len(sha)}")
+            self.assertTrue(all(c in '0123456789abcdef' for c in sha.lower()), 
+                          f"Git SHA should be hex, got: {sha}")
+        else:
+            # In environments where git is not available, 'unknown' is acceptable
+            self.assertEqual(sha, 'unknown')
+            
+    def test_z_framework_import_compatibility(self):
+        """Test that z_framework module can be imported and instantiated."""
+        try:
+            from z_framework import ZFrameworkCalculator
+            calc = ZFrameworkCalculator()
+            self.assertIsNotNone(calc)
+            # Test that basic methods exist that are used by the MVE
+            self.assertTrue(hasattr(calc, 'calculate_z_values'))
+            self.assertTrue(hasattr(calc, 'calculate_geodesic_resolution'))
+        except ImportError as e:
+            self.fail(f"Could not import ZFrameworkCalculator: {e}")
+        except Exception as e:
+            self.fail(f"Could not instantiate ZFrameworkCalculator: {e}")
 
 
 class TestScientificGatesCompliance(unittest.TestCase):
