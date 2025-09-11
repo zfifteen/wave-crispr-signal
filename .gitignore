@@ -84,4 +84,3 @@ proof_pack/validation_results/
 proof_pack/__pycache__/
 bin_resonance_results.csv
 results/
-*.dcm
