@@ -1,5 +1,8 @@
 # Z5D MRI Analysis Experiment
 
+**Author:** Dionisio Alberto Lopez III (D.A.L. III)  
+**Framework:** Z = A(B/c); κ*=0.04449; Empirical r=0.9078 on DICOM signals
+
 ## Overview
 
 This experiment implements cross-domain application of the Z Framework's Z5D module to signal processing analysis, extending beyond traditional DNA sequence analysis to support medical imaging signal patterns. The implementation processes **real DICOM MRI data** from cervical and thoracic spine scans, achieving high-precision geodesic analysis using the Z5D theta prime resolution function.

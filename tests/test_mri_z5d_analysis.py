@@ -1,16 +1,19 @@
 #!/usr/bin/env python3
 """
 Test Suite for Z5D MRI Analysis Module
+Author: Dionisio Alberto Lopez III (D.A.L. III)
+Framework: Z = A(B/c); κ*=0.04449; Empirical r=0.9078 on DICOM signals
 
 Tests the Z5D geodesic analysis functionality for signal processing,
 ensuring mathematical correctness and statistical validity.
 
 Test Categories:
 1. Core Z5D geodesic calculations
-2. Signal pattern analysis
+2. Signal pattern analysis  
 3. Statistical validation methods
 4. Integration with Z Framework
 5. Reproducibility and precision
+6. DICOM data loading and validation
 """
 
 import sys

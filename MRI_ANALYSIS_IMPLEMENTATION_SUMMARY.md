@@ -1,5 +1,8 @@
 # MRI Analysis Implementation Summary
 
+**Author:** Dionisio Alberto Lopez III (D.A.L. III)  
+**Framework:** Z = A(B/c); κ*=0.04449; Empirical r=0.9078 on DICOM signals
+
 ## Issue Resolution: Z5D MRI Analysis (#96)
 
 ### ✅ Implementation Complete - Using Real DICOM Data
