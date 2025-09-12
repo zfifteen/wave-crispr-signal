@@ -30,7 +30,8 @@ try:
         Z5DGeodeskAnalyzer,
         Z5DAnalysisResult,
         StatisticalSummary,
-        generate_synthetic_mri_signals
+        generate_synthetic_mri_signals,
+        load_dicom_signals
     )
     IMPORT_SUCCESS = True
 except ImportError as e:
@@ -231,6 +232,96 @@ class TestSyntheticSignalGeneration:
             np.testing.assert_array_almost_equal(s1, s2)
 
 
+class TestDicomSignalLoading:
+    """Test DICOM signal loading functionality."""
+    
+    def test_load_dicom_signals(self):
+        """Test DICOM signal loading."""
+        if not IMPORT_SUCCESS:
+            pytest.skip("Module import failed")
+        
+        # Test DICOM loading with the actual data directories
+        cervical_dir = "data/MRI__CERVICAL_SPINE_W_O_CONT/DICOM"
+        thoracic_dir = "data/MRI__THORACIC_SPINE_W_O_CONT/DICOM"
+        
+        # Only test if DICOM directories exist
+        if not (os.path.exists(cervical_dir) and os.path.exists(thoracic_dir)):
+            pytest.skip("DICOM data directories not found")
+        
+        signals = load_dicom_signals(
+            cervical_dir=cervical_dir,
+            thoracic_dir=thoracic_dir,
+            signal_length=32,  # Small for testing
+            max_files_per_series=2  # Limit for testing
+        )
+        
+        assert len(signals) > 0, "Should load at least some signals"
+        
+        for signal in signals:
+            assert isinstance(signal, np.ndarray)
+            assert signal.shape == (32,), f"Expected shape (32,), got {signal.shape}"
+            assert np.all(signal >= 0), "Signal values should be non-negative"
+            assert np.all(signal <= 1), "Signal values should be normalized to [0,1]"
+            assert not np.all(signal == signal[0]), "Signal should not be constant"
+    
+    def test_dicom_loading_missing_directories(self):
+        """Test DICOM loading with missing directories."""
+        if not IMPORT_SUCCESS:
+            pytest.skip("Module import failed")
+        
+        # Test with non-existent directories
+        signals = load_dicom_signals(
+            cervical_dir="/nonexistent/path1",
+            thoracic_dir="/nonexistent/path2",
+            signal_length=16,
+            max_files_per_series=1
+        )
+        
+        # Should return fallback signals
+        assert len(signals) >= 2, "Should provide fallback signals when no DICOM files found"
+    
+    def test_dicom_vs_synthetic_compatibility(self):
+        """Test that DICOM and synthetic signals produce compatible analysis results."""
+        if not IMPORT_SUCCESS:
+            pytest.skip("Module import failed")
+        
+        analyzer = Z5DGeodeskAnalyzer(seed=42)
+        
+        # Test with synthetic signals
+        synthetic_signals = generate_synthetic_mri_signals(n_samples=3, signal_length=16, seed=42)
+        synthetic_results = []
+        for i, signal in enumerate(synthetic_signals):
+            result = analyzer.analyze_signal_pattern(signal, f"synthetic_{i}")
+            synthetic_results.append(result)
+        
+        # Test with DICOM signals if available, otherwise use fallback
+        cervical_dir = "data/MRI__CERVICAL_SPINE_W_O_CONT/DICOM" 
+        thoracic_dir = "data/MRI__THORACIC_SPINE_W_O_CONT/DICOM"
+        
+        dicom_signals = load_dicom_signals(
+            cervical_dir=cervical_dir,
+            thoracic_dir=thoracic_dir,
+            signal_length=16,
+            max_files_per_series=1
+        )
+        
+        dicom_results = []
+        for i, signal in enumerate(dicom_signals[:3]):  # Limit to 3 for comparison
+            result = analyzer.analyze_signal_pattern(signal, f"dicom_{i}")
+            dicom_results.append(result)
+        
+        # Both should produce valid results
+        assert len(synthetic_results) > 0
+        assert len(dicom_results) > 0
+        
+        # Results should have the same structure
+        for result in synthetic_results + dicom_results:
+            assert isinstance(result, Z5DAnalysisResult)
+            assert isinstance(result.theta_prime_mean, float)
+            assert isinstance(result.focal_accuracy, float)
+            assert result.classification in ['high-coherence', 'moderate-coherence', 'low-coherence']
+
+
 class TestIntegrationAndReproducibility:
     """Test integration and reproducibility aspects."""
     
@@ -295,19 +386,36 @@ def run_smoke_test():
         return False
     
     try:
-        # Quick functional test
+        # Quick functional test with both synthetic and DICOM signals
         analyzer = Z5DGeodeskAnalyzer(seed=42)
-        signals = generate_synthetic_mri_signals(n_samples=5, signal_length=20, seed=42)
         
-        results = []
-        for i, signal in enumerate(signals):
-            result = analyzer.analyze_signal_pattern(signal, f"smoke_test_{i}")
-            results.append(result)
+        # Test 1: Synthetic signals
+        print("Testing synthetic signal generation...")
+        synthetic_signals = generate_synthetic_mri_signals(n_samples=3, signal_length=16, seed=42)
         
-        # Quick validation
-        stats = analyzer.statistical_validation(results, n_bootstrap=10, n_permutation=10)
+        synthetic_results = []
+        for i, signal in enumerate(synthetic_signals):
+            result = analyzer.analyze_signal_pattern(signal, f"smoke_synthetic_{i}")
+            synthetic_results.append(result)
         
-        print(f"✓ Processed {len(results)} signals")
+        # Test 2: DICOM signals (if available)
+        print("Testing DICOM signal loading...")
+        dicom_signals = load_dicom_signals(
+            signal_length=16,
+            max_files_per_series=2
+        )
+        
+        dicom_results = []
+        for i, signal in enumerate(dicom_signals[:3]):
+            result = analyzer.analyze_signal_pattern(signal, f"smoke_dicom_{i}")
+            dicom_results.append(result)
+        
+        # Quick validation with combined results
+        all_results = synthetic_results + dicom_results
+        stats = analyzer.statistical_validation(all_results, n_bootstrap=10, n_permutation=10)
+        
+        print(f"✓ Processed {len(synthetic_results)} synthetic signals")
+        print(f"✓ Processed {len(dicom_results)} DICOM signals")
         print(f"✓ Statistical validation complete (r={stats.pearson_r:.3f})")
         print("✓ Z5D MRI Analysis smoke test passed")
         return True

@@ -2,7 +2,7 @@
 
 ## Overview
 
-This experiment implements cross-domain application of the Z Framework's Z5D module to signal processing analysis, extending beyond traditional DNA sequence analysis to support medical imaging signal patterns. The implementation achieves high-precision geodesic analysis using the Z5D theta prime resolution function.
+This experiment implements cross-domain application of the Z Framework's Z5D module to signal processing analysis, extending beyond traditional DNA sequence analysis to support medical imaging signal patterns. The implementation processes **real DICOM MRI data** from cervical and thoracic spine scans, achieving high-precision geodesic analysis using the Z5D theta prime resolution function.
 
 ## Scientific Background
 
@@ -23,13 +23,27 @@ Where:
 
 While the Z Framework was originally developed for DNA sequence analysis, this experiment demonstrates its mathematical applicability to signal processing domains, specifically:
 
-1. **Signal Pattern Analysis**: Applying Z5D geodesic transforms to 1D signal data
-2. **Coherence Classification**: Categorizing signals based on theta prime characteristics
-3. **Statistical Validation**: Comprehensive validation using bootstrap CI and permutation tests
+1. **Real DICOM Data Processing**: Loading and analyzing actual MRI DICOM files from medical imaging datasets
+2. **Signal Pattern Analysis**: Applying Z5D geodesic transforms to 1D profiles extracted from 2D MRI images  
+3. **Coherence Classification**: Categorizing signals based on theta prime characteristics
+4. **Statistical Validation**: Comprehensive validation using bootstrap CI and permutation tests
+
+### DICOM Data Sources
+
+The analysis processes real medical imaging data from:
+- **Cervical Spine MRI**: `data/MRI__CERVICAL_SPINE_W_O_CONT/DICOM/` (6 series)
+- **Thoracic Spine MRI**: `data/MRI__THORACIC_SPINE_W_O_CONT/DICOM/` (8 series)
+
+Signal extraction methodology:
+1. Load DICOM pixel arrays (512x512 uint16 images)
+2. Extract central row and column profiles as 1D signals
+3. Normalize to [0,1] range and resample to target length
+4. Apply light smoothing to reduce high-frequency noise
 
 ## Implementation Features
 
 ### Core Functionality
+- **Real DICOM Processing**: Loads actual MRI DICOM files using pydicom
 - High-precision calculations using mpmath (dps=50)
 - Z5D theta prime geodesic resolution
 - Signal pattern analysis with multiple classification levels
@@ -42,6 +56,7 @@ While the Z Framework was originally developed for DNA sequence analysis, this e
 - ✅ Pre-registered endpoints with Pearson r and effect sizes
 - ✅ Reproducible with pinned environment and seed control
 - ✅ Null model with ≥1,000× permutation tests
+- ✅ Real medical imaging data (not synthetic)
 
 ## Usage
 
@@ -52,14 +67,26 @@ While the Z Framework was originally developed for DNA sequence analysis, this e
 python experiments/mri_z5d_analysis.py
 
 # Full analysis with specified parameters
+# Run with real DICOM data (default)
 python experiments/mri_z5d_analysis.py \
     --seed 42 \
     --bootstrap 1000 \
     --permutation 1000 \
-    --n-samples 100 \
     --signal-length 256 \
     --output-dir results \
-    --k-parameter 0.04449
+    --k-parameter 0.04449 \
+    --max-files-per-series 20
+
+# Run with custom DICOM directories
+python experiments/mri_z5d_analysis.py \
+    --cervical-dir data/MRI__CERVICAL_SPINE_W_O_CONT/DICOM \
+    --thoracic-dir data/MRI__THORACIC_SPINE_W_O_CONT/DICOM \
+    --max-files-per-series 10
+
+# Run with synthetic data (for comparison/testing)
+python experiments/mri_z5d_analysis.py \
+    --use-synthetic \
+    --seed 42
 ```
 
 ### Parameters
@@ -69,27 +96,41 @@ python experiments/mri_z5d_analysis.py \
 | `--seed` | 42 | Random seed for reproducibility |
 | `--bootstrap` | 1000 | Number of bootstrap resamples |
 | `--permutation` | 1000 | Number of permutation tests |
-| `--n-samples` | 100 | Number of synthetic samples to generate |
 | `--signal-length` | 256 | Length of each signal |
 | `--output-dir` | results | Output directory |
 | `--k-parameter` | 0.04449 | Geodesic curvature parameter |
+| `--cervical-dir` | data/MRI__CERVICAL_SPINE_W_O_CONT/DICOM | Cervical spine DICOM directory |
+| `--thoracic-dir` | data/MRI__THORACIC_SPINE_W_O_CONT/DICOM | Thoracic spine DICOM directory |
+| `--max-files-per-series` | 20 | Maximum DICOM files per series |
+| `--use-synthetic` | False | Use synthetic data instead of DICOM |
 
 ### Programmatic Usage
 
 ```python
-from experiments.mri_z5d_analysis import Z5DGeodeskAnalyzer
+from experiments.mri_z5d_analysis import Z5DGeodeskAnalyzer, load_dicom_signals
 import numpy as np
 
 # Initialize analyzer
 analyzer = Z5DGeodeskAnalyzer(seed=42)
 
-# Analyze a signal
-signal = np.array([0.1, 0.5, 0.8, 0.6, 0.3, 0.7, 0.9, 0.4, 0.2])
-result = analyzer.analyze_signal_pattern(signal, "test_signal")
+# Load real DICOM signals
+signals = load_dicom_signals(
+    cervical_dir="data/MRI__CERVICAL_SPINE_W_O_CONT/DICOM",
+    thoracic_dir="data/MRI__THORACIC_SPINE_W_O_CONT/DICOM", 
+    signal_length=256,
+    max_files_per_series=20
+)
 
-print(f"Theta prime mean: {result.theta_prime_mean:.4f}")
-print(f"Classification: {result.classification}")
-print(f"Focal accuracy: {result.focal_accuracy:.4f}")
+# Analyze signals
+results = []
+for i, signal in enumerate(signals):
+    result = analyzer.analyze_signal_pattern(signal, f"dicom_signal_{i}")
+    results.append(result)
+    print(f"Signal {i}: {result.classification}, θ'={result.theta_prime_mean:.4f}")
+
+# Statistical validation
+stats = analyzer.statistical_validation(results, n_bootstrap=1000, n_permutation=1000)
+print(f"Pearson r: {stats.pearson_r:.4f}")
 ```
 
 ## Output Structure

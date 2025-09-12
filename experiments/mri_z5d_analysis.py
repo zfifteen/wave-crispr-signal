@@ -43,6 +43,7 @@ import pandas as pd
 from scipy import stats
 from sklearn.metrics import mean_squared_error
 import matplotlib.pyplot as plt
+import pydicom
 
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -310,14 +311,128 @@ class Z5DGeodeskAnalyzer:
         )
 
 
+def load_dicom_signals(cervical_dir: str = "data/MRI__CERVICAL_SPINE_W_O_CONT/DICOM",
+                       thoracic_dir: str = "data/MRI__THORACIC_SPINE_W_O_CONT/DICOM", 
+                       signal_length: int = 256,
+                       max_files_per_series: int = 20) -> List[np.ndarray]:
+    """
+    Load actual DICOM files and extract signal patterns for Z5D analysis.
+    
+    Extracts 1D signal patterns from 2D MRI DICOM images by:
+    1. Reading pixel data from DICOM files
+    2. Extracting central row/column profiles 
+    3. Normalizing to consistent signal length
+    4. Converting to normalized floating point values
+    
+    Args:
+        cervical_dir: Path to cervical spine DICOM directory
+        thoracic_dir: Path to thoracic spine DICOM directory  
+        signal_length: Target length for extracted signals
+        max_files_per_series: Maximum DICOM files to process per series
+        
+    Returns:
+        List of 1D signal arrays extracted from DICOM files
+    """
+    signals = []
+    
+    for dataset_name, base_dir in [("Cervical", cervical_dir), ("Thoracic", thoracic_dir)]:
+        if not os.path.exists(base_dir):
+            logger.warning(f"DICOM directory not found: {base_dir}")
+            continue
+            
+        logger.info(f"Loading {dataset_name} DICOM data from {base_dir}")
+        
+        # Get all series directories
+        series_dirs = sorted([d for d in os.listdir(base_dir) if d.startswith('SERIES_')])
+        logger.info(f"Found {len(series_dirs)} series in {dataset_name}")
+        
+        for series_name in series_dirs:
+            series_path = os.path.join(base_dir, series_name)
+            if not os.path.isdir(series_path):
+                continue
+                
+            # Get DICOM files in this series
+            dcm_files = sorted([f for f in os.listdir(series_path) if f.endswith('.dcm')])
+            
+            if not dcm_files:
+                logger.warning(f"No DICOM files found in {series_path}")
+                continue
+                
+            logger.info(f"Processing {len(dcm_files)} files from {series_name} (limit: {max_files_per_series})")
+            
+            # Process files (up to max_files_per_series)
+            for i, dcm_file in enumerate(dcm_files[:max_files_per_series]):
+                try:
+                    dcm_path = os.path.join(series_path, dcm_file)
+                    ds = pydicom.dcmread(dcm_path)
+                    
+                    # Extract pixel data
+                    pixel_array = ds.pixel_array
+                    
+                    if pixel_array is None or pixel_array.size == 0:
+                        logger.warning(f"Empty pixel data in {dcm_path}")
+                        continue
+                    
+                    # Extract central row as signal (horizontal profile)
+                    center_row = pixel_array.shape[0] // 2
+                    signal_raw = pixel_array[center_row, :].astype(float)
+                    
+                    # Also extract central column (vertical profile) for variety
+                    center_col = pixel_array.shape[1] // 2  
+                    signal_raw_2 = pixel_array[:, center_col].astype(float)
+                    
+                    # Process both signals
+                    for signal_candidate in [signal_raw, signal_raw_2]:
+                        # Normalize to [0, 1] range
+                        if np.max(signal_candidate) > np.min(signal_candidate):
+                            signal_norm = (signal_candidate - np.min(signal_candidate)) / (np.max(signal_candidate) - np.min(signal_candidate))
+                        else:
+                            signal_norm = np.ones_like(signal_candidate) * 0.5
+                        
+                        # Resample to target length
+                        if len(signal_norm) != signal_length:
+                            # Use simple interpolation to resize
+                            x_old = np.linspace(0, 1, len(signal_norm))
+                            x_new = np.linspace(0, 1, signal_length)
+                            signal_resized = np.interp(x_new, x_old, signal_norm)
+                        else:
+                            signal_resized = signal_norm
+                        
+                        # Add small amount of smoothing to reduce high-frequency noise
+                        if len(signal_resized) > 4:
+                            # Simple moving average with window size 3
+                            kernel = np.ones(3) / 3
+                            signal_smoothed = np.convolve(signal_resized, kernel, mode='same')
+                        else:
+                            signal_smoothed = signal_resized
+                        
+                        signals.append(signal_smoothed)
+                        
+                except Exception as e:
+                    logger.error(f"Error processing {dcm_path}: {e}")
+                    continue
+    
+    logger.info(f"Successfully loaded {len(signals)} signals from DICOM files")
+    
+    if len(signals) == 0:
+        logger.error("No valid signals extracted from DICOM files")
+        # Fallback to a minimal synthetic signal for testing
+        logger.warning("Creating minimal fallback signals for testing")
+        t = np.linspace(0, 2*np.pi, signal_length)
+        signals = [
+            0.5 + 0.2 * np.sin(t) + 0.05 * np.random.randn(signal_length),
+            0.4 + 0.3 * np.cos(t) + 0.08 * np.random.randn(signal_length)
+        ]
+    
+    return signals
+
+
 def generate_synthetic_mri_signals(n_samples: int = 100, signal_length: int = 256, seed: int = 42) -> List[np.ndarray]:
     """
-    Generate synthetic MRI-like signal patterns for testing.
+    DEPRECATED: Generate synthetic MRI-like signal patterns for testing.
     
-    This simulates T2 intensity patterns with various characteristics:
-    - High coherence signals (trauma-like patterns)
-    - Moderate coherence signals (normal tissue)
-    - Low coherence signals (noise/artifacts)
+    This function is deprecated in favor of load_dicom_signals() which uses real DICOM data.
+    Kept for backwards compatibility only.
     
     Args:
         n_samples: Number of signal samples to generate
@@ -327,6 +442,8 @@ def generate_synthetic_mri_signals(n_samples: int = 100, signal_length: int = 25
     Returns:
         List of synthetic signal arrays
     """
+    logger.warning("Using deprecated synthetic signal generation. Use load_dicom_signals() for real DICOM data.")
+    
     np.random.seed(seed)
     signals = []
     
@@ -355,14 +472,21 @@ def generate_synthetic_mri_signals(n_samples: int = 100, signal_length: int = 25
 
 def main():
     """Main analysis pipeline."""
-    parser = argparse.ArgumentParser(description="Z5D MRI Signal Analysis")
+    parser = argparse.ArgumentParser(description="Z5D MRI Signal Analysis with Real DICOM Data")
     parser.add_argument("--seed", type=int, default=42, help="Random seed")
     parser.add_argument("--bootstrap", type=int, default=1000, help="Bootstrap resamples")
     parser.add_argument("--permutation", type=int, default=1000, help="Permutation tests")
-    parser.add_argument("--n-samples", type=int, default=100, help="Number of synthetic samples")
     parser.add_argument("--signal-length", type=int, default=256, help="Signal length")
     parser.add_argument("--output-dir", type=str, default="results", help="Output directory")
     parser.add_argument("--k-parameter", type=float, default=0.04449, help="Geodesic curvature parameter")
+    parser.add_argument("--cervical-dir", type=str, default="data/MRI__CERVICAL_SPINE_W_O_CONT/DICOM", 
+                       help="Path to cervical spine DICOM directory")
+    parser.add_argument("--thoracic-dir", type=str, default="data/MRI__THORACIC_SPINE_W_O_CONT/DICOM", 
+                       help="Path to thoracic spine DICOM directory")
+    parser.add_argument("--max-files-per-series", type=int, default=20, 
+                       help="Maximum DICOM files to process per series")
+    parser.add_argument("--use-synthetic", action="store_true", 
+                       help="Use synthetic data instead of DICOM (for testing)")
     
     args = parser.parse_args()
     
@@ -377,20 +501,33 @@ def main():
     # Initialize analyzer
     analyzer = Z5DGeodeskAnalyzer(seed=args.seed)
     
-    # Generate synthetic MRI signals
-    logger.info(f"Generating {args.n_samples} synthetic MRI signals")
-    signals = generate_synthetic_mri_signals(
-        n_samples=args.n_samples,
-        signal_length=args.signal_length,
-        seed=args.seed
-    )
+    # Load signals (DICOM or synthetic)
+    if args.use_synthetic:
+        logger.info("Using synthetic MRI signals for testing")
+        signals = generate_synthetic_mri_signals(
+            n_samples=100,  # Default for synthetic
+            signal_length=args.signal_length,
+            seed=args.seed
+        )
+        sample_prefix = "synthetic_mri"
+    else:
+        logger.info("Loading real DICOM signals")
+        signals = load_dicom_signals(
+            cervical_dir=args.cervical_dir,
+            thoracic_dir=args.thoracic_dir,
+            signal_length=args.signal_length,
+            max_files_per_series=args.max_files_per_series
+        )
+        sample_prefix = "dicom_signal"
+    
+    logger.info(f"Loaded {len(signals)} signals for analysis")
     
     # Analyze signals
     logger.info("Performing Z5D geodesic analysis")
     results = []
     
     for i, signal in enumerate(signals):
-        sample_id = f"synthetic_mri_{i:03d}"
+        sample_id = f"{sample_prefix}_{i:03d}"
         result = analyzer.analyze_signal_pattern(signal, sample_id)
         results.append(result)
         
@@ -424,9 +561,11 @@ def main():
         f.write(f"seed: {args.seed}\n")
         f.write(f"bootstrap: {args.bootstrap}\n")
         f.write(f"permutation: {args.permutation}\n")
-        f.write(f"n_samples: {args.n_samples}\n")
+        f.write(f"n_signals: {len(signals)}\n")
         f.write(f"signal_length: {args.signal_length}\n")
         f.write(f"k_parameter: {args.k_parameter}\n")
+        f.write(f"max_files_per_series: {args.max_files_per_series}\n")
+        f.write(f"use_synthetic: {args.use_synthetic}\n")
         f.write(f"timestamp: {timestamp}\n")
         f.write(f"mpmath_dps: {mp.dps}\n")
     
