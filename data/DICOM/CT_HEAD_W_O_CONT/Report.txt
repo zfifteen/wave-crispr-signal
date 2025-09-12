@@ -1,0 +1,66 @@
+1^CT HEAD W/O CONT^[PATIENT_NAME]
+Group ID# [GROUP_ID]
+_______________________________________________________________________________
+[PATIENT_NAME]  [SSN]    DOB-[DOB] M
+Exm Date: [EXAM_DATE]@14:29
+Req Phys: [PHYSICIAN_NAME]                     Pat Loc: [LOCATION]
+                                         Img Loc: CT SCAN
+                                         Service: Unknown
+
+                             [HOSPITAL_NAME]
+                                  [ADDRESS]
+                                      [PHONE]
+
+
+(Case [CASE_ID] COMPLETE)CT HEAD W/O CONT                 (CT   Detailed) CPT:70450
+     Reason for Study: dizzy
+
+    Clinical History:
+      Patient age: 50
+
+    Report Status: Verified                   Date Reported: [REPORT_DATE]
+                                              Date Verified: [VERIFY_DATE]
+    Verifier E-Sig:/ES/[VERIFIER_NAME]
+
+    Report:
+      CT head without contrast.
+
+      CLINICAL HISTORY: Dizziness.
+
+      TECHNIQUE: CT scanning of the head was performed without contrast
+      enhancement. Images were evaluated using 4 mm slice thickness
+      axial, coronal and sagittal reconstructions.
+
+      COMPARISON: None.
+
+      FINDINGS: The ventricular size is normal. The lateral, third and
+      fourth ventricles are normally outlined. No acute intra-axial or
+      extra-axial hemorrhage is evident. There is no mass effect or
+      shift of the midline structures. The bony calvarium is intact.
+      The visualized paranasal sinuses are clear.
+
+
+
+    Impression:
+
+
+      No evidence for acute intracranial hemorrhage, mass effect or
+      midline shift.
+
+      TOTAL CT RADIATION DOSE (DLP): 1256.2 mGy/cm
+
+      Reading Physician: [PHYSICIAN_NAME]
+       [REPORT_TIMESTAMP]
+
+       Attention Patients / Veterans: If you have questions or concerns
+       about these test results, please contact your ordering provider
+      or primary care team.
+
+    Primary Diagnostic Code:
+
+Primary Interpreting Staff:
+  [PHYSICIAN_NAME], RADIOLOGIST (Verifier)
+/[INITIALS]
+
+
+** END REPORT [END_TIMESTAMP] **
