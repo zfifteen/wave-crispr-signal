@@ -403,13 +403,16 @@ def run_smoke_test():
         
         # Test 2: DICOM signals (if available)
         print("Testing DICOM signal loading...")
-        dicom_signals = load_dicom_signals(
-            signal_length=16,
-            max_files_per_series=2
-        )
+        with tempfile.TemporaryDirectory() as cervical_dir, tempfile.TemporaryDirectory() as thoracic_dir:
+            dicom_signals = load_dicom_signals(
+                signal_length=16,
+                max_files_per_series=2,
+                cervical_dir=cervical_dir,
+                thoracic_dir=thoracic_dir
+            )
         
-        dicom_results = []
-        for i, signal in enumerate(dicom_signals[:3]):
+            dicom_results = []
+            for i, signal in enumerate(dicom_signals[:3]):
             result = analyzer.analyze_signal_pattern(signal, f"smoke_dicom_{i}")
             dicom_results.append(result)
         
