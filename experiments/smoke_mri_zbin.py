@@ -1,11 +1,12 @@
 # experiments/smoke_mri_zbin.py
-# Minimal smoke test: handles mixed slice shapes by grouping and classifies each group.
+# Refined smoke test: Series-aware grouping, T2-like selection, and corrected logic for syrinx/desiccation detection.
+# Handles mixed shapes/series; classifies with refined rules to avoid over-trauma bias.
 # Usage: python experiments/smoke_mri_zbin.py /path/to/DICOM
 #
 # Dependencies: pydicom, numpy
 #   pip install pydicom numpy
 #
-# Output: For each shape group, prints a single-line verdict:
+# Output: For each selected group, prints a single-line verdict:
 #   [shape (H, W)] <degenerative-like|old-trauma-like|ambiguous> | segments=<n> | widest=<rows> rows | coverage=<0..1> | focality=<ratio> | slices=<n>/<total>
 
 import sys, os, glob
@@ -17,11 +18,13 @@ except ImportError:
     print("Please: pip install pydicom numpy")
     sys.exit(1)
 
-def iter_slices(dicom_dir):
-    files = sorted(glob.glob(os.path.join(dicom_dir, "**", "*.dcm"), recursive=True))
-    if not files:
-        raise RuntimeError(f"No .dcm files found under {dicom_dir}")
+# --- Series + metadata aware helpers ---
 
+def series_uid_of(ds):
+    return getattr(ds, "SeriesInstanceUID", "unknown")
+
+def iter_slices_with_meta(dicom_dir):
+    files = sorted(glob.glob(os.path.join(dicom_dir, "**", "*.dcm"), recursive=True))
     def sort_key(fp):
         try:
             ds = pydicom.dcmread(fp, stop_before_pixels=True, force=True)
@@ -29,26 +32,6 @@ def iter_slices(dicom_dir):
         except Exception:
             return 0
     files.sort(key=sort_key)
-
-    for fp in files:
-        try:
-            ds = pydicom.dcmread(fp, force=True)
-            arr = ds.pixel_array.astype(np.float32)
-            slope = float(getattr(ds, "RescaleSlope", 1.0))
-            inter = float(getattr(ds, "RescaleIntercept", 0.0))
-            arr = arr * slope + inter
-            yield arr
-        except Exception:
-            # skip unreadable
-            continue
-
-# --- New series + metadata aware helpers ---
-
-def series_uid_of(ds):
-    return getattr(ds, "SeriesInstanceUID", "unknown")
-
-def iter_slices_with_meta(dicom_dir):
-    files = sorted(glob.glob(os.path.join(dicom_dir, "**", "*.dcm"), recursive=True))
     for fp in files:
         try:
             ds = pydicom.dcmread(fp, force=True)
@@ -70,7 +53,7 @@ def group_by_series_then_shape(dicom_dir):
     return groups, total
 
 def pick_t2_like(uids_to_slices):
-    # prefer a series with larger EchoTime if available
+    # Prefer series with larger EchoTime (T2-like) if available
     def te_of(ds):
         try:
             return float(getattr(ds, "EchoTime", 0.0))
@@ -80,21 +63,14 @@ def pick_t2_like(uids_to_slices):
     for (uid, shape), items in uids_to_slices.items():
         tes = [te_of(ds) for (_, ds) in items]
         scored.append(((uid, shape), np.median(tes) if tes else 0.0, len(items)))
-    # sort by EchoTime desc, then by slice count desc
+    # Sort by EchoTime desc, then by slice count desc
     scored.sort(key=lambda t: (t[1], t[2]), reverse=True)
-    return [x[0] for x in scored]  # ordered keys
-# --- End new helpers ---
+    return [x[0] for x in scored]  # Ordered keys
 
-def group_by_shape(dicom_dir):
-    groups = {}
-    total = 0
-    for arr in iter_slices(dicom_dir):
-        total += 1
-        groups.setdefault(arr.shape, []).append(arr)
-    return groups, total
+# --- End helpers ---
 
 def minmax01(img):
-    # robust normalize to [0,1] using 1–99th percentiles; tolerate constant arrays
+    # Robust normalize to [0,1] using 1–99th percentiles; tolerate constant arrays
     img = np.asarray(img, dtype=np.float32)
     if not np.isfinite(img).any():
         return np.zeros_like(img, dtype=np.float32)
@@ -104,13 +80,12 @@ def minmax01(img):
     if hi <= lo:
         return np.zeros_like(img, dtype=np.float32)
     img = np.clip(img, lo, hi)
-    return (img - lo) / (hi - hi + 1e-9 if hi == lo else (hi - lo))
+    return (img - lo) / (hi - lo + 1e-9)
 
 def theta_prime(x, k=0.3):
-    # θ′(x,k) = φ * frac(x/φ)^k ; for x∈[0,1], frac(x/φ)=x/φ
+    # θ′(x,k) = φ * (x/φ)^k ; for x∈[0,1]
     phi = (1 + 5 ** 0.5) / 2.0
     x = np.clip(x, 0.0, 1.0).astype(np.float32)
-    # Avoid domain issues for very small x
     base = x / phi
     base = np.clip(base, 0.0, 1.0)
     return phi * (base ** k)
@@ -136,8 +111,8 @@ def count_segments(v, thr=0.6, min_len_frac=0.02):
         runs.append(cur)
     return runs
 
-def classify_profile(profile):
-    # Returns: label, nseg, maxw, foc_ratio, coverage
+def classify_profile(profile, has_syrinx, has_desiccation, focal_count, multi_count):
+    # Refined classification with syrinx/desiccation checks
     v = smooth1d(profile, w=7)
     vmax, vmin = float(np.max(v)), float(np.min(v))
     if not np.isfinite(vmax) or vmax - vmin <= 0:
@@ -151,17 +126,19 @@ def classify_profile(profile):
     vmean = float(np.mean(v)) if np.isfinite(v).all() else 1.0
     foc_ratio = float(np.max(v) / (vmean + 1e-9))
 
-    # Simple explicit rules
-    if nseg >= 3 and coverage >= 0.30:
+    # Refined rules: Incorporate syrinx and desiccation for better distinction
+    if has_desiccation and nseg >= 3 and coverage >= 0.30 and multi_count > focal_count:
         label = "degenerative-like"
-    elif nseg <= 2 and foc_ratio >= 1.55 and (maxw / float(length)) <= 0.20:
+    elif has_syrinx and nseg <= 2 and foc_ratio >= 1.55 and (maxw / float(length)) <= 0.20 and focal_count >= multi_count:
         label = "old-trauma-like"
+    elif has_syrinx and multi_count > focal_count:
+        label = "degenerative-like"  # Syrinx mimic in degenerative context
     else:
         label = "ambiguous"
     return label, nseg, maxw, foc_ratio, coverage
 
 def analyze_stack(stack):
-    # Take mid slice, build craniocaudal darkness profile, classify
+    # Refined: Mid slice profile + syrinx/desiccation detection
     mid = stack[len(stack)//2]
     img = minmax01(mid)
     h, w = img.shape
@@ -169,16 +146,32 @@ def analyze_stack(stack):
     if c1 <= c0:
         c0, c1 = 0, w
     strip = img[:, c0:c1]
-    # Darkness = 1 - intensity (low T2 → dark)
     darkness = 1.0 - np.mean(strip, axis=1)
-    # θ′ transform and re-normalize
     tp = theta_prime(darkness, k=0.3)
     tmax, tmin = float(np.max(tp)), float(np.min(tp))
     if tmax - tmin <= 0:
         tp = np.zeros_like(tp, dtype=np.float32)
     else:
         tp = (tp - tmin) / (tmax - tmin + 1e-9)
-    return classify_profile(tp)
+
+    # New: Syrinx detection (high intensity central region)
+    thresh_high = np.where(img > 0.8, 1, 0)  # High T2 threshold
+    labels = np.zeros_like(thresh_high)
+    for row in range(h):
+        row_seg = thresh_high[row, int(w*0.4):int(w*0.6)]  # Central cord
+        if np.sum(row_seg) > (0.2 * len(row_seg)):  # Wide high-signal
+            labels[row] = 1
+    has_syrinx = np.sum(labels) > (0.1 * h)  # >10% rows with syrinx-like signal
+
+    # New: Desiccation (low signal dominance via histogram)
+    hist, _ = np.histogram(img.flatten(), bins=256, range=(0,1))
+    has_desiccation = hist[0:50].sum() > (0.1 * img.size)  # Low bins >10% pixels
+
+    # Placeholder counts for focal/multi (refine with contour analysis if needed)
+    focal_count = 1 if has_syrinx else 0  # Simplified; expand for production
+    multi_count = 1 if has_desiccation else 0
+
+    return classify_profile(tp, has_syrinx, has_desiccation, focal_count, multi_count)
 
 def main():
     if len(sys.argv) < 2:
@@ -186,16 +179,18 @@ def main():
         sys.exit(2)
 
     dicom_dir = sys.argv[1]
-    groups, total = group_by_shape(dicom_dir)
+    groups, total = group_by_series_then_shape(dicom_dir)
+    ordered_keys = pick_t2_like(groups)  # Select T2-like series first
 
-    shapes = list(groups.keys())
-    shapes_sorted = sorted(shapes, key=lambda s: len(groups[s]), reverse=True)
-    counts = [(s, len(groups[s])) for s in shapes_sorted]
-    if len(shapes_sorted) > 1:
-        print(f"Warning: mixed slice shapes {shapes_sorted}, processing each group separately ({sum(c for _, c in counts)}/{total} slices)")
+    if len(ordered_keys) > 1:
+        print(f"Warning: multiple series/shapes {ordered_keys}, processing ordered by T2-likeness ({total} total slices)")
 
-    for shape in shapes_sorted:
-        slices = groups[shape]
+    for key in ordered_keys:
+        items = groups.get(key, [])
+        shape = key[1]
+        slices = [arr for (arr, _) in items]
+        if not slices:
+            continue
         try:
             stack = np.stack(slices, axis=0)
         except Exception:
