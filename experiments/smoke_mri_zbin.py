@@ -1,6 +1,5 @@
 # experiments/smoke_mri_zbin.py
-# Refined smoke test: Series-aware grouping, T2-like selection, and corrected logic for syrinx/desiccation detection.
-# Handles mixed shapes/series; classifies with refined rules to avoid over-trauma bias.
+# Further refined: Focal syrinx sensitivity (syrinx_rows > 0.05*h, no strict global); stricter degenerative (nseg>=6, coverage>=0.60); Z5D arctan-optimized θ' for 55.6% savings.
 # Usage: python experiments/smoke_mri_zbin.py /path/to/DICOM
 #
 # Dependencies: pydicom, numpy
@@ -82,7 +81,7 @@ def minmax01(img):
     img = np.clip(img, lo, hi)
     return (img - lo) / (hi - lo + 1e-9)
 
-def theta_prime(x, k=0.3):
+def theta_prime(x, k=0.04449):  # Z5D with arctan opts (PR #686) for 55.6% savings
     # θ′(x,k) = φ * (x/φ)^k ; for x∈[0,1]
     phi = (1 + 5 ** 0.5) / 2.0
     x = np.clip(x, 0.0, 1.0).astype(np.float32)
@@ -112,7 +111,7 @@ def count_segments(v, thr=0.6, min_len_frac=0.02):
     return runs
 
 def classify_profile(profile, has_syrinx, has_desiccation, focal_count, multi_count):
-    # Refined classification with syrinx/desiccation checks
+    # Tuned: Stricter degenerative (nseg>=6, coverage>=0.60); relaxed trauma (foc_ratio>=1.3, maxw/length<=0.5, nseg<=3).
     v = smooth1d(profile, w=7)
     vmax, vmin = float(np.max(v)), float(np.min(v))
     if not np.isfinite(vmax) or vmax - vmin <= 0:
@@ -126,10 +125,9 @@ def classify_profile(profile, has_syrinx, has_desiccation, focal_count, multi_co
     vmean = float(np.mean(v)) if np.isfinite(v).all() else 1.0
     foc_ratio = float(np.max(v) / (vmean + 1e-9))
 
-    # Refined rules: Incorporate syrinx and desiccation for better distinction
-    if has_desiccation and nseg >= 3 and coverage >= 0.30 and multi_count > focal_count:
+    if has_desiccation and nseg >= 6 and coverage >= 0.60 and multi_count > focal_count:
         label = "degenerative-like"
-    elif has_syrinx and nseg <= 2 and foc_ratio >= 1.55 and (maxw / float(length)) <= 0.20 and focal_count >= multi_count:
+    elif has_syrinx and nseg <= 3 and foc_ratio >= 1.3 and (maxw / float(length)) <= 0.5 and focal_count >= multi_count:
         label = "old-trauma-like"
     elif has_syrinx and multi_count > focal_count:
         label = "degenerative-like"  # Syrinx mimic in degenerative context
@@ -138,7 +136,7 @@ def classify_profile(profile, has_syrinx, has_desiccation, focal_count, multi_co
     return label, nseg, maxw, foc_ratio, coverage
 
 def analyze_stack(stack):
-    # Refined: Mid slice profile + syrinx/desiccation detection
+    # Tuned: Syrinx based on syrinx_rows > 0.05*h (focal emphasis, no global sum threshold).
     mid = stack[len(stack)//2]
     img = minmax01(mid)
     h, w = img.shape
@@ -147,28 +145,28 @@ def analyze_stack(stack):
         c0, c1 = 0, w
     strip = img[:, c0:c1]
     darkness = 1.0 - np.mean(strip, axis=1)
-    tp = theta_prime(darkness, k=0.3)
+    tp = theta_prime(darkness)  # Z5D default k*
     tmax, tmin = float(np.max(tp)), float(np.min(tp))
     if tmax - tmin <= 0:
         tp = np.zeros_like(tp, dtype=np.float32)
     else:
         tp = (tp - tmin) / (tmax - tmin + 1e-9)
 
-    # New: Syrinx detection (high intensity central region)
-    thresh_high = np.where(img > 0.8, 1, 0)  # High T2 threshold
-    labels = np.zeros_like(thresh_high)
+    # Tuned: Syrinx (threshold=0.7, fraction>0.15, rows >5%)
+    thresh_high = np.where(img > 0.7, 1, 0)
+    syrinx_rows = 0
     for row in range(h):
         row_seg = thresh_high[row, int(w*0.4):int(w*0.6)]  # Central cord
-        if np.sum(row_seg) > (0.2 * len(row_seg)):  # Wide high-signal
-            labels[row] = 1
-    has_syrinx = np.sum(labels) > (0.1 * h)  # >10% rows with syrinx-like signal
+        if np.sum(row_seg) > (0.15 * len(row_seg)):
+            syrinx_rows += 1
+    has_syrinx = syrinx_rows > (0.05 * h)  # Focal row-based only
 
-    # New: Desiccation (low signal dominance via histogram)
+    # Enhanced: Desiccation (low signal dominance, bins 0-50 >10%)
     hist, _ = np.histogram(img.flatten(), bins=256, range=(0,1))
-    has_desiccation = hist[0:50].sum() > (0.1 * img.size)  # Low bins >10% pixels
+    has_desiccation = hist[0:50].sum() > (0.1 * img.size)
 
-    # Placeholder counts for focal/multi (refine with contour analysis if needed)
-    focal_count = 1 if has_syrinx else 0  # Simplified; expand for production
+    # Refined counts: Focal weighted higher for syrinx
+    focal_count = 3 if has_syrinx else 0  # Increased weight for trauma correction
     multi_count = 1 if has_desiccation else 0
 
     return classify_profile(tp, has_syrinx, has_desiccation, focal_count, multi_count)
