@@ -8,7 +8,7 @@ name: Repository Policy Enforcement
 
 jobs:
   policy-check:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     strategy:
       matrix:
         python-version: [3.12]
