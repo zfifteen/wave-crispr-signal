@@ -50,6 +50,7 @@ def main():
         ("Geodesic Bridge", "tests/test_geodesic_bridge.py"),
         ("Bin-Resonance Test", "tests/test_bin_resonance.py"),
         ("ORCS Physical Z-Metrics", "tests/test_orcs_physical_z_metrics.py"),
+        ("MRI Z5D Analysis", "tests/test_mri_z5d_analysis.py"),
     ]
 
     results = []
