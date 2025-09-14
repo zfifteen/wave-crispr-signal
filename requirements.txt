@@ -26,3 +26,6 @@ kiwisolver==1.4.9
 pillow==11.3.0
 narwhals==2.1.2
 tzdata==2025.2
+
+# PyTorch for vectorized optimization
+torch==2.8.0
