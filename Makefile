@@ -21,7 +21,7 @@ test:
 	python run_tests.py
 
 # Run smoke tests for CI
-smoke: mve-smoke test-z-framework-import mri-z5d-smoke
+smoke: mve-smoke test-z-framework-import mri-z5d-smoke fus-enhancer-smoke
 	@echo "✓ All smoke tests completed"
 
 # Test Z Framework import compatibility
@@ -109,3 +109,32 @@ run-mri-z5d-synthetic:
 		--output-dir results \
 		--k-parameter 0.04449 \
 		--use-synthetic
+
+# Run optimized FUS enhancer with vectorized processing (10^6 trials)
+run-fus-enhancer:
+	python fus_enhancer.py \
+		--seed 42 \
+		--bootstrap 1000 \
+		--permutation 1000 \
+		--n-trials 1000000 \
+		--batch-size 100000 \
+		--grid-size 100 \
+		--k-parameter 0.3 \
+		--output-dir results \
+		--visualize
+
+# Run quick FUS enhancer test (reduced parameters)
+run-fus-enhancer-quick:
+	python fus_enhancer.py \
+		--seed 42 \
+		--bootstrap 100 \
+		--permutation 100 \
+		--n-trials 10000 \
+		--batch-size 1000 \
+		--grid-size 50 \
+		--output-dir results
+
+# Run FUS enhancer smoke test
+fus-enhancer-smoke:
+	@echo "Running FUS Enhancer smoke test..."
+	python tests/test_fus_enhancer.py --smoke
