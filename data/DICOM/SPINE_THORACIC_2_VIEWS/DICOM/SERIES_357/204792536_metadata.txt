@@ -1,0 +1,367 @@
+# DICOM Metadata Dump
+# Source file: /Users/velocityworks/IdeaProjects/wave-crispr-signal/data/DICOM/SPINE_THORACIC_2_VIEWS/DICOM/SERIES_357/204792536.dcm
+# Extracted: 2025-09-14T21:46:17.556142Z
+
+SOPClassUID: 1.2.840.10008.5.1.4.1.1.1.1
+SOPInstanceUID: 1.2.840.113619.2.420.4.8323328.1752775760.627554
+StudyInstanceUID: 1.2.840.113754.1.4.646.6749282.8589.1.646.71725.1849
+SeriesInstanceUID: 1.2.840.113619.2.420.4.8323328.1752775609.903938
+Modality: DX
+Manufacturer: GE Healthcare
+ManufacturerModelName: Discovery XR656 HD
+Rows: 4259
+Columns: 2254
+NumberOfFrames: None
+SamplesPerPixel: 1
+BitsAllocated: 16
+BitsStored: 16
+HighBit: 15
+PixelRepresentation: 0
+PhotometricInterpretation: MONOCHROME2
+PlanarConfiguration: None
+RescaleSlope: 1
+RescaleIntercept: 0
+WindowCenter: [24019, 24019, 24019]
+WindowWidth: [16523, 12392, 24784]
+PixelSpacing: [0.097467, 0.097467]
+SliceThickness: None
+SpacingBetweenSlices: None
+ImagePositionPatient: None
+ImageOrientationPatient: None
+SliceLocation: None
+
+### Full Dataset ###
+Dataset.file_meta -------------------------------
+(0002,0000) File Meta Information Group Length  UL: 200
+(0002,0001) File Meta Information Version       OB: b'\x00\x01'
+(0002,0002) Media Storage SOP Class UID         UI: Digital X-Ray Image Storage - For Presentation
+(0002,0003) Media Storage SOP Instance UID      UI: 1.2.840.113619.2.420.4.8323328.1752775760.627554
+(0002,0010) Transfer Syntax UID                 UI: Implicit VR Little Endian
+(0002,0012) Implementation Class UID            UI: 1.2.840.114089.1.0.0.3.3.68
+(0002,0013) Implementation Version Name         SH: 'DCF 3.3.68c'
+(0002,0016) Source Application Entity Title     AE: 'DCF'
+-------------------------------------------------
+(0008,0005) Specific Character Set              CS: 'ISO_IR 100'
+(0008,0008) Image Type                          CS: ['ORIGINAL', 'PRIMARY', '']
+(0008,0016) SOP Class UID                       UI: Digital X-Ray Image Storage - For Presentation
+(0008,0018) SOP Instance UID                    UI: 1.2.840.113619.2.420.4.8323328.1752775760.627554
+(0008,0020) Study Date                          DA: '20250717'
+(0008,0021) Series Date                         DA: '20250717'
+(0008,0022) Acquisition Date                    DA: '20250717'
+(0008,0023) Content Date                        DA: '20250717'
+(0008,002A) Acquisition DateTime                DT: '20250717140919.000000'
+(0008,0030) Study Time                          TM: '140649.000'
+(0008,0031) Series Time                         TM: '140649.000'
+(0008,0032) Acquisition Time                    TM: '140919.000'
+(0008,0033) Content Time                        TM: '140920.000'
+(0008,0050) Accession Number                    SH: 'ANONYMIZED'
+(0008,0060) Modality                            CS: 'DX'
+(0008,0068) Presentation Intent Type            CS: 'FOR PRESENTATION'
+(0008,0070) Manufacturer                        LO: 'GE Healthcare'
+(0008,0080) Institution Name                    LO: 'ANONYMIZED'
+(0008,0081) Institution Address                 ST: 'ANONYMIZED'
+(0008,0090) Referring Physician's Name          PN: 'ANONYMIZED'
+(0008,1010) Station Name                        SH: '412822XR1'
+(0008,1030) Study Description                   LO: 'SPINE THORACIC 2 VIEWS'
+(0008,103E) Series Description                  LO: 'Thoracic-spine'
+(0008,1040) Institutional Department Name       LO: 'Radiology'
+(0008,1050) Performing Physician's Name         PN: 'ANONYMIZED'
+(0008,1070) Operators' Name                     PN: 'ANONYMIZED'
+(0008,1090) Manufacturer's Model Name           LO: 'Discovery XR656 HD'
+(0008,1110)  Referenced Study Sequence  1 item(s) ---- 
+   (0008,1150) Referenced SOP Class UID            UI: Detached Study Management SOP Class
+   (0008,1155) Referenced SOP Instance UID         UI: 1.2.840.113754.1.4.646.6749282.8589.1.646.71725.1849
+   ---------
+(0008,1120)  Referenced Patient Sequence  1 item(s) ---- 
+   (0008,1150) Referenced SOP Class UID            UI: Detached Patient Management SOP Class
+   (0008,1155) Referenced SOP Instance UID         UI: 1.2.840.113754.1.1.646.2361356280
+   ---------
+(0008,2112)  Source Image Sequence  1 item(s) ---- 
+   (0008,1150) Referenced SOP Class UID            UI: Digital X-Ray Image Storage - For Processing
+   (0008,1155) Referenced SOP Instance UID         UI: 1.2.840.113619.2.420.4.8323328.1752775759.487251
+   ---------
+(0008,2218)  Anatomic Region Sequence  1 item(s) ---- 
+   (0008,0100) Code Value                          SH: 'T-11502'
+   (0008,0102) Coding Scheme Designator            SH: 'SRT'
+   (0008,0104) Code Meaning                        LO: 'Thoracic spine'
+   ---------
+(0008,3010) Irradiation Event UID               UI: 1.2.840.113619.2.420.4.8323328.1752775755.696771
+(0010,0010) Patient's Name                      PN: 'ANONYMIZED'
+(0010,0020) Patient ID                          LO: 'ANONYMIZED'
+(0010,0030) Patient's Birth Date                DA: ''
+(0010,0040) Patient's Sex                       CS: 'ANONYMIZED'
+(0010,1000) Other Patient IDs                   LO: 'ANONYMIZED'
+(0010,1010) Patient's Age                       AS: 'ANONYMIZED'
+(0010,1020) Patient's Size                      DS: '1.9431'
+(0010,1030) Patient's Weight                    DS: '90.80'
+(0010,1040) Patient's Address                   LO: 'ANONYMIZED'
+(0010,2000) Medical Alerts                      LO: ''
+(0010,2110) Allergies                           LO: ''
+(0011,0010) Private Creator                     LO: 'GEMS_GDXE_FALCON_04'
+(0011,1003) [Processed Series UID]              UI: 1.2.840.113619.2.420.4.8323328.1752775609.903938
+(0011,1004) [Acquisition Type]                  CS: 'SE'
+(0011,1005) [Acquisition UID]                   UI: 1.2.840.113619.2.420.4.8323328.1752775755.696771
+(0011,1006) [Image Dose]                        DS: '0.406325'
+(0011,1009) [Non-Digital Exposures]             SL: 0
+(0011,1010) [Total Exposures]                   SL: 2
+(0011,1011) [ROI]                               LT: Array of 291 elements
+(0011,1012) [Patient Size String]               LT: 'LARGE_ADULT'
+(0011,1013) [SPS UID]                           UI: 1.2.840.113619.2.420.4.8323328.1752775606.733494
+(0011,1015) [Detector ARC Gain]                 DS: '457.000000'
+(0011,1016) [Processing Debug Info]             LT: Array of 778 elements
+(0011,1017) [Override mode]                     CS: 'DISABLE'
+(0011,1019) [Film Speed Selection]              DS: '400'
+(0011,1031) [Detected Field of View]            IS: [4259, 3150, 0, 3150, 0, 896, 4259, 896]
+(0011,1032) [Adjusted Field of View]            IS: [4259, 3150, 0, 3150, 0, 896, 4259, 896]
+(0011,1034) [Compensated Detector Exposure]     DS: '1.530000'
+(0011,1036) [Median Anatomy Count Value]        DS: '810'
+(0011,1037) [DEI lower and upper limit values]  DS: [-5.000000, -3.000000, 2.000000, 4.000000]
+(0011,1042) [View IP]                           LO: 'left-lateral'
+(0011,1044) [Receptor Type]                     CS: 'WALLSTAND'
+(0011,1046) [Unknown]                           LO: ['Thoracic-spine', 'left-lateral', 'Standard', 'LARGE ADULT', 'Factory3']
+(0011,1047) [Unknown]                           DS: '1095.276733'
+(0011,1059) Private tag data                    UN: b'NORMAL'
+(0011,1060) Private tag data                    UN: b'VERTICAL'
+(0011,1064) Private tag data                    UN: Array of 26 elements
+(0011,1065) Private tag data                    UN: b'GlobalG3WS'
+(0011,1066) Private tag data                    UN: b'No'
+(0011,1067) Private tag data                    UN: b'Front '
+(0011,1068) Private tag data                    UN: Array of 18 elements
+(0011,1069) Private tag data                    UN: b'-1.000000 '
+(0011,106B) Private tag data                    UN: Array of 131072 elements
+(0011,106D) Private tag data                    UN: b'711.330681'
+(0011,1076) Private tag data                    UN: b'A\\F '
+(0011,107D) Private tag data                    UN: b'YES '
+(0011,107E) Private tag data                    UN: b'0 '
+(0011,1080) Private tag data                    UN: b'2 '
+(0011,1081) Private tag data                    UN: b'LATERAL '
+(0011,1082) Private tag data                    UN: b'70'
+(0011,10A1) Private tag data                    UN: b'PORTRAIT'
+(0011,10A2) Private tag data                    UN: b'None'
+(0011,10A3) Private tag data                    UN: b'In'
+(0011,10A4) Private tag data                    UN: b'\xa4\x10'
+(0011,10A5) Private tag data                    UN: b'\xa4\x10'
+(0011,10AA) Private tag data                    UN: b'None'
+(0011,10AB) Private tag data                    UN: Array of 66 elements
+(0011,10B9) Private tag data                    UN: b'11084 '
+(0011,10BA) Private tag data                    UN: b'23702 '
+(0011,10BB) Private tag data                    UN: b'11084 '
+(0011,10BC) Private tag data                    UN: b'23702 '
+(0011,10BD) Private tag data                    UN: None
+(0011,10BE) Private tag data                    UN: b'0.98'
+(0011,10BF) Private tag data                    UN: b'0.88'
+(0011,10C0) Private tag data                    UN: b'-1'
+(0011,10C1) Private tag data                    UN: b'-1'
+(0011,10C2) Private tag data                    UN: b'-4.0'
+(0011,10C3) Private tag data                    UN: b'-16.0 '
+(0011,10C4) Private tag data                    UN: b'0 '
+(0011,10C7) Private tag data                    UN: b'3.568428'
+(0011,10C8) Private tag data                    UN: b'20.322763\x00'
+(0011,10C9) Private tag data                    UN: b'0\x00'
+(0011,10CA) Private tag data                    UN: b'3\x00'
+(0011,10D0) Private tag data                    UN: b'None'
+(0011,10D1) Private tag data                    UN: b'0 '
+(0011,10D2) Private tag data                    UN: b'0.000000'
+(0011,10D3) Private tag data                    UN: Array of 18 elements
+(0018,0015) Body Part Examined                  CS: 'TSPINE'
+(0018,0060) KVP                                 DS: '80.000000'
+(0018,1020) Software Versions                   LO: 'DM_PLATFORM_XRAY_DUCKWEED_4.9.11_2021_FW29.2_9'
+(0018,1030) Protocol Name                       LO: 'T_SPINE_2_VIEW'
+(0018,1110) Distance Source to Detector         DS: '1500.000000'
+(0018,1111) Distance Source to Patient          DS: '1462.000000'
+(0018,1147) Field of View Shape                 CS: 'RECTANGLE'
+(0018,1149) Field of View Dimension(s)          IS: [426, 225]
+(0018,1150) Exposure Time                       IS: '24'
+(0018,1151) X-Ray Tube Current                  IS: '502'
+(0018,1152) Exposure                            IS: '12'
+(0018,1153) Exposure in uAs                     IS: '12224'
+(0018,115E) Image and Fluoroscopy Area Dose Pro DS: '2.486687'
+(0018,1160) Filter Type                         SH: 'NONE'
+(0018,1164) Imager Pixel Spacing                DS: [0.1, 0.1]
+(0018,1166) Grid                                CS: ['FIXED', 'FOCUSED']
+(0018,1190) Focal Spot(s)                       DS: '1.300000'
+(0018,1400) Acquisition Device Processing Descr LO: 'left-lateral^Factory3'
+(0018,1405) Relative X-Ray Exposure             IS: '406'
+(0018,1411) Exposure Index                      DS: '121.840000'
+(0018,1412) Target Exposure Index               DS: '242.000000'
+(0018,1413) Deviation Index                     DS: '-3.000000'
+(0018,1508) Positioner Type                     CS: ''
+(0018,1700) Collimator Shape                    CS: 'POLYGONAL'
+(0018,1720) Vertices of the Polygonal Collimato IS: [4259, 3220, 0, 3220, 0, 1040, 4259, 1040]
+(0018,5101) View Position                       CS: 'LL'
+(0018,6000) Sensitivity                         DS: '528.205689'
+(0018,7000) Detector Conditions Nominal Flag    CS: 'YES'
+(0018,7001) Detector Temperature                DS: '31.037001'
+(0018,7004) Detector Type                       CS: 'SCINTILLATOR'
+(0018,7005) Detector Configuration              CS: 'AREA'
+(0018,700A) Detector ID                         SH: '6224871705921'
+(0018,701A) Detector Binning                    DS: [1, 1]
+(0018,7020) Detector Element Physical Size      DS: [0.100000, 0.100000]
+(0018,7022) Detector Element Spacing            DS: [0.100000, 0.100000]
+(0018,7024) Detector Active Shape               CS: 'RECTANGLE'
+(0018,7026) Detector Active Dimension(s)        DS: [426.000000, 426.000000]
+(0018,7030) Field of View Origin                DS: [896, 0]
+(0018,7032) Field of View Rotation              DS: '0.0'
+(0018,7034) Field of View Horizontal Flip       CS: 'NO'
+(0018,704C) Grid Focal Distance                 DS: '1300'
+(0018,7050) Filter Material                     CS: 'COPPER'
+(0018,7052) Filter Thickness Minimum            DS: '0.000000'
+(0018,7054) Filter Thickness Maximum            DS: '0.000000'
+(0018,7060) Exposure Control Mode               CS: 'AUTOMATIC'
+(0018,7062) Exposure Control Mode Description   LT: Array of 24 elements
+(0020,000D) Study Instance UID                  UI: 1.2.840.113754.1.4.646.6749282.8589.1.646.71725.1849
+(0020,000E) Series Instance UID                 UI: 1.2.840.113619.2.420.4.8323328.1752775609.903938
+(0020,0010) Study ID                            SH: 'ANONYMIZED'
+(0020,0011) Series Number                       IS: '357'
+(0020,0013) Instance Number                     IS: '2'
+(0020,0062) Image Laterality                    CS: 'U'
+(0028,0002) Samples per Pixel                   US: 1
+(0028,0004) Photometric Interpretation          CS: 'MONOCHROME2'
+(0028,0010) Rows                                US: 4259
+(0028,0011) Columns                             US: 2254
+(0028,0030) Pixel Spacing                       DS: [0.097467, 0.097467]
+(0028,0100) Bits Allocated                      US: 16
+(0028,0101) Bits Stored                         US: 16
+(0028,0102) High Bit                            US: 15
+(0028,0103) Pixel Representation                US: 0
+(0028,0300) Quality Control Image               CS: 'NO'
+(0028,0301) Burned In Annotation                CS: 'NO'
+(0028,0A02) Pixel Spacing Calibration Type      CS: 'GEOMETRY'
+(0028,0A04) Pixel Spacing Calibration Descripti LO: 'Corrected by the SOD and SID'
+(0028,1040) Pixel Intensity Relationship        CS: 'LOG'
+(0028,1041) Pixel Intensity Relationship Sign   SS: -1
+(0028,1050) Window Center                       DS: [24019, 24019, 24019]
+(0028,1051) Window Width                        DS: [16523, 12392, 24784]
+(0028,1052) Rescale Intercept                   DS: '0'
+(0028,1053) Rescale Slope                       DS: '1'
+(0028,1054) Rescale Type                        LO: 'US'
+(0028,1055) Window Center & Width Explanation   LO: ['NORMAL', 'HARDER', 'SOFTER']
+(0028,2110) Lossy Image Compression             CS: '00'
+(0028,3010)  VOI LUT Sequence  3 item(s) ---- 
+   (0028,3002) LUT Descriptor                      US: [0, 0, 16]
+   (0028,3003) LUT Explanation                     LO: 'NORMAL'
+   (0028,3006) LUT Data                            OW: Array of 131072 elements
+   ---------
+   (0028,3002) LUT Descriptor                      US: [0, 0, 16]
+   (0028,3003) LUT Explanation                     LO: 'HARDER'
+   (0028,3006) LUT Data                            OW: Array of 131072 elements
+   ---------
+   (0028,3002) LUT Descriptor                      US: [0, 0, 16]
+   (0028,3003) LUT Explanation                     LO: 'SOFTER'
+   (0028,3006) LUT Data                            OW: Array of 131072 elements
+   ---------
+(0032,1020) Scheduled Study Location            LO: '646'
+(0032,1032) Requesting Physician                PN: 'WILLIAMS^TEONA M'
+(0032,1060) Requested Procedure Description     LO: 'X-RAY EXAM THORAC SPINE 2VWS'
+(0038,0300) Current Patient Location            LO: ''
+(0038,0500) Patient State                       LO: ''
+(0040,0244) Performed Procedure Step Start Date DA: '20250717'
+(0040,0245) Performed Procedure Step Start Time TM: '140649.000'
+(0040,0253) Performed Procedure Step ID         SH: '1752775609507596'
+(0040,0254) Performed Procedure Step Descriptio LO: 'Performed Desc'
+(0040,0260)  Performed Protocol Code Sequence  3 item(s) ---- 
+   (0008,0100) Code Value                          SH: '72070'
+   (0008,0102) Coding Scheme Designator            SH: 'C4'
+   (0008,0104) Code Meaning                        LO: 'X-RAY EXAM THORAC SPINE 2VWS'
+   ---------
+   (0008,0100) Code Value                          SH: '72070'
+   (0008,0102) Coding Scheme Designator            SH: 'C4'
+   (0008,0104) Code Meaning                        LO: 'X-RAY EXAM THORAC SPINE 2VWS'
+   ---------
+   (0008,0100) Code Value                          SH: '72070'
+   (0008,0102) Coding Scheme Designator            SH: 'C4'
+   (0008,0104) Code Meaning                        LO: 'X-RAY EXAM THORAC SPINE 2VWS'
+   ---------
+(0040,0275)  Request Attributes Sequence  1 item(s) ---- 
+   (0032,1060) Requested Procedure Description     LO: 'X-RAY EXAM THORAC SPINE 2VWS'
+   (0032,1064)  Requested Procedure Code Sequence  1 item(s) ---- 
+      (0008,0100) Code Value                          SH: '72070'
+      (0008,0102) Coding Scheme Designator            SH: 'C4'
+      (0008,0104) Code Meaning                        LO: 'X-RAY EXAM THORAC SPINE 2VWS'
+      ---------
+   (0040,0100)  Scheduled Procedure Step Sequence  1 item(s) ---- 
+      (0008,0060) Modality                            CS: 'DX'
+      (0040,0001) Scheduled Station AE Title          AE: 'PTBM_DX_GE426196'
+      (0040,0002) Scheduled Procedure Step Start Date DA: '20250717'
+      (0040,0003) Scheduled Procedure Step Start Time TM: '141000'
+      (0040,0006) Scheduled Performing Physician's Na PN: ''
+      (0040,0007) Scheduled Procedure Step Descriptio LO: 'SPINE THORACIC 2 VIEWS'
+      (0040,0008)  Scheduled Protocol Code Sequence  1 item(s) ---- 
+         (0008,0100) Code Value                          SH: '85'
+         (0008,0102) Coding Scheme Designator            SH: 'L'
+         (0008,0104) Code Meaning                        LO: 'SPINE THORACIC 2 VIEWS'
+         ---------
+      (0040,0009) Scheduled Procedure Step ID         SH: '646-071725-1849'
+      (0040,0010) Scheduled Station Name              SH: ''
+      (0040,0011) Scheduled Procedure Step Location   SH: 'RAD'
+      (0040,0020) Scheduled Procedure Step Status     CS: 'SCHEDULED'
+      ---------
+   (0040,1001) Requested Procedure ID              SH: '1849'
+   ---------
+(0040,0302) Entrance Dose                       US: 0
+(0040,0310) Comments on Radiation Dose          ST: '125%'
+(0040,0555)  Acquisition Context Sequence  0 item(s) ---- 
+(0040,8302) Entrance Dose in mGy                DS: '0.406325'
+(0045,0010) Private Creator                     LO: 'GEMS_SEND_03'
+(0045,1055) Private tag data                    UN: Array of 88 elements
+(0045,1062) Private tag data                    UN: b'23702 '
+(0045,1063) Private tag data                    UN: b'10263 '
+(0045,1065) Private tag data                    UN: b'3560'
+(0045,1067) Private tag data                    UN: Array of 30 elements
+(0045,1069) Private tag data                    UN: b'0 '
+(0045,1072) Private tag data                    UN: b'218 '
+(0045,1073) Private tag data                    UN: b'430 '
+(0045,1075) Private tag data                    UN: b'LSHU'
+(0045,1077) Private tag data                    UN: b'Unpaired'
+(0045,1083) Private tag data                    UN: b'WS-Vert-40in'
+(0054,0220)  View Code Sequence  1 item(s) ---- 
+   (0008,0100) Code Value                          SH: 'R-10236'
+   (0008,0102) Coding Scheme Designator            SH: 'SRT'
+   (0008,0104) Code Meaning                        LO: 'left lateral'
+   ---------
+(0054,0410)  Patient Orientation Code Sequence  1 item(s) ---- 
+   (0008,0100) Code Value                          SH: 'F-10450'
+   (0008,0102) Coding Scheme Designator            SH: 'SRT'
+   (0008,0104) Code Meaning                        LO: 'recumbent'
+   ---------
+(0054,0414)  Patient Gantry Relationship Code Sequence  1 item(s) ---- 
+   (0008,0100) Code Value                          SH: 'F-10470'
+   (0008,0102) Coding Scheme Designator            SH: 'SRT'
+   (0008,0104) Code Meaning                        LO: 'head-first'
+   ---------
+(0088,0200)  Icon Image Sequence  1 item(s) ---- 
+   (0028,0002) Samples per Pixel                   US: 1
+   (0028,0004) Photometric Interpretation          CS: 'MONOCHROME2'
+   (0028,0010) Rows                                US: 64
+   (0028,0011) Columns                             US: 34
+   (0028,0100) Bits Allocated                      US: 8
+   (0028,0101) Bits Stored                         US: 8
+   (0028,0102) High Bit                            US: 7
+   (0028,0103) Pixel Representation                US: 0
+   (0028,1040) Pixel Intensity Relationship        CS: 'LOG'
+   (7FE0,0010) Pixel Data                          OW: Array of 2176 elements
+   ---------
+(00A1,0010) Private Creator                     LO: 'GEMS_GDXE_AI_TAG'
+(00A1,10B1) Private tag data                    UN: b'NOT APPLICABLE'
+(00A1,10B2) Private tag data                    UN: Array of 888 elements
+(00A1,10B3) Private tag data                    UN: Array of 188 elements
+(00A1,10B4) Private tag data                    UN: None
+(00A1,10B5) Private tag data                    UN: None
+(00A1,10B6) Private tag data                    UN: None
+(00A1,10B7) Private tag data                    UN: b'90.1'
+(00A1,10B8) Private tag data                    UN: b'\xb4\x00'
+(2050,0020) Presentation LUT Shape              CS: 'IDENTITY'
+(6000,0010) Overlay Rows                        US: 4259
+(6000,0011) Overlay Columns                     US: 2254
+(6000,0040) Overlay Type                        CS: 'G'
+(6000,0045) Overlay Subtype                     LO: 'USER'
+(6000,0050) Overlay Origin                      SS: [1, 1]
+(6000,0100) Overlay Bits Allocated              US: 1
+(6000,0102) Overlay Bit Position                US: 0
+(6000,3000) Overlay Data                        OW: Array of 1199974 elements
+(7FDF,0010) Private Creator                     LO: 'GEMS_GDXE_ATHENAV2_INTERNAL_USE'
+(7FDF,1010) [PPS Stream]                        LT: Array of 196 elements
+(7FDF,1011) [Pixel Data References (temporary)] LT: Array of 76 elements
+(7FDF,1020) [Auto Push Tag]                     SS: 1
+(7FDF,1025) [PPS Status]                        CS: 'COMPLETED'
+(7FE0,0010) Pixel Data                          OW: Array of 19199572 elements
