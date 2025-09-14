@@ -678,10 +678,7 @@ def main():
     
     # Visualization if requested
     if args.visualize:
-        print("\n🎨 Generating visualization plots...")
+        print("\n🎨 Visualization feature is not yet implemented.")
         # Note: Visualization implementation would go here
-        print("Visualization saved to output directory")
-
-
 if __name__ == "__main__":
     main()
