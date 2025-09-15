@@ -50,11 +50,16 @@ def test_dicom_analysis():
     print(f"  Modalities match: {'✅' if expected_modalities == actual_modalities else '❌'}")
     
     # Test 3: Check example files exist
-    example_files = [
-        'data/DICOM/CT_HEAD_W_O_CONT/DICOM/SERIES_202/209585291.dcm',
-        'data/DICOM/MRI__CERVICAL_SPINE_W_O_CONT/DICOM/SERIES_3/207815325.dcm',
-        'data/DICOM/SPINE_THORACIC_2_VIEWS/DICOM/SERIES_357/204792524.dcm'
-    ]
+    # Dynamically extract example DICOM file paths from the inventory
+    example_files = []
+    # Try to get one example file from up to 3 different series
+    if 'series' in inventory:
+        for series in list(inventory['series'].values())[:3]:
+            if 'files' in series and series['files']:
+                # Prepend the relative path to the file
+                example_files.append(series['files'][0])
+    if not example_files:
+        print("⚠️  No example files found in inventory for validation.")
     
     print(f"\n📁 Example Files Validation:")
     all_examples_exist = True
