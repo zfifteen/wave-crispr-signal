@@ -1,0 +1,598 @@
+{
+  "patient_id": "Patient A",
+  "analysis_timestamp": "2025-09-15T01:25:18.808244",
+  "modalities": {},
+  "summary_stats": {
+    "total_modalities": 4,
+    "total_series": 20,
+    "total_dicom_files": 477,
+    "total_png_files": 1430,
+    "total_metadata_files": 477,
+    "total_size_gb": 0.38160471245646477,
+    "modalities_present": [
+      "CT",
+      "MR",
+      "DX"
+    ],
+    "manufacturers": {
+      "Philips": 205,
+      "Siemens Healthineers": 269,
+      "GE Healthcare": 3
+    },
+    "study_dates": {
+      "20250910": 205,
+      "20250821": 269,
+      "20250717": 3
+    },
+    "body_parts_examined": {
+      "BRAIN": 202,
+      "": 2,
+      "Unknown": 1,
+      "CSPINE": 164,
+      "TSPINE": 108
+    }
+  },
+  "technical_parameters": {
+    "CT": {
+      "rows": {
+        "min": 378,
+        "max": 512,
+        "unique_values": 4,
+        "total_count": 205
+      },
+      "columns": {
+        "min": 344,
+        "max": 800,
+        "unique_values": 5,
+        "total_count": 205
+      },
+      "bits_allocated": {
+        "min": 8,
+        "max": 16,
+        "unique_values": 2,
+        "total_count": 205
+      },
+      "bits_stored": {
+        "min": 8,
+        "max": 12,
+        "unique_values": 2,
+        "total_count": 205
+      },
+      "pixel_spacing": {
+        "unique_values": [
+          "[0.78125, 0.78125]",
+          "[0.5787037, 0.5787037]",
+          "[0.4785714, 0.4785714]"
+        ],
+        "total_count": 204
+      },
+      "slice_thickness": {
+        "min": 0.625,
+        "max": 4.0,
+        "unique_values": 2,
+        "total_count": 204
+      },
+      "kvp": {
+        "min": 120.0,
+        "max": 120.0,
+        "unique_values": 1,
+        "total_count": 204
+      },
+      "tube_current": {
+        "min": 30,
+        "max": 301,
+        "unique_values": 2,
+        "total_count": 204
+      },
+      "exposure_time": {
+        "min": 1415,
+        "max": 3030,
+        "unique_values": 2,
+        "total_count": 204
+      },
+      "window_center": {
+        "unique_values": [
+          "[40, 40]",
+          "-174.9405",
+          "-335.4737"
+        ],
+        "total_count": 204
+      },
+      "window_width": {
+        "unique_values": [
+          "2525.60165405273",
+          "[80, 80]",
+          "1852.51366933187"
+        ],
+        "total_count": 204
+      }
+    },
+    "MR": {
+      "rows": {
+        "min": 256,
+        "max": 1273,
+        "unique_values": 5,
+        "total_count": 269
+      },
+      "columns": {
+        "min": 256,
+        "max": 852,
+        "unique_values": 5,
+        "total_count": 269
+      },
+      "bits_allocated": {
+        "min": 16,
+        "max": 16,
+        "unique_values": 1,
+        "total_count": 269
+      },
+      "bits_stored": {
+        "min": 12,
+        "max": 12,
+        "unique_values": 1,
+        "total_count": 269
+      },
+      "pixel_spacing": {
+        "unique_values": [
+          "[0.7031, 0.7031]",
+          "[0.585938, 0.585938]",
+          "[0.5625, 0.5625]",
+          "[0.71875, 0.71875]",
+          "[0.976562, 0.976562]",
+          "[0.885417, 0.885417]",
+          "[0.351562, 0.351562]",
+          "[1.0625, 1.0625]"
+        ],
+        "total_count": 269
+      },
+      "slice_thickness": {
+        "min": 2.0,
+        "max": 9.0,
+        "unique_values": 4,
+        "total_count": 269
+      },
+      "repetition_time": {
+        "min": 7.5,
+        "max": 7010.0,
+        "unique_values": 11,
+        "total_count": 269
+      },
+      "echo_time": {
+        "min": 3.36,
+        "max": 106.0,
+        "unique_values": 10,
+        "total_count": 269
+      },
+      "flip_angle": {
+        "min": 20.0,
+        "max": 150.0,
+        "unique_values": 5,
+        "total_count": 269
+      },
+      "magnetic_field_strength": {
+        "min": 3.0,
+        "max": 3.0,
+        "unique_values": 1,
+        "total_count": 269
+      },
+      "sequence_name": {
+        "unique_values": [
+          "*tse2d1rs17",
+          "*spcR_50",
+          "*fl2d1",
+          "*tir2d1_8",
+          "*tseR2d1_19",
+          "*fl2d1r",
+          "*tse2d1_27",
+          "*tir2d1rr14",
+          "*tirR2d1_16"
+        ],
+        "total_count": 269
+      }
+    },
+    "DX": {
+      "rows": {
+        "min": 2920,
+        "max": 4259,
+        "unique_values": 2,
+        "total_count": 3
+      },
+      "columns": {
+        "min": 2214,
+        "max": 2254,
+        "unique_values": 3,
+        "total_count": 3
+      },
+      "bits_allocated": {
+        "min": 16,
+        "max": 16,
+        "unique_values": 1,
+        "total_count": 3
+      },
+      "bits_stored": {
+        "min": 16,
+        "max": 16,
+        "unique_values": 1,
+        "total_count": 3
+      },
+      "pixel_spacing": {
+        "unique_values": [
+          "[0.097469, 0.097469]",
+          "[0.097467, 0.097467]"
+        ],
+        "total_count": 3
+      },
+      "kvp": {
+        "min": 80.0,
+        "max": 80.0,
+        "unique_values": 1,
+        "total_count": 3
+      },
+      "exposure_time": {
+        "min": 24,
+        "max": 158,
+        "unique_values": 3,
+        "total_count": 3
+      },
+      "window_center": {
+        "unique_values": [
+          "[20229, 20229, 20229]",
+          "[16643, 16643, 16643]",
+          "[24019, 24019, 24019]"
+        ],
+        "total_count": 3
+      },
+      "window_width": {
+        "unique_values": [
+          "[19779, 14834, 29668]",
+          "[16523, 12392, 24784]",
+          "[9773, 7329, 14659]"
+        ],
+        "total_count": 3
+      }
+    }
+  },
+  "file_organization": {
+    "CT_HEAD_W_O_CONT": {
+      "path": "CT_HEAD_W_O_CONT",
+      "series": {
+        "SERIES_202": {
+          "path": "CT_HEAD_W_O_CONT/DICOM/SERIES_202",
+          "dcm_files": 77,
+          "png_files": 231,
+          "metadata_files": 77,
+          "example_dcm_file": "209585291.dcm",
+          "size_mb": 37.60330867767334
+        },
+        "SERIES_100": {
+          "path": "CT_HEAD_W_O_CONT/DICOM/SERIES_100",
+          "dcm_files": 2,
+          "png_files": 6,
+          "metadata_files": 2,
+          "example_dcm_file": "209581222.dcm",
+          "size_mb": 1.5450868606567383
+        },
+        "SERIES_301": {
+          "path": "CT_HEAD_W_O_CONT/DICOM/SERIES_301",
+          "dcm_files": 1,
+          "png_files": 2,
+          "metadata_files": 1,
+          "example_dcm_file": "209582131.dcm",
+          "size_mb": 1.1937532424926758
+        },
+        "SERIES_203": {
+          "path": "CT_HEAD_W_O_CONT/DICOM/SERIES_203",
+          "dcm_files": 65,
+          "png_files": 195,
+          "metadata_files": 65,
+          "example_dcm_file": "209583551.dcm",
+          "size_mb": 39.372382164001465
+        },
+        "SERIES_201": {
+          "path": "CT_HEAD_W_O_CONT/DICOM/SERIES_201",
+          "dcm_files": 60,
+          "png_files": 180,
+          "metadata_files": 60,
+          "example_dcm_file": "209584358.dcm",
+          "size_mb": 28.628178596496582
+        }
+      },
+      "dicom_files_count": 205,
+      "png_files_count": 614,
+      "metadata_files_count": 205,
+      "total_size_mb": 108.3427095413208
+    },
+    "MRI__CERVICAL_SPINE_W_O_CONT": {
+      "path": "MRI__CERVICAL_SPINE_W_O_CONT",
+      "series": {
+        "SERIES_3": {
+          "path": "MRI__CERVICAL_SPINE_W_O_CONT/DICOM/SERIES_3",
+          "dcm_files": 15,
+          "png_files": 45,
+          "metadata_files": 15,
+          "example_dcm_file": "207815336.dcm",
+          "size_mb": 8.113357543945312
+        },
+        "SERIES_2": {
+          "path": "MRI__CERVICAL_SPINE_W_O_CONT/DICOM/SERIES_2",
+          "dcm_files": 15,
+          "png_files": 45,
+          "metadata_files": 15,
+          "example_dcm_file": "207815207.dcm",
+          "size_mb": 8.241822242736816
+        },
+        "SERIES_4": {
+          "path": "MRI__CERVICAL_SPINE_W_O_CONT/DICOM/SERIES_4",
+          "dcm_files": 15,
+          "png_files": 45,
+          "metadata_files": 15,
+          "example_dcm_file": "207815363.dcm",
+          "size_mb": 7.985382080078125
+        },
+        "SERIES_6": {
+          "path": "MRI__CERVICAL_SPINE_W_O_CONT/DICOM/SERIES_6",
+          "dcm_files": 72,
+          "png_files": 216,
+          "metadata_files": 72,
+          "example_dcm_file": "207815785.dcm",
+          "size_mb": 27.241870880126953
+        },
+        "SERIES_1": {
+          "path": "MRI__CERVICAL_SPINE_W_O_CONT/DICOM/SERIES_1",
+          "dcm_files": 6,
+          "png_files": 18,
+          "metadata_files": 6,
+          "example_dcm_file": "207815150.dcm",
+          "size_mb": 5.767253875732422
+        },
+        "SERIES_5": {
+          "path": "MRI__CERVICAL_SPINE_W_O_CONT/DICOM/SERIES_5",
+          "dcm_files": 35,
+          "png_files": 105,
+          "metadata_files": 35,
+          "example_dcm_file": "207815453.dcm",
+          "size_mb": 36.853729248046875
+        }
+      },
+      "dicom_files_count": 158,
+      "png_files_count": 474,
+      "metadata_files_count": 158,
+      "total_size_mb": 94.2034158706665
+    },
+    "MRI__THORACIC_SPINE_W_O_CONT": {
+      "path": "MRI__THORACIC_SPINE_W_O_CONT",
+      "series": {
+        "SERIES_3": {
+          "path": "MRI__THORACIC_SPINE_W_O_CONT/DICOM/SERIES_3",
+          "dcm_files": 6,
+          "png_files": 18,
+          "metadata_files": 6,
+          "example_dcm_file": "207824034.dcm",
+          "size_mb": 5.897551536560059
+        },
+        "SERIES_2": {
+          "path": "MRI__THORACIC_SPINE_W_O_CONT/DICOM/SERIES_2",
+          "dcm_files": 6,
+          "png_files": 18,
+          "metadata_files": 6,
+          "example_dcm_file": "207823991.dcm",
+          "size_mb": 5.169597625732422
+        },
+        "SERIES_4": {
+          "path": "MRI__THORACIC_SPINE_W_O_CONT/DICOM/SERIES_4",
+          "dcm_files": 2,
+          "png_files": 6,
+          "metadata_files": 2,
+          "example_dcm_file": "207824038.dcm",
+          "size_mb": 6.430267333984375
+        },
+        "SERIES_8": {
+          "path": "MRI__THORACIC_SPINE_W_O_CONT/DICOM/SERIES_8",
+          "dcm_files": 40,
+          "png_files": 120,
+          "metadata_files": 40,
+          "example_dcm_file": "207824268.dcm",
+          "size_mb": 21.54628086090088
+        },
+        "SERIES_6": {
+          "path": "MRI__THORACIC_SPINE_W_O_CONT/DICOM/SERIES_6",
+          "dcm_files": 17,
+          "png_files": 51,
+          "metadata_files": 17,
+          "example_dcm_file": "207824155.dcm",
+          "size_mb": 8.703739166259766
+        },
+        "SERIES_1": {
+          "path": "MRI__THORACIC_SPINE_W_O_CONT/DICOM/SERIES_1",
+          "dcm_files": 6,
+          "png_files": 18,
+          "metadata_files": 6,
+          "example_dcm_file": "207823975.dcm",
+          "size_mb": 5.767253875732422
+        },
+        "SERIES_5": {
+          "path": "MRI__THORACIC_SPINE_W_O_CONT/DICOM/SERIES_5",
+          "dcm_files": 17,
+          "png_files": 51,
+          "metadata_files": 17,
+          "example_dcm_file": "207824087.dcm",
+          "size_mb": 11.165365219116211
+        },
+        "SERIES_7": {
+          "path": "MRI__THORACIC_SPINE_W_O_CONT/DICOM/SERIES_7",
+          "dcm_files": 17,
+          "png_files": 51,
+          "metadata_files": 17,
+          "example_dcm_file": "207824248.dcm",
+          "size_mb": 10.767241477966309
+        }
+      },
+      "dicom_files_count": 111,
+      "png_files_count": 333,
+      "metadata_files_count": 111,
+      "total_size_mb": 75.44729709625244
+    },
+    "SPINE_THORACIC_2_VIEWS": {
+      "path": "SPINE_THORACIC_2_VIEWS",
+      "series": {
+        "SERIES_357": {
+          "path": "SPINE_THORACIC_2_VIEWS/DICOM/SERIES_357",
+          "dcm_files": 3,
+          "png_files": 9,
+          "metadata_files": 3,
+          "example_dcm_file": "204792547.dcm",
+          "size_mb": 112.76980304718018
+        }
+      },
+      "dicom_files_count": 3,
+      "png_files_count": 9,
+      "metadata_files_count": 3,
+      "total_size_mb": 112.76980304718018
+    }
+  },
+  "navigation_guide": {
+    "overview": {
+      "patient": "Patient A",
+      "total_modalities": 4,
+      "modality_list": [
+        "CT_HEAD_W_O_CONT",
+        "MRI__CERVICAL_SPINE_W_O_CONT",
+        "MRI__THORACIC_SPINE_W_O_CONT",
+        "SPINE_THORACIC_2_VIEWS"
+      ],
+      "total_series": 20,
+      "total_dicom_files": 477
+    },
+    "modality_details": {
+      "CT_HEAD_W_O_CONT": {
+        "description": "CT scan of head without contrast - computed tomography imaging for brain and skull evaluation",
+        "series_count": 5,
+        "file_count": 205,
+        "series_list": [
+          "SERIES_202",
+          "SERIES_100",
+          "SERIES_301",
+          "SERIES_203",
+          "SERIES_201"
+        ],
+        "example_path": "data/DICOM/CT_HEAD_W_O_CONT/DICOM/",
+        "typical_use_cases": [
+          "Brain injury assessment",
+          "Stroke evaluation",
+          "Headache investigation",
+          "Skull fracture detection"
+        ]
+      },
+      "MRI__CERVICAL_SPINE_W_O_CONT": {
+        "description": "MRI of cervical spine without contrast - magnetic resonance imaging of neck vertebrae",
+        "series_count": 6,
+        "file_count": 158,
+        "series_list": [
+          "SERIES_3",
+          "SERIES_2",
+          "SERIES_4",
+          "SERIES_6",
+          "SERIES_1",
+          "SERIES_5"
+        ],
+        "example_path": "data/DICOM/MRI__CERVICAL_SPINE_W_O_CONT/DICOM/",
+        "typical_use_cases": [
+          "Neck pain evaluation",
+          "Disc herniation assessment",
+          "Spinal cord evaluation",
+          "Nerve compression"
+        ]
+      },
+      "MRI__THORACIC_SPINE_W_O_CONT": {
+        "description": "MRI of thoracic spine without contrast - magnetic resonance imaging of upper back vertebrae",
+        "series_count": 8,
+        "file_count": 111,
+        "series_list": [
+          "SERIES_3",
+          "SERIES_2",
+          "SERIES_4",
+          "SERIES_8",
+          "SERIES_6",
+          "SERIES_1",
+          "SERIES_5",
+          "SERIES_7"
+        ],
+        "example_path": "data/DICOM/MRI__THORACIC_SPINE_W_O_CONT/DICOM/",
+        "typical_use_cases": [
+          "Back pain investigation",
+          "Spinal deformity assessment",
+          "Disc disease evaluation",
+          "Tumor screening"
+        ]
+      },
+      "SPINE_THORACIC_2_VIEWS": {
+        "description": "X-ray of thoracic spine in 2 views - conventional radiography of upper back",
+        "series_count": 1,
+        "file_count": 3,
+        "series_list": [
+          "SERIES_357"
+        ],
+        "example_path": "data/DICOM/SPINE_THORACIC_2_VIEWS/DICOM/",
+        "typical_use_cases": [
+          "Spine alignment check",
+          "Fracture detection",
+          "Scoliosis screening",
+          "General spine evaluation"
+        ]
+      }
+    },
+    "anatomy_mapping": {},
+    "finding_files_by": {
+      "modality": {
+        "CT_HEAD_W_O_CONT": {
+          "base_path": "data/DICOM/CT_HEAD_W_O_CONT/DICOM/",
+          "series_directories": [
+            "SERIES_202",
+            "SERIES_100",
+            "SERIES_301",
+            "SERIES_203",
+            "SERIES_201"
+          ],
+          "example_file": "209585291.dcm"
+        },
+        "MRI__CERVICAL_SPINE_W_O_CONT": {
+          "base_path": "data/DICOM/MRI__CERVICAL_SPINE_W_O_CONT/DICOM/",
+          "series_directories": [
+            "SERIES_3",
+            "SERIES_2",
+            "SERIES_4",
+            "SERIES_6",
+            "SERIES_1",
+            "SERIES_5"
+          ],
+          "example_file": "207815336.dcm"
+        },
+        "MRI__THORACIC_SPINE_W_O_CONT": {
+          "base_path": "data/DICOM/MRI__THORACIC_SPINE_W_O_CONT/DICOM/",
+          "series_directories": [
+            "SERIES_3",
+            "SERIES_2",
+            "SERIES_4",
+            "SERIES_8",
+            "SERIES_6",
+            "SERIES_1",
+            "SERIES_5",
+            "SERIES_7"
+          ],
+          "example_file": "207824034.dcm"
+        },
+        "SPINE_THORACIC_2_VIEWS": {
+          "base_path": "data/DICOM/SPINE_THORACIC_2_VIEWS/DICOM/",
+          "series_directories": [
+            "SERIES_357"
+          ],
+          "example_file": "204792547.dcm"
+        }
+      },
+      "anatomy": {},
+      "test_type": {},
+      "parameters": {}
+    },
+    "file_examples": {}
+  }
+}
