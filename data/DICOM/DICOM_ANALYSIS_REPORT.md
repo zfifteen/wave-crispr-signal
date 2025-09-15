@@ -20,6 +20,9 @@ CT, MR, DX
 
 ## Directory Structure and Organization
 
+- https://github.com/zfifteen/wave-crispr-signal/blob/52261dcb956319deb109b37e2d70d5ad6fc3d06d/data/DICOM
+- https://github.com/zfifteen/wave-crispr-signal/tree/main/docs
+
 ### Overview
 ```
 data/DICOM/
