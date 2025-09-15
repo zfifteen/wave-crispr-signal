@@ -1,6 +1,6 @@
 {
   "patient_id": "Patient A",
-  "analysis_timestamp": "2025-09-14T22:07:07.696726",
+  "analysis_timestamp": "2025-09-15T01:25:18.808244",
   "modalities": {},
   "summary_stats": {
     "total_modalities": 4,
@@ -15,21 +15,21 @@
       "DX"
     ],
     "manufacturers": {
-      "Philips": 71,
-      "Siemens Healthineers": 201,
+      "Philips": 205,
+      "Siemens Healthineers": 269,
       "GE Healthcare": 3
     },
     "study_dates": {
-      "20250910": 71,
-      "20250821": 201,
+      "20250910": 205,
+      "20250821": 269,
       "20250717": 3
     },
     "body_parts_examined": {
-      "BRAIN": 68,
+      "BRAIN": 202,
       "": 2,
       "Unknown": 1,
-      "CSPINE": 116,
-      "TSPINE": 88
+      "CSPINE": 164,
+      "TSPINE": 108
     }
   },
   "technical_parameters": {
@@ -38,25 +38,25 @@
         "min": 378,
         "max": 512,
         "unique_values": 4,
-        "total_count": 71
+        "total_count": 205
       },
       "columns": {
         "min": 344,
         "max": 800,
         "unique_values": 5,
-        "total_count": 71
+        "total_count": 205
       },
       "bits_allocated": {
         "min": 8,
         "max": 16,
         "unique_values": 2,
-        "total_count": 71
+        "total_count": 205
       },
       "bits_stored": {
         "min": 8,
         "max": 12,
         "unique_values": 2,
-        "total_count": 71
+        "total_count": 205
       },
       "pixel_spacing": {
         "unique_values": [
@@ -64,47 +64,47 @@
           "[0.5787037, 0.5787037]",
           "[0.4785714, 0.4785714]"
         ],
-        "total_count": 70
+        "total_count": 204
       },
       "slice_thickness": {
         "min": 0.625,
         "max": 4.0,
         "unique_values": 2,
-        "total_count": 70
+        "total_count": 204
       },
       "kvp": {
         "min": 120.0,
         "max": 120.0,
         "unique_values": 1,
-        "total_count": 70
+        "total_count": 204
       },
       "tube_current": {
         "min": 30,
         "max": 301,
         "unique_values": 2,
-        "total_count": 70
+        "total_count": 204
       },
       "exposure_time": {
         "min": 1415,
         "max": 3030,
         "unique_values": 2,
-        "total_count": 70
+        "total_count": 204
       },
       "window_center": {
         "unique_values": [
+          "[40, 40]",
           "-174.9405",
-          "-335.4737",
-          "[40, 40]"
+          "-335.4737"
         ],
-        "total_count": 70
+        "total_count": 204
       },
       "window_width": {
         "unique_values": [
+          "2525.60165405273",
           "[80, 80]",
-          "1852.51366933187",
-          "2525.60165405273"
+          "1852.51366933187"
         ],
-        "total_count": 70
+        "total_count": 204
       }
     },
     "MR": {
@@ -112,82 +112,82 @@
         "min": 256,
         "max": 1273,
         "unique_values": 5,
-        "total_count": 201
+        "total_count": 269
       },
       "columns": {
         "min": 256,
         "max": 852,
         "unique_values": 5,
-        "total_count": 201
+        "total_count": 269
       },
       "bits_allocated": {
         "min": 16,
         "max": 16,
         "unique_values": 1,
-        "total_count": 201
+        "total_count": 269
       },
       "bits_stored": {
         "min": 12,
         "max": 12,
         "unique_values": 1,
-        "total_count": 201
+        "total_count": 269
       },
       "pixel_spacing": {
         "unique_values": [
-          "[0.5625, 0.5625]",
-          "[0.885417, 0.885417]",
           "[0.7031, 0.7031]",
-          "[1.0625, 1.0625]",
-          "[0.976562, 0.976562]",
+          "[0.585938, 0.585938]",
+          "[0.5625, 0.5625]",
           "[0.71875, 0.71875]",
+          "[0.976562, 0.976562]",
+          "[0.885417, 0.885417]",
           "[0.351562, 0.351562]",
-          "[0.585938, 0.585938]"
+          "[1.0625, 1.0625]"
         ],
-        "total_count": 201
+        "total_count": 269
       },
       "slice_thickness": {
         "min": 2.0,
         "max": 9.0,
         "unique_values": 4,
-        "total_count": 201
+        "total_count": 269
       },
       "repetition_time": {
         "min": 7.5,
         "max": 7010.0,
         "unique_values": 11,
-        "total_count": 201
+        "total_count": 269
       },
       "echo_time": {
         "min": 3.36,
         "max": 106.0,
         "unique_values": 10,
-        "total_count": 201
+        "total_count": 269
       },
       "flip_angle": {
         "min": 20.0,
         "max": 150.0,
         "unique_values": 5,
-        "total_count": 201
+        "total_count": 269
       },
       "magnetic_field_strength": {
         "min": 3.0,
         "max": 3.0,
         "unique_values": 1,
-        "total_count": 201
+        "total_count": 269
       },
       "sequence_name": {
         "unique_values": [
-          "*tir2d1rr14",
-          "*tseR2d1_19",
-          "*tir2d1_8",
-          "*fl2d1r",
-          "*fl2d1",
+          "*tse2d1rs17",
           "*spcR_50",
-          "*tirR2d1_16",
+          "*fl2d1",
+          "*tir2d1_8",
+          "*tseR2d1_19",
+          "*fl2d1r",
           "*tse2d1_27",
-          "*tse2d1rs17"
+          "*tir2d1rr14",
+          "*tirR2d1_16"
         ],
-        "total_count": 201
+        "total_count": 269
       }
     },
     "DX": {
@@ -236,17 +236,17 @@
       },
       "window_center": {
         "unique_values": [
-          "[16643, 16643, 16643]",
           "[20229, 20229, 20229]",
+          "[16643, 16643, 16643]",
           "[24019, 24019, 24019]"
         ],
         "total_count": 3
       },
       "window_width": {
         "unique_values": [
-          "[9773, 7329, 14659]",
+          "[19779, 14834, 29668]",
           "[16523, 12392, 24784]",
-          "[19779, 14834, 29668]"
+          "[9773, 7329, 14659]"
         ],
         "total_count": 3
       }

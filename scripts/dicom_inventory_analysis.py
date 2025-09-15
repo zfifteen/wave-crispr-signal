@@ -7,6 +7,11 @@ This script performs a comprehensive analysis of DICOM data for Patient A,
 examining metadata, technical parameters, and file organization across 
 all modalities (CT, MRI, X-Ray).
 
+IMPORTANT: This script analyzes ALL DICOM files in the dataset without 
+sampling or skipping any files. Medical imaging data cannot be discarded 
+or sampled as each file may contain unique technical parameters and 
+metadata variations that are medically significant.
+
 Usage:
     python scripts/dicom_inventory_analysis.py
 
@@ -293,8 +298,8 @@ class DICOMInventoryAnalyzer:
         directory_structure = self.analyze_directory_structure()
         self.inventory['file_organization'] = directory_structure
         
-        # 2. Collect all DICOM files
-        print("\n2. Collecting DICOM file metadata...")
+        # 2. Collect ALL DICOM files for comprehensive analysis
+        print("\n2. Collecting ALL DICOM file metadata for comprehensive analysis...")
         dicom_files_data = []
         total_files = 0
         
@@ -307,18 +312,17 @@ class DICOMInventoryAnalyzer:
                             dcm_files = list(series_dir.glob('*.dcm'))
                             total_files += len(dcm_files)
                             
-                            # Analyze a subset for performance (every 10th file for large series)
-                            step = max(1, len(dcm_files) // 20)  # Sample up to 20 files per series
-                            for dcm_file in dcm_files[::step]:
+                            # Analyze ALL DICOM files - medical data cannot be sampled or discarded
+                            for dcm_file in dcm_files:
                                 file_data = self.analyze_dicom_file(dcm_file)
                                 file_data['series_directory'] = series_dir.name
                                 file_data['modality_directory'] = modality_dir.name
                                 dicom_files_data.append(file_data)
                                 
-                                if len(dicom_files_data) % 50 == 0:
-                                    print(f"  Processed {len(dicom_files_data)} sample files...")
+                                if len(dicom_files_data) % 100 == 0:
+                                    print(f"  Processed {len(dicom_files_data)} files...")
         
-        print(f"  Completed analysis of {len(dicom_files_data)} sample files from {total_files} total DICOM files")
+        print(f"  Completed comprehensive analysis of ALL {len(dicom_files_data)} DICOM files (total: {total_files})")
         
         # 3. Extract technical parameters
         print("\n3. Extracting technical parameters by modality...")
