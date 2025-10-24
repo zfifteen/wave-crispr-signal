@@ -18,6 +18,7 @@ import numpy as np
 import random
 from scipy import stats
 from scipy.fft import fft
+from scipy import signal
 from typing import Dict, List, Tuple
 import sys
 import os
@@ -76,20 +77,21 @@ class DiscreteZetaShift:
         return Z
 
 # Experimental breathing frequencies (Hz)
-# Electronic polarizability (Å³) - measures electron cloud distortion
-POLARIZABILITY = {
-    'A': 12.1,  # Adenine: highest polarizability
-    'T': 10.8,  # Thymine: moderate
-    'C': 9.4,   # Cytosine: lowest
-    'G': 11.6   # Guanine: high
+# Dimensionless breathing rate ratios - AT opens 100x faster than GC (μs-ms timescales)
+BREATHING_RATE_RATIO = {
+    'A': 1,     # AT pair: fast opening (μs scale)
+    'T': 1,     # AT pair: fast opening
+    'C': 100,   # GC pair: slow opening (ms scale)
+    'G': 100    # GC pair: slow opening
 }
 
 # For comparison: helical periodicity (structural)
 HELICAL_PERIOD = 10.5  # bp per turn
 
 
-class ElectronicPolarizabilityEncoder:
-    """Encode DNA using experimental breathing frequency data"""
+class BreathingDynamicsEncoder:
+    """Encode DNA using dimensionless breathing rate ratios""" 
+    
 
     def __init__(self):
         """Initialize with experimentally-derived breathing frequencies"""
@@ -201,8 +203,7 @@ class BreathingDynamicsValidator:
             seq = ''.join(c for c in seq if c in 'ATCG')
             if len(seq) == seq_length:
                 sequences.append(seq)
-                return sequences
-    def compute_spectrum(self, encoded_seq: np.ndarray) -> np.ndarray:
+        return sequences    def compute_spectrum(self, encoded_seq: np.ndarray) -> np.ndarray:
         """Compute FFT spectrum"""
         return np.abs(fft(encoded_seq))
 
@@ -342,11 +343,11 @@ class BreathingDynamicsValidator:
             t_stat, p_value = stats.ttest_ind(breath_scores, arb_means_list)
 
             # Effect size (Cohen's d)
-            pooled_std = np.sqrt(
+            pooled_std = max(np.sqrt(
                 ((len(breath_scores) - 1) * np.var(breath_scores, ddof=1) +
                  (len(arb_means_list) - 1) * np.var(arb_means_list, ddof=1)) /
                 (len(breath_scores) + len(arb_means_list) - 2)
-            )
+            ), 1e-8)
             cohens_d = (np.mean(breath_scores) - np.mean(arb_means_list)) / pooled_std
 
             breath_better = np.mean(breath_scores) > np.mean(arb_means_list)
@@ -443,9 +444,9 @@ def main():
     np.random.seed(42)
 
     print("\n" + "="*70)
-    print("DNA ELECTRONIC POLARIZABILITY vs ARBITRARY ENCODING")
+    print("DNA BREATHING DYNAMICS vs ARBITRARY ENCODING")
     print("="*70)
-    print("\nHypothesis: Electronic polarizability provide better spectral")
+    print("\nHypothesis: Base pair opening rates provide better spectral")
     print("encoding than arbitrary weights because they reflect real oscillatory")
     print("phenomena affecting CRISPR accessibility.")
     print("\nExperimental basis:")

@@ -289,3 +289,23 @@ If referencing this work:
 **Status**: ✅ Complete, Ready for Review
 **Total Reading Time**: 30-60 minutes (depending on depth)
 **Total Validation Time**: 5-10 minutes
+
+---
+
+## Appendices
+
+### Biophysics Note
+DNA base pair opening occurs on μs–ms scales with clear AT/GC differences; use relative rates or ΔG° to parametrize weights. Helical periodicity (10.5 bp/turn) is well-established in nucleosomal DNA ([PMC327434](https://pmc.ncbi.nlm.nih.gov/articles/PMC327434/)). We use relative rates, not literal MHz/GHz frequencies.
+
+### Statistical Appendix
+- **Cohen's d**: (μ₁ - μ₂) / σ_pooled, where σ_pooled = sqrt(((n₁-1)*σ₁² + (n₂-1)*σ₂²)/(n₁+n₂-2))
+- **Hedges' g**: d * (1 - 3/(4*(n₁+n₂-2)-1)) for bias correction
+- **Bootstrap CI**: Resample with replacement 1000x, compute percentile CIs
+- **Permutation test**: Shuffle labels 10k times, p = (rank +1)/(10001)
+
+### Spectral Appendix
+Fractional periodicity (10.5 bp) requires CZT or Goertzel for accurate binning. We use Hann windowing to reduce leakage, remove DC component, and validate window-robustness.
+
+---
+
+## Citation
