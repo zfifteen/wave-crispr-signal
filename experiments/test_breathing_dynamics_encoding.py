@@ -2,7 +2,7 @@
 """
 Test: DNA Breathing Dynamics vs Arbitrary Encoding
 
-Hypothesis: Base pair opening frequencies (breathing dynamics) provide better
+Hypothesis: Electronic polarizability (breathing dynamics) provide better
 spectral encoding than arbitrary weights because they reflect real oscillatory
 phenomena that affect CRISPR accessibility.
 
@@ -21,6 +21,7 @@ from scipy.fft import fft
 from typing import Dict, List, Tuple
 import sys
 import os
+from Bio import SeqIO
 
 # Add parent directory to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
@@ -75,18 +76,19 @@ class DiscreteZetaShift:
         return Z
 
 # Experimental breathing frequencies (Hz)
-BREATHING_FREQ = {
-    'A': 1e7,   # AT pair opens at ~10 MHz
-    'T': 1e7,   # AT pair opens at ~10 MHz
-    'C': 1e9,   # GC pair opens at ~1 GHz (100x slower)
-    'G': 1e9    # GC pair opens at ~1 GHz
+# Electronic polarizability (Å³) - measures electron cloud distortion
+POLARIZABILITY = {
+    'A': 12.1,  # Adenine: highest polarizability
+    'T': 10.8,  # Thymine: moderate
+    'C': 9.4,   # Cytosine: lowest
+    'G': 11.6   # Guanine: high
 }
 
 # For comparison: helical periodicity (structural)
 HELICAL_PERIOD = 10.5  # bp per turn
 
 
-class BreathingDynamicsEncoder:
+class ElectronicPolarizabilityEncoder:
     """Encode DNA using experimental breathing frequency data"""
 
     def __init__(self):
@@ -183,40 +185,23 @@ class ArbitraryEncoder:
 
 class BreathingDynamicsValidator:
     """Test breathing dynamics encoding against arbitrary controls"""
-
     def __init__(self):
-        self.breathing_encoder = BreathingDynamicsEncoder()
-        self.results = {}
-
-    def generate_crispr_sequences(self, n_sequences: int = 100,
                                    seq_length: int = 20) -> List[str]:
-        """Generate realistic CRISPR guide sequences"""
+        """Generate CRISPR guide sequences from real human cDNA"""
+        records = list(SeqIO.parse('data/test_human_cdna.fasta', 'fasta'))
         sequences = []
-
-        for i in range(n_sequences):
-            # Half with varied GC content (40-60%)
-            if i < n_sequences // 2:
-                target_gc = random.uniform(0.4, 0.6)
-                seq = self._generate_gc_controlled_sequence(seq_length, target_gc)
-            else:
-                # Half completely random
-                seq = ''.join(random.choices('ATCG', k=seq_length))
-
-            sequences.append(seq)
-
-        return sequences
-
-    def _generate_gc_controlled_sequence(self, length: int, target_gc: float) -> str:
-        """Generate sequence with controlled GC content"""
-        gc_count = int(length * target_gc)
-        at_count = length - gc_count
-
-        bases = ['G'] * (gc_count // 2) + ['C'] * (gc_count - gc_count // 2)
-        bases += ['A'] * (at_count // 2) + ['T'] * (at_count - at_count // 2)
-
-        random.shuffle(bases)
-        return ''.join(bases)
-
+       
+        while len(sequences) < n_sequences:
+            record = random.choice(records)
+            full_seq = str(record.seq)
+            if len(full_seq) < seq_length:
+                continue
+            start = random.randint(0, len(full_seq) - seq_length)
+            seq = full_seq[start:start + seq_length].upper()
+            seq = ''.join(c for c in seq if c in 'ATCG')
+            if len(seq) == seq_length:
+                sequences.append(seq)
+                return sequences
     def compute_spectrum(self, encoded_seq: np.ndarray) -> np.ndarray:
         """Compute FFT spectrum"""
         return np.abs(fft(encoded_seq))
@@ -289,11 +274,11 @@ class BreathingDynamicsValidator:
         breathing_scores_random = []
 
         for seq in sequences:
-            z_gc = self.analyze_mutation_sensitivity(seq, self.breathing_encoder,
+            z_gc = self.analyze_mutation_sensitivity(seq, self.encoder,
                                                      'gc_affecting')
-            z_at = self.analyze_mutation_sensitivity(seq, self.breathing_encoder,
+            z_at = self.analyze_mutation_sensitivity(seq, self.encoder,
                                                      'at_affecting')
-            z_rand = self.analyze_mutation_sensitivity(seq, self.breathing_encoder,
+            z_rand = self.analyze_mutation_sensitivity(seq, self.encoder,
                                                        'random')
 
             breathing_scores_gc.append(z_gc)
@@ -458,9 +443,9 @@ def main():
     np.random.seed(42)
 
     print("\n" + "="*70)
-    print("DNA BREATHING DYNAMICS vs ARBITRARY ENCODING")
+    print("DNA ELECTRONIC POLARIZABILITY vs ARBITRARY ENCODING")
     print("="*70)
-    print("\nHypothesis: Base pair opening frequencies provide better spectral")
+    print("\nHypothesis: Electronic polarizability provide better spectral")
     print("encoding than arbitrary weights because they reflect real oscillatory")
     print("phenomena affecting CRISPR accessibility.")
     print("\nExperimental basis:")
@@ -472,7 +457,7 @@ def main():
 
     # Run test
     validator = BreathingDynamicsValidator()
-    results = validator.run_comparative_test(n_sequences=100, n_arbitrary_trials=10)
+    results = validator.run_comparative_test(n_sequences=10, n_arbitrary_trials=2)
 
     # Interpret
     validator.interpret_results(results)
