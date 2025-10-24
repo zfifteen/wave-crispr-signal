@@ -36,7 +36,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 import numpy as np
 
 # Import our spectral utilities
@@ -119,7 +119,8 @@ class AnalyzeRequest(BaseModel):
         description="Opt-in to privacy-safe logging (SHA256 + features only)"
     )
     
-    @validator('guide')
+    @field_validator('guide')
+    @classmethod
     def validate_guide(cls, v):
         """Validate guide RNA sequence."""
         try:
@@ -128,7 +129,8 @@ class AnalyzeRequest(BaseModel):
         except ValueError as e:
             raise ValueError(f"Invalid guide sequence: {e}")
     
-    @validator('target')
+    @field_validator('target')
+    @classmethod
     def validate_target(cls, v):
         """Validate target DNA sequence."""
         try:
@@ -203,7 +205,7 @@ def log_analysis(request: AnalyzeRequest, response: AnalyzeResponse):
         return
     
     log_entry = {
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": datetime.now().isoformat(),
         "guide_hash": hash_sequence(request.guide),
         "target_hash": hash_sequence(request.target),
         "guide_length": len(request.guide),
@@ -222,86 +224,20 @@ def log_analysis(request: AnalyzeRequest, response: AnalyzeResponse):
 @app.get("/", response_class=HTMLResponse)
 async def root():
     """Serve landing page."""
-    html_content = """
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>CRISPR Breathing Dynamics Demo</title>
-        <style>
-            body { font-family: Arial, sans-serif; max-width: 1200px; margin: 0 auto; padding: 20px; }
-            h1 { color: #2c3e50; }
-            .info-box { background: #ecf0f1; padding: 15px; border-radius: 5px; margin: 20px 0; }
-            .endpoint { background: #e8f5e9; padding: 10px; margin: 10px 0; border-left: 4px solid #4caf50; }
-            code { background: #f5f5f5; padding: 2px 5px; border-radius: 3px; }
-        </style>
-    </head>
-    <body>
-        <h1>🧬 CRISPR Breathing Dynamics Demo</h1>
-        
-        <div class="info-box">
-            <h2>About This Demo</h2>
-            <p>This interactive demo shows how DNA breathing dynamics (base pair opening rates) 
-            create spectral signatures at the helical period of <strong>10.5 bp/turn</strong>.</p>
-            
-            <p><strong>Key Features:</strong></p>
-            <ul>
-                <li>10.5-bp spectral peak detection (fundamental helical period)</li>
-                <li>Harmonic analysis (5.25 bp, 3.5 bp)</li>
-                <li>Rotational phase wheel visualization</li>
-                <li>Dimensionless parametrization (rate ratios, not MHz)</li>
-            </ul>
-        </div>
-        
-        <div class="info-box">
-            <h2>API Endpoints</h2>
-            
-            <div class="endpoint">
-                <h3>POST /analyze</h3>
-                <p>Analyze a guide RNA + target DNA pair</p>
-                <p><strong>Example:</strong></p>
-                <pre><code>curl -X POST http://localhost:8000/analyze \\
-  -H "Content-Type: application/json" \\
-  -d '{
-    "guide": "GACGAUCGAUCGAUCGAUCG",
-    "target": "ATGCGATCGATCGATCGATCGCTAGCTAGCTA",
-    "rate_ratio": 20.0,
-    "weight_mode": "rate_ratio"
-  }'</code></pre>
-            </div>
-            
-            <div class="endpoint">
-                <h3>GET /health</h3>
-                <p>Check service health</p>
-            </div>
-            
-            <div class="endpoint">
-                <h3>GET /info</h3>
-                <p>Get information about available parameters</p>
-            </div>
-        </div>
-        
-        <div class="info-box">
-            <h2>Scientific Validation</h2>
-            <p>This demo enforces strict scientific gates:</p>
-            <ul>
-                <li>✓ Human DNA only (A/C/G/T for DNA, A/C/G/U for RNA)</li>
-                <li>✓ No fabrication (real nucleotides only)</li>
-                <li>✓ Dimensionless parameters (rate ratios)</li>
-                <li>✓ Privacy-safe logging (opt-in, SHA256 only)</li>
-            </ul>
-        </div>
-        
-        <p><em>For full documentation, see <code>experiments/trinity/README.md</code></em></p>
-    </body>
-    </html>
-    """
-    return HTMLResponse(content=html_content)
+    # Serve the index.html file
+    html_path = os.path.join(os.path.dirname(__file__), "index.html")
+    try:
+        with open(html_path, "r") as f:
+            return HTMLResponse(content=f.read())
+    except FileNotFoundError:
+        # Fallback if file not found
+        return HTMLResponse(content="<h1>Demo not found</h1><p>index.html missing</p>")
 
 
 @app.get("/health")
 async def health_check():
     """Health check endpoint."""
-    return {"status": "healthy", "timestamp": datetime.utcnow().isoformat()}
+    return {"status": "healthy", "timestamp": datetime.now().isoformat()}
 
 
 @app.get("/info")
