@@ -23,6 +23,9 @@ def run_smoke_test():
     repo_root = Path(__file__).parent.parent
     
     # Run experiment with minimal parameters
+    import tempfile
+    temp_dir = tempfile.mkdtemp(prefix='fus_smoke_test_')
+    
     cmd = [
         sys.executable,
         str(repo_root / "experiments" / "focused_ultrasound_mve.py"),
@@ -34,7 +37,7 @@ def run_smoke_test():
         "--k-parameter", "0.3",
         "--grid-size", "50",  # Reduced grid size
         "--n-trials", "100",  # Reduced trials
-        "--output-dir", "/tmp/fus_smoke_test",
+        "--output-dir", temp_dir,
         "--smoke-test"  # Enable smoke test mode
     ]
     

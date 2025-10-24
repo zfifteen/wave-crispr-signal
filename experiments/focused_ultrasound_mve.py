@@ -837,6 +837,9 @@ def main():
             raise ValueError("Bootstrap samples must be ≥1,000 for scientific rigor")
         if args.permutation < 1000:
             raise ValueError("Permutation samples must be ≥1,000 for scientific rigor")
+    else:
+        logger.warning("SMOKE TEST MODE: Scientific rigor gates bypassed. "
+                      "Results are for validation purposes only, not publication.")
     
     # Create experiment configuration
     config = ExperimentConfig(
