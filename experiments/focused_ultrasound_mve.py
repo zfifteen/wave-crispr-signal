@@ -517,10 +517,10 @@ class StatisticalAnalysis:
         
         # Convert to millimeters (assuming grid units are cm for realistic tissue scale)
         # Grid size 100 = 10cm x 10cm tissue, so 1 grid unit = 1mm
-        baseline_mean_mm = baseline_mean * 1.0  # Already in mm scale
-        baseline_std_mm = baseline_std * 1.0
-        z_framework_mean_mm = z_framework_mean * 1.0
-        z_framework_std_mm = z_framework_std * 1.0
+        baseline_mean_mm = baseline_mean  # Already in mm scale
+        baseline_std_mm = baseline_std
+        z_framework_mean_mm = z_framework_mean
+        z_framework_std_mm = z_framework_std
         
         # Time-to-target statistics
         baseline_times = np.array([r.baseline_time for r in self.results])
