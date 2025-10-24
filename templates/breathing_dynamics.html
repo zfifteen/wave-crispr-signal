@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DNA Breathing Dynamics - Interactive Demo</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Plotly for charts -->
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+        .main-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            padding: 30px;
+            margin: 20px auto;
+            max-width: 1400px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+        }
+        .header h1 {
+            color: #667eea;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .header .subtitle {
+            color: #666;
+            font-size: 1.1em;
+        }
+        .breakthrough-badge {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            display: inline-block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        .sequence-input {
+            font-family: 'Courier New', monospace;
+            font-size: 1.1em;
+            letter-spacing: 2px;
+        }
+        .card {
+            border: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: bold;
+        }
+        .btn-analyze {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            padding: 12px 40px;
+            font-size: 1.1em;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+        .btn-analyze:hover {
+            transform: scale(1.05);
+            color: white;
+        }
+        .example-btn {
+            margin: 5px;
+            font-size: 0.9em;
+        }
+        .results-container {
+            display: none;
+        }
+        .metric-card {
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+        .metric-value {
+            font-size: 2em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .metric-label {
+            font-size: 0.9em;
+            color: #666;
+            text-transform: uppercase;
+        }
+        .winner-breathing {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+        .winner-arbitrary {
+            background: linear-gradient(135deg, #fc4a1a 0%, #f7b733 100%);
+            color: white;
+        }
+        .winner-neutral {
+            background: linear-gradient(135deg, #757f9a 0%, #d7dde8 100%);
+            color: #333;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+        }
+        .frequency-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+        .base-freq {
+            display: inline-block;
+            margin: 5px 10px;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+        }
+        .base-at {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+        .base-gc {
+            background: #fce4ec;
+            color: #c2185b;
+        }
+        .info-panel {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="header">
+            <h1><i class="fas fa-dna"></i> DNA Breathing Dynamics Encoding</h1>
+            <p class="subtitle">Interactive Demonstration of PR #103 Breakthrough Findings</p>
+            <span class="breakthrough-badge">
+                <i class="fas fa-trophy"></i> First Positive Result: Cohen's d = +4.130
+            </span>
+        </div>
+
+        <!-- Information Panel -->
+        <div class="info-panel">
+            <h5><i class="fas fa-info-circle"></i> About This Demo</h5>
+            <p class="mb-0">
+                This application demonstrates the breakthrough finding that <strong>DNA breathing dynamics</strong> 
+                (base pair opening frequencies) significantly outperform arbitrary encodings in spectral DNA analysis. 
+                This is the first biological property to show a positive effect, with a very large Cohen's d of +4.130 
+                for GC-affecting mutations.
+            </p>
+        </div>
+
+        <!-- Frequency Information -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-wave-square"></i> DNA Breathing Frequencies (Experimental)
+            </div>
+            <div class="card-body">
+                <div class="frequency-info text-center">
+                    <div class="base-freq base-at">A/T: ~10 MHz (2 H-bonds - Opens Easily/Fast)</div>
+                    <div class="base-freq base-gc">G/C: ~1 GHz (3 H-bonds - Opens Slowly/Rarely)</div>
+                    <div class="mt-2">
+                        <small class="text-muted">
+                            <i class="fas fa-arrow-right"></i> 100× frequency difference in base pair opening kinetics
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Section -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-keyboard"></i> Enter DNA Sequence (Human DNA Only)
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label for="dnaSequence" class="form-label fw-bold">DNA Sequence:</label>
+                    <textarea class="form-control sequence-input" id="dnaSequence" rows="4" 
+                              placeholder="Enter DNA sequence (A, T, C, G only)&#10;Example: ATGCGATCGATCGTAGCTAGCTAGC"></textarea>
+                    <div class="form-text">
+                        <i class="fas fa-shield-alt"></i> Scientific Gate: Only human DNA (A/C/G/T nucleotides). 
+                        Length: 10-500 bases.
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <button class="btn btn-analyze" onclick="analyzeSequence()">
+                        <i class="fas fa-calculator"></i> Analyze Sequence
+                    </button>
+                </div>
+
+                <!-- Example Sequences -->
+                <div class="mt-4">
+                    <h6><i class="fas fa-flask"></i> Quick Examples (Real Human DNA):</h6>
+                    <div id="exampleButtons" class="text-center">
+                        <button class="btn btn-outline-primary btn-sm example-btn" onclick="loadExample(0)">
+                            <i class="fas fa-dna"></i> Human TOP2A (GC-rich)
+                        </button>
+                        <button class="btn btn-outline-success btn-sm example-btn" onclick="loadExample(1)">
+                            <i class="fas fa-dna"></i> Human CDK6 (Balanced)
+                        </button>
+                        <button class="btn btn-outline-info btn-sm example-btn" onclick="loadExample(2)">
+                            <i class="fas fa-dna"></i> Human MYB (Repeats)
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div class="loading" id="loadingIndicator">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-3">Analyzing sequence...</p>
+        </div>
+
+        <!-- Results Section -->
+        <div class="results-container" id="resultsContainer">
+            <!-- Sequence Info -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-chart-bar"></i> Sequence Analysis
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="metric-card winner-neutral">
+                                <div class="metric-label">Length</div>
+                                <div class="metric-value" id="seqLength">-</div>
+                                <small>base pairs</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="metric-card winner-neutral">
+                                <div class="metric-label">GC Content</div>
+                                <div class="metric-value" id="gcContent">-</div>
+                                <small>percent</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="metric-card winner-neutral">
+                                <div class="metric-label">Base Composition</div>
+                                <div id="baseComp" style="font-size: 1.2em; margin: 10px 0;">-</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mutation Analysis Results -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-vial"></i> Mutation Analysis: Breathing vs Arbitrary Encoding
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <strong><i class="fas fa-lightbulb"></i> Key Insight:</strong> 
+                        Breathing dynamics encoding should excel at <strong>GC-affecting mutations</strong> 
+                        (changing frequency classes) but show minimal signal for within-class mutations.
+                    </div>
+
+                    <div class="row" id="mutationResults">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Spectral Visualization -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-chart-line"></i> Frequency Spectrum Comparison
+                </div>
+                <div class="card-body">
+                    <div id="spectrumPlot" style="width: 100%; height: 500px;"></div>
+                </div>
+            </div>
+
+            <!-- Encoding Weights -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-cogs"></i> Encoding Weights Comparison
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-center">Breathing Dynamics (Biological)</h6>
+                            <div id="breathingWeights" class="frequency-info">
+                                <!-- Populated by JavaScript -->
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-center">Arbitrary (Random)</h6>
+                            <div id="arbitraryWeights" class="frequency-info">
+                                <!-- Populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        let exampleSequences = [];
+
+        // Load example sequences on page load
+        fetch('/example_sequences')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    exampleSequences = data.sequences;
+                }
+            })
+            .catch(error => console.error('Error loading examples:', error));
+
+        function loadExample(index) {
+            if (exampleSequences.length > index) {
+                document.getElementById('dnaSequence').value = exampleSequences[index].sequence;
+            } else {
+                // Fallback examples
+                const fallbackExamples = [
+                    'ATGAGTCCGGCGGGAAGCTACGGCGGCGGCGGCGGCAACGGCGGCGGCCGCCGCCGCCACCACCGCCGCCGCCACCGCCGCCTCTCCTGCTGGTGGC',
+                    'ATGAGCTCCTGCCTGGAGAGACAGGAGAAACAGAAATTCTACTACATGATGCACTTCTTGGGGAAAATGAAGGAGTACTTGGAGCAGATGGAGCCC',
+                    'ATGGCGCCGGGCTGCGGGCCGCAGGGCCGCCAGGGGGCCTCGATGGCGGGCCGCCAGGGCCGGGGGCCGCCGGGCCGGGGGCCGCCGGGCCGGGGG'
+                ];
+                document.getElementById('dnaSequence').value = fallbackExamples[index];
+            }
+        }
+
+        async function analyzeSequence() {
+            const sequence = document.getElementById('dnaSequence').value.trim();
+            
+            if (!sequence) {
+                alert('Please enter a DNA sequence');
+                return;
+            }
+
+            // Show loading
+            document.getElementById('loadingIndicator').style.display = 'block';
+            document.getElementById('resultsContainer').style.display = 'none';
+
+            try {
+                const response = await fetch('/analyze', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ sequence: sequence })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Analysis failed');
+                }
+
+                displayResults(data.results);
+            } catch (error) {
+                alert('Error: ' + error.message);
+            } finally {
+                document.getElementById('loadingIndicator').style.display = 'none';
+            }
+        }
+
+        function displayResults(results) {
+            // Show results container
+            document.getElementById('resultsContainer').style.display = 'block';
+
+            // Sequence info
+            document.getElementById('seqLength').textContent = results.sequence_length;
+            document.getElementById('gcContent').textContent = results.gc_content.toFixed(1) + '%';
+            
+            const comp = results.base_composition;
+            document.getElementById('baseComp').innerHTML = 
+                `A: ${comp.A} &nbsp; T: ${comp.T} &nbsp; C: ${comp.C} &nbsp; G: ${comp.G}`;
+
+            // Mutation results
+            displayMutationResults(results.mutation_analysis);
+
+            // Spectrum plot
+            plotSpectrum(results.breathing_spectrum, results.arbitrary_spectrum);
+
+            // Display weights
+            displayWeights(results.breathing_weights, results.arbitrary_weights);
+
+            // Scroll to results
+            document.getElementById('resultsContainer').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function displayMutationResults(mutations) {
+            const container = document.getElementById('mutationResults');
+            container.innerHTML = '';
+
+            const mutationTypes = [
+                { key: 'gc_affecting', title: 'GC-Affecting', description: 'Changes frequency class (AT↔GC)', expected: 'Breathing should win' },
+                { key: 'at_affecting', title: 'Within-Class', description: 'Stays in same frequency class', expected: 'Should show ~0 signal' },
+                { key: 'random_mutation', title: 'Random', description: 'Any base substitution', expected: 'Mixed results expected' }
+            ];
+
+            mutationTypes.forEach(type => {
+                const mut = mutations[type.key];
+                if (!mut) return;
+
+                const isBreathingWinner = mut.winner === 'Breathing';
+                const cardClass = isBreathingWinner ? 'winner-breathing' : 
+                                 Math.abs(mut.difference) < 0.001 ? 'winner-neutral' : 'winner-arbitrary';
+
+                const html = `
+                    <div class="col-md-4">
+                        <div class="metric-card ${cardClass}">
+                            <div class="metric-label">${type.title}</div>
+                            <div style="font-size: 0.9em; margin: 5px 0;">${mut.description}</div>
+                            <hr style="margin: 10px 0; opacity: 0.3;">
+                            <div style="text-align: left; font-size: 0.9em;">
+                                <strong>Z-scores:</strong><br>
+                                Breathing: ${mut.z_breathing.toFixed(4)}<br>
+                                Arbitrary: ${mut.z_arbitrary.toFixed(4)}<br>
+                                <strong>Difference: ${mut.difference > 0 ? '+' : ''}${mut.difference.toFixed(4)}</strong><br>
+                                Winner: <strong>${mut.winner}</strong>
+                                ${mut.breathing_advantage !== 0 ? '<br>Advantage: ' + mut.breathing_advantage.toFixed(1) + '%' : ''}
+                            </div>
+                            <div style="margin-top: 10px; font-size: 0.85em; opacity: 0.9;">
+                                <em>${type.expected}</em>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += html;
+            });
+        }
+
+        function plotSpectrum(breathing, arbitrary) {
+            const trace1 = {
+                x: breathing.frequencies,
+                y: breathing.power,
+                type: 'scatter',
+                mode: 'lines',
+                name: 'Breathing Dynamics',
+                line: { color: '#38ef7d', width: 2 }
+            };
+
+            const trace2 = {
+                x: arbitrary.frequencies,
+                y: arbitrary.power,
+                type: 'scatter',
+                mode: 'lines',
+                name: 'Arbitrary',
+                line: { color: '#f7b733', width: 2 }
+            };
+
+            const layout = {
+                title: 'Power Spectrum Comparison',
+                xaxis: { title: 'Frequency', gridcolor: '#e0e0e0' },
+                yaxis: { title: 'Power', gridcolor: '#e0e0e0' },
+                paper_bgcolor: '#fafafa',
+                plot_bgcolor: '#ffffff',
+                showlegend: true,
+                legend: { x: 0.7, y: 1 }
+            };
+
+            Plotly.newPlot('spectrumPlot', [trace1, trace2], layout);
+        }
+
+        function displayWeights(breathing, arbitrary) {
+            let breathingHtml = '<table class="table table-sm"><thead><tr><th>Base</th><th>Frequency</th><th>Weight</th></tr></thead><tbody>';
+            for (const [base, info] of Object.entries(breathing)) {
+                breathingHtml += `
+                    <tr>
+                        <td><strong>${base}</strong></td>
+                        <td>${info.frequency_hz.toExponential(0)} Hz</td>
+                        <td>${info.real_part.toFixed(2)} ${info.imag_part >= 0 ? '+' : ''}${info.imag_part.toFixed(2)}j</td>
+                    </tr>
+                `;
+            }
+            breathingHtml += '</tbody></table>';
+            document.getElementById('breathingWeights').innerHTML = breathingHtml;
+
+            let arbitraryHtml = '<table class="table table-sm"><thead><tr><th>Base</th><th>Weight</th></tr></thead><tbody>';
+            for (const [base, info] of Object.entries(arbitrary)) {
+                arbitraryHtml += `
+                    <tr>
+                        <td><strong>${base}</strong></td>
+                        <td>${info.real_part.toFixed(2)} ${info.imag_part >= 0 ? '+' : ''}${info.imag_part.toFixed(2)}j</td>
+                    </tr>
+                `;
+            }
+            arbitraryHtml += '</tbody></table>';
+            document.getElementById('arbitraryWeights').innerHTML = arbitraryHtml;
+        }
+    </script>
+</body>
+</html>
