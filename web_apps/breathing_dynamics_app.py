@@ -162,8 +162,9 @@ class BreathingDemonstrator:
             return results
             
         except Exception as e:
-            self.logger.error(f"Analysis failed: {e}")
-            return {'error': str(e)}
+            # Log error but don't expose stack trace details
+            self.logger.error(f"Analysis failed for sequence length {len(sequence)}")
+            return {'error': 'Analysis failed. Please check your sequence and try again.'}
     
     def plot_spectrum(self, analyzer: BreathingSpectralAnalyzer, sequence: str) -> str:
         """
@@ -313,8 +314,9 @@ def analyze():
         return jsonify(results)
         
     except Exception as e:
-        logger.error(f"Analysis error: {e}")
-        return jsonify({'error': str(e)}), 500
+        # Log error but don't expose stack trace
+        logger.error(f"Analysis request failed")
+        return jsonify({'error': 'Analysis failed. Please try again.'}), 500
 
 
 @app.route('/example/<example_type>')
@@ -366,7 +368,7 @@ if __name__ == '__main__':
         # Production settings
         app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=False)
     else:
-        # Development settings
+        # Development settings - debug disabled for security
         print("\n" + "="*70)
         print("DNA BREATHING DYNAMICS DEMO")
         print("="*70)
@@ -378,4 +380,5 @@ if __name__ == '__main__':
         print("\nPress Ctrl+C to stop")
         print("="*70 + "\n")
         
-        app.run(host='0.0.0.0', port=5000, debug=True)
+        # Run without debug mode for security
+        app.run(host='0.0.0.0', port=5000, debug=False)
