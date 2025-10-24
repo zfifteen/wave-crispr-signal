@@ -98,6 +98,17 @@ python applications/crispr_cli.py score "GACGATCGATCGATCGATCG"
 
 ---
 
+## 🤖 AI Assistant Configuration
+
+This repository includes configuration files for AI research assistants:
+
+- **Claude Sonnet 4** (`.claude/`) - Deep research and scientific analysis
+- **Grok** (`.grok/`) - Code analysis and validation
+
+Both are configured with complete project context and mandatory scientific gates.
+
+---
+
 ## License
 
 MIT
