@@ -50,6 +50,10 @@ from scipy import stats
 sys.path.append('.')
 sys.path.append('..')
 
+# Add scripts directory for Z Framework
+repo_root = Path(__file__).parent.parent
+sys.path.insert(0, str(repo_root / 'scripts'))
+
 # Import core Z Framework components
 from z_framework import ZFrameworkCalculator
 
@@ -506,14 +510,50 @@ class StatisticalAnalysis:
         
         # Basic statistics
         baseline_mean = np.mean(self.baseline_errors)
+        baseline_std = np.std(self.baseline_errors)
         z_framework_mean = np.mean(self.z_framework_errors)
+        z_framework_std = np.std(self.z_framework_errors)
         improvement = (baseline_mean - z_framework_mean) / baseline_mean * 100
+        
+        # Convert to millimeters (assuming grid units are cm for realistic tissue scale)
+        # Grid size 100 = 10cm x 10cm tissue, so 1 grid unit = 1mm
+        baseline_mean_mm = baseline_mean * 1.0  # Already in mm scale
+        baseline_std_mm = baseline_std * 1.0
+        z_framework_mean_mm = z_framework_mean * 1.0
+        z_framework_std_mm = z_framework_std * 1.0
+        
+        # Time-to-target statistics
+        baseline_times = np.array([r.baseline_time for r in self.results])
+        z_framework_times = np.array([r.z_framework_time for r in self.results])
+        
+        # Convert to milliseconds (times are in seconds from velocity calculations)
+        baseline_time_mean_ms = np.mean(baseline_times) * 1000
+        baseline_time_std_ms = np.std(baseline_times) * 1000
+        z_framework_time_mean_ms = np.mean(z_framework_times) * 1000
+        z_framework_time_std_ms = np.std(z_framework_times) * 1000
         
         # Effect size (Cohen's d)
         pooled_std = np.sqrt(
             (np.var(self.baseline_errors) + np.var(self.z_framework_errors)) / 2
         )
         cohens_d = (baseline_mean - z_framework_mean) / pooled_std
+        
+        # Bootstrap confidence interval for Cohen's d
+        boot_cohens_d = []
+        for _ in range(self.config.n_bootstrap):
+            indices = np.random.choice(len(self.baseline_errors), 
+                                     len(self.baseline_errors), replace=True)
+            boot_baseline = self.baseline_errors[indices]
+            boot_z = self.z_framework_errors[indices]
+            
+            boot_pooled_std = np.sqrt(
+                (np.var(boot_baseline) + np.var(boot_z)) / 2
+            )
+            boot_d = (np.mean(boot_baseline) - np.mean(boot_z)) / boot_pooled_std
+            boot_cohens_d.append(boot_d)
+        
+        cohens_d_ci_low = np.percentile(boot_cohens_d, 2.5)
+        cohens_d_ci_high = np.percentile(boot_cohens_d, 97.5)
         
         # Bootstrap correlation analysis
         correlation_r, corr_ci_low, corr_ci_high, corr_p = self.bootstrap_correlation(
@@ -543,18 +583,45 @@ class StatisticalAnalysis:
         statistically_significant = perm_p_value < 0.05
         
         return {
+            # Error metrics (grid units)
             "baseline_mean_error": float(baseline_mean),
+            "baseline_std_error": float(baseline_std),
             "z_framework_mean_error": float(z_framework_mean),
+            "z_framework_std_error": float(z_framework_std),
+            
+            # Error metrics (millimeters)
+            "baseline_mean_error_mm": float(baseline_mean_mm),
+            "baseline_std_error_mm": float(baseline_std_mm),
+            "z_framework_mean_error_mm": float(z_framework_mean_mm),
+            "z_framework_std_error_mm": float(z_framework_std_mm),
+            
+            # Time metrics (milliseconds)
+            "baseline_time_mean_ms": float(baseline_time_mean_ms),
+            "baseline_time_std_ms": float(baseline_time_std_ms),
+            "z_framework_time_mean_ms": float(z_framework_time_mean_ms),
+            "z_framework_time_std_ms": float(z_framework_time_std_ms),
+            
+            # Improvement metrics
             "improvement_percentage": float(improvement),
             "improvement_ci_low": float(improvement_ci_low),
             "improvement_ci_high": float(improvement_ci_high),
+            
+            # Effect size
             "cohens_d": float(cohens_d),
+            "cohens_d_ci_low": float(cohens_d_ci_low),
+            "cohens_d_ci_high": float(cohens_d_ci_high),
+            
+            # Correlation
             "correlation_r": float(correlation_r),
             "correlation_ci_low": float(corr_ci_low),
             "correlation_ci_high": float(corr_ci_high),
             "correlation_p_value": float(corr_p),
+            
+            # Statistical tests
             "permutation_p_value": float(perm_p_value),
             "statistically_significant": bool(statistically_significant),
+            
+            # Sample sizes
             "n_bootstrap": int(self.config.n_bootstrap),
             "n_permutation": int(self.config.n_permutation)
         }
@@ -621,15 +688,23 @@ def save_results(results: List[TargetingResult], analysis: Dict,
         f.write(f"- Random seed: {config.seed}\n")
         f.write(f"- K parameter: {config.k_parameter}\n\n")
         
-        f.write("Results:\n")
-        f.write(f"- Baseline mean error: {analysis['baseline_mean_error']:.6f}\n")
-        f.write(f"- Z Framework mean error: {analysis['z_framework_mean_error']:.6f}\n")
+        f.write("Results (Targeting Error):\n")
+        f.write(f"- Baseline: {analysis['baseline_mean_error_mm']:.2f} ± {analysis['baseline_std_error_mm']:.2f} mm\n")
+        f.write(f"- Z Framework: {analysis['z_framework_mean_error_mm']:.2f} ± {analysis['z_framework_std_error_mm']:.2f} mm\n")
         f.write(f"- Improvement: {analysis['improvement_percentage']:.2f}% "
-               f"(CI: {analysis['improvement_ci_low']:.2f}% to "
-               f"{analysis['improvement_ci_high']:.2f}%)\n")
-        f.write(f"- Effect size (Cohen's d): {analysis['cohens_d']:.4f}\n")
+               f"(95% CI: {analysis['improvement_ci_low']:.2f}% to "
+               f"{analysis['improvement_ci_high']:.2f}%)\n\n")
+        
+        f.write("Results (Time-to-Target):\n")
+        f.write(f"- Baseline: {analysis['baseline_time_mean_ms']:.3f} ± {analysis['baseline_time_std_ms']:.3f} ms\n")
+        f.write(f"- Z Framework: {analysis['z_framework_time_mean_ms']:.3f} ± {analysis['z_framework_time_std_ms']:.3f} ms\n\n")
+        
+        f.write("Statistical Analysis:\n")
+        f.write(f"- Effect size (Cohen's d): {analysis['cohens_d']:.4f} "
+               f"(95% CI: {analysis['cohens_d_ci_low']:.4f} to {analysis['cohens_d_ci_high']:.4f})\n")
         f.write(f"- Correlation r: {analysis['correlation_r']:.4f} "
-               f"(p={analysis['correlation_p_value']:.6f})\n")
+               f"(95% CI: {analysis['correlation_ci_low']:.4f} to {analysis['correlation_ci_high']:.4f}, "
+               f"p={analysis['correlation_p_value']:.6f})\n")
         f.write(f"- Permutation p-value: {analysis['permutation_p_value']:.6f}\n")
         f.write(f"- Statistically significant: {analysis['statistically_significant']}\n")
     
@@ -808,16 +883,26 @@ def main():
     
     # Print summary
     print("\nEXPERIMENT RESULTS:")
-    print("-" * 40)
-    print(f"Baseline mean error:     {analysis['baseline_mean_error']:.6f}")
-    print(f"Z Framework mean error:  {analysis['z_framework_mean_error']:.6f}")
-    print(f"Improvement:             {analysis['improvement_percentage']:.2f}% "
-          f"(CI: {analysis['improvement_ci_low']:.2f}% to {analysis['improvement_ci_high']:.2f}%)")
-    print(f"Effect size (Cohen's d): {analysis['cohens_d']:.4f}")
-    print(f"Correlation r:           {analysis['correlation_r']:.4f} (p={analysis['correlation_p_value']:.6f})")
-    print(f"Permutation p-value:     {analysis['permutation_p_value']:.6f}")
-    print(f"Statistically significant: {analysis['statistically_significant']}")
-    print(f"Runtime:                 {analysis['runtime_seconds']:.2f} seconds")
+    print("-" * 80)
+    print("\nTargeting Error (mm):")
+    print(f"  Baseline:     {analysis['baseline_mean_error_mm']:.2f} ± {analysis['baseline_std_error_mm']:.2f}")
+    print(f"  Z Framework:  {analysis['z_framework_mean_error_mm']:.2f} ± {analysis['z_framework_std_error_mm']:.2f}")
+    print(f"  Improvement:  {analysis['improvement_percentage']:.2f}% "
+          f"(95% CI: {analysis['improvement_ci_low']:.2f}% to {analysis['improvement_ci_high']:.2f}%)")
+    
+    print("\nTime-to-Target (ms):")
+    print(f"  Baseline:     {analysis['baseline_time_mean_ms']:.3f} ± {analysis['baseline_time_std_ms']:.3f}")
+    print(f"  Z Framework:  {analysis['z_framework_time_mean_ms']:.3f} ± {analysis['z_framework_time_std_ms']:.3f}")
+    
+    print("\nStatistical Analysis:")
+    print(f"  Effect size (Cohen's d): {analysis['cohens_d']:.4f} "
+          f"(95% CI: {analysis['cohens_d_ci_low']:.4f} to {analysis['cohens_d_ci_high']:.4f})")
+    print(f"  Correlation r:           {analysis['correlation_r']:.4f} "
+          f"(95% CI: {analysis['correlation_ci_low']:.4f} to {analysis['correlation_ci_high']:.4f})")
+    print(f"  Permutation p-value:     {analysis['permutation_p_value']:.6f}")
+    print(f"  Statistically significant: {analysis['statistically_significant']}")
+    print(f"  Runtime:                 {analysis['runtime_seconds']:.2f} seconds")
+    
     print("\nHYPOTHESIS TEST RESULT:")
     if analysis['statistically_significant'] and analysis['improvement_percentage'] > 0:
         print("✓ HYPOTHESIS SUPPORTED: Z Framework significantly improves targeting precision")
