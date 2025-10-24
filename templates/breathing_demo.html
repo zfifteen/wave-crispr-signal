@@ -345,12 +345,12 @@
                 
                 <div class="plot-container">
                     <h3>📈 Breathing Spectrum</h3>
-                    <img id="spectrum-plot" alt="Breathing spectrum">
+                    <img id="spectrum-plot" alt="DNA breathing dynamics power spectrum showing frequency analysis at 10.5 bp helical period with encoded waveform magnitude and phase">
                 </div>
                 
                 <div class="plot-container">
                     <h3>🧪 Base Weights (Biophysical)</h3>
-                    <img id="weights-plot" alt="Base weights">
+                    <img id="weights-plot" alt="Biophysical base pair weight distribution showing real and imaginary components from opening rates and thermodynamic stability in complex plane">
                 </div>
             </div>
         </div>
@@ -410,39 +410,46 @@
             // Show results section
             document.getElementById('results').classList.add('show');
             
-            // Display key metrics
+            // Helper function to safely format numbers
+            const safeFixed = (value, decimals) => {
+                return (value !== null && value !== undefined && !isNaN(value)) 
+                    ? Number(value).toFixed(decimals) 
+                    : '0.00';
+            };
+            
+            // Display key metrics with null checks
             const metricsHtml = `
                 <div class="metric">
-                    <div class="metric-value">${data.features.czt_10_5bp_power.toFixed(2)}</div>
+                    <div class="metric-value">${safeFixed(data.features?.czt_10_5bp_power, 2)}</div>
                     <div class="metric-label">10.5 bp Power</div>
                 </div>
                 <div class="metric">
-                    <div class="metric-value">${(data.gc_content * 100).toFixed(1)}%</div>
+                    <div class="metric-value">${safeFixed((data.gc_content || 0) * 100, 1)}%</div>
                     <div class="metric-label">GC Content</div>
                 </div>
                 <div class="metric">
-                    <div class="metric-value">${data.features.phase_coherence.toFixed(3)}</div>
+                    <div class="metric-value">${safeFixed(data.features?.phase_coherence, 3)}</div>
                     <div class="metric-label">Phase Coherence</div>
                 </div>
                 <div class="metric">
-                    <div class="metric-value">${data.features.amplitude_variance.toFixed(2)}</div>
+                    <div class="metric-value">${safeFixed(data.features?.amplitude_variance, 2)}</div>
                     <div class="metric-label">Amplitude Var</div>
                 </div>
             `;
             document.getElementById('metrics').innerHTML = metricsHtml;
             
-            // Display harmonics
+            // Display harmonics with null checks
             const harmonicsHtml = `
                 <div class="metric">
-                    <div class="metric-value">${data.harmonics.h1_power.toFixed(2)}</div>
+                    <div class="metric-value">${safeFixed(data.harmonics?.h1_power, 2)}</div>
                     <div class="metric-label">H1 (Fundamental)</div>
                 </div>
                 <div class="metric">
-                    <div class="metric-value">${data.harmonics.h2_power.toFixed(2)}</div>
+                    <div class="metric-value">${safeFixed(data.harmonics?.h2_power, 2)}</div>
                     <div class="metric-label">H2 (2nd Harmonic)</div>
                 </div>
                 <div class="metric">
-                    <div class="metric-value">${data.harmonics.h3_power.toFixed(2)}</div>
+                    <div class="metric-value">${safeFixed(data.harmonics?.h3_power, 2)}</div>
                     <div class="metric-label">H3 (3rd Harmonic)</div>
                 </div>
             `;
