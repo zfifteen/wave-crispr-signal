@@ -826,14 +826,17 @@ def main():
                        help='Output directory for results')
     parser.add_argument('--visualize', action='store_true',
                        help='Create visualization plots')
+    parser.add_argument('--smoke-test', action='store_true',
+                       help='Run in smoke test mode (relaxes scientific rigor gates for CI)')
     
     args = parser.parse_args()
     
-    # Validate scientific gates
-    if args.bootstrap < 1000:
-        raise ValueError("Bootstrap samples must be ≥1,000 for scientific rigor")
-    if args.permutation < 1000:
-        raise ValueError("Permutation samples must be ≥1,000 for scientific rigor")
+    # Validate scientific gates (unless in smoke test mode)
+    if not args.smoke_test:
+        if args.bootstrap < 1000:
+            raise ValueError("Bootstrap samples must be ≥1,000 for scientific rigor")
+        if args.permutation < 1000:
+            raise ValueError("Permutation samples must be ≥1,000 for scientific rigor")
     
     # Create experiment configuration
     config = ExperimentConfig(
