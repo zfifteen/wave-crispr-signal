@@ -1,0 +1,296 @@
+# Trinity Experiments Manifest
+# Experiment metadata and provenance tracking
+
+version: "1.0.0"
+created: "2025-10-24"
+repository: "zfifteen/wave-crispr-signal"
+
+# Experiment suite metadata
+suite:
+  name: "Trinity: CRISPR Breathing Dynamics Validation"
+  description: |
+    Three complementary experiments demonstrating DNA breathing dynamics effects
+    on CRISPR guide efficiency through spectral analysis at the 10.5-bp helical period.
+  
+  experiments:
+    - id: "trinity_c_phase_figure"
+      name: "Rotational Phase Figure"
+      status: "implemented"
+    - id: "trinity_a_doench_lift"
+      name: "Doench 2016 Nested Model Lift"
+      status: "planned"
+    - id: "trinity_b_cross_species"
+      name: "Cross-species Generalization"
+      status: "planned"
+
+# Scientific gates
+gates:
+  dna_validation:
+    description: "Human DNA only (A/C/G/T for DNA, A/C/G/U for RNA)"
+    enforced: true
+    implementation: "spectral.validate_dna_sequence(), spectral.validate_rna_sequence()"
+  
+  no_fabrication:
+    description: "Real nucleotide sequences only"
+    enforced: true
+    implementation: "Validation functions reject invalid bases"
+  
+  dimensionless:
+    description: "Dimensionless parametrization (rate ratios)"
+    enforced: true
+    default_value: 20.0
+    range: [5.0, 200.0]
+  
+  preregistered_endpoints:
+    description: "Statistical endpoints declared before analysis"
+    enforced: true
+    endpoints:
+      - "Rayleigh p-value"
+      - "Circular-linear correlation r"
+      - "Bootstrap 95% CI"
+      - "ΔAUPRC (planned)"
+      - "ΔR² (planned)"
+  
+  null_models:
+    description: "Permutation-based null distributions"
+    enforced: true
+    min_permutations: 1000
+  
+  bootstrap_ci:
+    description: "Bootstrap confidence intervals"
+    enforced: true
+    min_resamples: 1000
+    confidence_level: 0.95
+  
+  multiple_comparison:
+    description: "Benjamini-Hochberg FDR correction"
+    enforced: true
+    alpha: 0.05
+  
+  leakage_prevention:
+    description: "No entity overlap between train/test"
+    strategies:
+      - "split-by-screen"
+      - "split-by-gene"
+      - "split-by-species"
+
+# Shared utilities
+utilities:
+  spectral:
+    file: "spectral.py"
+    functions:
+      - encode_complex
+      - breathing_features
+      - spectral_peak_analysis
+      - rotational_phase_curve
+      - phase_at
+    parameters:
+      rate_ratio:
+        symbol: "r"
+        type: "float"
+        default: 20.0
+        range: [5.0, 200.0]
+        description: "Dimensionless k_GC/k_AT opening rate ratio"
+      helical_period:
+        symbol: "φ"
+        value: 10.5
+        unit: "bp/turn"
+        description: "B-DNA helical period"
+  
+  statistics:
+    file: "statistics.py"
+    functions:
+      - bootstrap_ci
+      - permutation_test
+      - cohens_d
+      - hedges_g
+      - benjamini_hochberg_fdr
+      - rayleigh_test
+      - circular_linear_correlation
+      - partial_correlation
+
+# Experiment C: Rotational Phase Figure
+experiment_c:
+  id: "trinity_c_phase_figure"
+  file: "phase_figure.py"
+  status: "implemented"
+  
+  description: |
+    Demonstrates oscillatory dependence of CRISPR activity on rotational phase
+    at the cut site. The "viral plot" that shows φ-dependent effects.
+  
+  method:
+    1: "Calculate φ_cut = 2π·pos/10.5 for each guide"
+    2: "Bin guides by phase (24 bins, 15° resolution)"
+    3: "Compute mean activity ± 95% bootstrap CI per bin"
+    4: "Rayleigh test for non-uniform phase distribution"
+    5: "Circular-linear correlation between phase and activity"
+  
+  preregistered_endpoints:
+    primary:
+      - name: "Rayleigh p-value"
+        null_hypothesis: "Phases uniformly distributed"
+        threshold: 0.05
+      - name: "Circular-linear correlation r"
+        null_hypothesis: "No phase-activity relationship"
+        threshold: 0.05
+    
+    secondary:
+      - name: "Bootstrap 95% CI for bin means"
+        min_resamples: 1000
+  
+  usage: |
+    python experiments/trinity/phase_figure.py \
+      --seed 42 \
+      --n-guides 1000 \
+      --bootstrap 1000 \
+      --bins 24 \
+      --output results/trinity/phase_figure
+  
+  outputs:
+    figures:
+      - "phase_activity.png"
+    data:
+      - "results.json"
+  
+  runtime:
+    synthetic_100_guides: "< 5s"
+    synthetic_1000_guides: "< 30s"
+    real_doench_10000_guides: "< 2min (estimated)"
+
+# Experiment A: Doench Lift (Planned)
+experiment_a:
+  id: "trinity_a_doench_lift"
+  file: "doench_lift.py"
+  status: "planned"
+  
+  description: |
+    Nested model comparison: baseline canonical features vs. baseline + breathing
+    spectral features. Shows ΔAUPRC improvement on Doench 2016 dataset.
+  
+  datasets_required:
+    - name: "Doench 2016"
+      source: "doi:10.1038/nbt.3437"
+      size: "~1800 guides"
+      license: "Check publication"
+  
+  features:
+    baseline:
+      - "Position-dependent nucleotide identity"
+      - "GC content"
+      - "Dinucleotide composition"
+      - "Thermodynamic features"
+    
+    breathing:
+      - "P10_5: Power at 10.5 bp period"
+      - "P5_25: Power at 5.25 bp period"
+      - "P3_5: Power at 3.5 bp period"
+      - "φ_cut: Phase at cut site"
+      - "Circular-linear terms"
+  
+  preregistered_endpoints:
+    - "ΔAUPRC with 95% bootstrap CI"
+    - "ΔR² with 95% bootstrap CI"
+    - "Hedges' g effect size"
+    - "K-fold CV performance (no leakage)"
+  
+  model:
+    type: "nested"
+    baseline_model: "Random Forest or Gradient Boosting"
+    breathing_model: "baseline + breathing features"
+    comparison: "AUPRC improvement via nested cross-validation"
+
+# Experiment B: Cross-species (Planned)
+experiment_b:
+  id: "trinity_b_cross_species"
+  file: "cross_species.py"
+  status: "planned"
+  
+  description: |
+    Train on human data (Doench), test on zebrafish (CRISPRscan).
+    Zero-tuning generalization test for breathing features.
+  
+  datasets_required:
+    - name: "Doench 2016 (train)"
+      species: "Homo sapiens"
+      source: "doi:10.1038/nbt.3437"
+    
+    - name: "CRISPRscan (test)"
+      species: "Danio rerio"
+      source: "Check CRISPRscan publication"
+      note: "Zero tuning - use frozen human-trained model"
+  
+  protocol:
+    1: "Train model on Doench (human) with breathing features"
+    2: "Freeze all parameters (no tuning on zebrafish)"
+    3: "Test on CRISPRscan (zebrafish)"
+    4: "Compare against baseline model"
+  
+  preregistered_endpoints:
+    - "Cross-species ΔAUPRC"
+    - "Feature ablation (breathing on vs off)"
+    - "Species-specific performance breakdown"
+  
+  interpretation:
+    positive_result: |
+      Breathing features generalize across species because they capture
+      fundamental DNA physics (helical periodicity) that's conserved.
+    
+    negative_result: |
+      Breathing features don't generalize, suggesting species-specific
+      effects dominate or dataset differences confound analysis.
+
+# Dataset provenance
+datasets:
+  doench_2016:
+    name: "Doench 2016 sgRNA dataset"
+    species: "Homo sapiens"
+    size: "~1800 on-target scores"
+    doi: "10.1038/nbt.3437"
+    license: "Check publication"
+    status: "required for experiments A & B"
+  
+  kim_2025:
+    name: "Kim 2025 gRNA efficiency"
+    species: "Homo sapiens"
+    size: "18,102 guides"
+    status: "optional validation"
+  
+  crisprscan:
+    name: "CRISPRscan zebrafish"
+    species: "Danio rerio"
+    source: "CRISPRscan publication"
+    status: "required for experiment B"
+
+# Reproducibility
+reproducibility:
+  seed: 42
+  python_version: "3.12+"
+  dependencies: "../../../requirements.txt"
+  
+  environment_capture:
+    - "git commit SHA"
+    - "pip freeze output"
+    - "dataset SHA256 hashes"
+    - "random seeds"
+    - "timestamp"
+  
+  results_location: "results/trinity/"
+  
+  validation:
+    - "Smoke tests with synthetic data"
+    - "Unit tests for utilities"
+    - "Integration tests end-to-end"
+
+# License and citation
+license: "MIT"
+citation: |
+  If using these experiments, please cite:
+  - This repository: zfifteen/wave-crispr-signal
+  - Doench et al. (2016) doi:10.1038/nbt.3437
+  - Relevant dataset sources
+
+# Contact
+contact:
+  issues: "https://github.com/zfifteen/wave-crispr-signal/issues"
+  tags: ["trinity", "experiments", "crispr"]
