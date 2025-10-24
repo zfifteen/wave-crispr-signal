@@ -92,9 +92,11 @@ The application will start on `http://127.0.0.1:5000`
 #### Breathing Dynamics Encoder
 Based on experimental base pair opening frequencies:
 ```python
-# Real part: log-normalized frequency
-# AT: 10^7 Hz → -10.00 (fast opening)
-# GC: 10^9 Hz → +10.00 (slow opening)
+# Real part: log-normalized frequency using formula (log10(freq) - 8.0) * 10.0
+# This centers the encoding around 10^8 Hz and scales to ±10 range
+# 
+# AT: 10^7 Hz → (log10(10^7) - 8.0) * 10.0 = (7 - 8) * 10 = -10.00 (fast opening)
+# GC: 10^9 Hz → (log10(10^9) - 8.0) * 10.0 = (9 - 8) * 10 = +10.00 (slow opening)
 
 # Imaginary part: phase from kinetics
 # AT: +3.0j (weak bonds, positive phase)
