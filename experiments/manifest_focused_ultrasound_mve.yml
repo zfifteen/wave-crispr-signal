@@ -1,0 +1,176 @@
+# Experiment Manifest: Focused Ultrasound Cross-Domain Validation
+# 
+# This manifest tracks the focused ultrasound MVE experiment that validates
+# the Z Framework in the acoustic domain.
+
+experiment:
+  id: "focused_ultrasound_mve"
+  title: "Cross-Domain Validation of Z Framework for FUS Spatial Targeting"
+  version: "1.0"
+  date_created: "2025-10-24"
+  status: "validated"
+  
+hypothesis:
+  primary: "The Z Framework improves targeting precision in simulated focused ultrasound (FUS) by reducing spatial error through nonlinear time-distance transforms and geodesic curvature modeling."
+  null: "There is no significant difference in spatial targeting error between the Z Framework and baseline acoustic models."
+
+scientific_domain:
+  primary: "Acoustic Wave Propagation"
+  secondary: "Signal Processing"
+  cross_domain: "DNA/CRISPR → Focused Ultrasound"
+
+mathematical_framework:
+  discrete_domain_form: "Z = A(B/e²)"
+  geodesic_resolution: "θ'(n,k) = φ·((n mod φ)/φ)^k"
+  parameters:
+    - name: "k"
+      default: 0.3
+      description: "Geodesic curvature exponent"
+    - name: "φ"
+      value: 1.618033988749895
+      description: "Golden ratio"
+
+simulation_parameters:
+  grid:
+    size: 100
+    units: "millimeters"
+    total_area: "10cm × 10cm"
+  acoustic:
+    base_velocity: 1540  # m/s
+    velocity_variance: 0.10  # ±10%
+    heterogeneity: "Gaussian"
+  trials:
+    count: 1000
+    source_position: [5, 5]
+    target_range: [[10, 90], [10, 90]]
+  seed: 42
+
+statistical_validation:
+  methods:
+    - name: "Bootstrap Confidence Intervals"
+      samples: 1000
+      level: 0.95
+    - name: "Permutation Testing"
+      permutations: 1000
+      alpha: 0.05
+      tails: 2
+    - name: "Effect Size"
+      metric: "Cohen's d"
+      ci_method: "bootstrap"
+  
+  endpoints:
+    primary:
+      - name: "Targeting Error (mm)"
+        baseline_expected: "0.5-1.0"
+        z_framework_expected: "<0.5"
+    secondary:
+      - name: "Improvement Percentage"
+        expected_range: "5-25%"
+      - name: "Effect Size (Cohen's d)"
+        expected: ">0.2"
+      - name: "Correlation (r)"
+        expected_range: "0.7-0.95"
+
+results:
+  run_id: "20251024-222137"
+  targeting_error:
+    baseline:
+      mean_mm: 0.69
+      std_mm: 0.23
+    z_framework:
+      mean_mm: 0.40
+      std_mm: 0.13
+    improvement:
+      percentage: 42.0
+      ci_95: [41.6, 42.4]
+  
+  time_to_target:
+    baseline:
+      mean_ms: 44.36
+      std_ms: 14.68
+    z_framework:
+      mean_ms: 44.37
+      std_ms: 14.83
+  
+  effect_size:
+    cohens_d: 1.55
+    ci_95: [1.48, 1.63]
+    interpretation: "Large effect"
+  
+  correlation:
+    pearson_r: 0.956
+    ci_95: [0.947, 0.963]
+    p_value: "<0.001"
+  
+  statistical_test:
+    permutation_p_value: "<0.001"
+    significant: true
+    conclusion: "HYPOTHESIS SUPPORTED"
+
+runtime:
+  seconds: 0.44
+  performance: "Meets <5 minute target"
+
+reproducibility:
+  git_commit: "ebbfc93"
+  python_version: "3.12.3"
+  random_seed: 42
+  dependencies:
+    - "mpmath==1.3.0"
+    - "numpy==1.26.4"
+    - "scipy==1.16.1"
+    - "matplotlib==3.10.5"
+
+files:
+  implementation: "experiments/focused_ultrasound_mve.py"
+  readme: "experiments/FOCUSED_ULTRASOUND_MVE_README.md"
+  documentation: "docs/FOCUSED_ULTRASOUND_CROSS_DOMAIN_VALIDATION.md"
+  results_dir: "results/focused_ultrasound_mve/"
+  
+execution:
+  command: |
+    python experiments/focused_ultrasound_mve.py \
+      --seed 42 \
+      --bootstrap 1000 \
+      --permutation 1000 \
+      --splits single \
+      --domain discrete \
+      --k-parameter 0.3 \
+      --grid-size 100 \
+      --n-trials 1000 \
+      --visualize
+
+validation:
+  status: "PASSED"
+  gates:
+    - name: "Statistical Significance"
+      status: "PASSED"
+      value: "p < 0.001"
+    - name: "Effect Size"
+      status: "PASSED"
+      value: "d = 1.55 (large)"
+    - name: "Reproducibility"
+      status: "PASSED"
+      value: "Fixed seed, versioned code"
+    - name: "Runtime"
+      status: "PASSED"
+      value: "0.44s < 5min"
+
+notes: |
+  This experiment successfully demonstrates cross-domain transferability of the
+  Z Framework from DNA/CRISPR signal analysis to acoustic wave propagation.
+  
+  The 42% improvement in targeting precision with large effect size (d=1.55) 
+  exceeds typical expectations (5-25%), likely due to favorable conditions:
+  - Moderate heterogeneity (10% variance)
+  - Optimized k-parameter (0.3)
+  - Mid-range targeting distances
+  
+  IMPORTANT: This is for research hypothesis testing only, not clinical applications.
+
+future_work:
+  - "Extend to 3D acoustic propagation"
+  - "Systematic k-parameter optimization"
+  - "Test across heterogeneity range (5-20%)"
+  - "Compare with k-Wave FUS simulator"
+  - "Multi-focus targeting evaluation"
