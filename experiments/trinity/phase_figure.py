@@ -37,7 +37,7 @@ import matplotlib.pyplot as plt
 # Add parent directories to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
-from experiments.trinity.spectral import phase_at, breathing_features, HELICAL_PERIOD
+from wave_crispr_signal.spectral import rotational_phase_at as phase_at, breathing_features, 10.5 as HELICAL_PERIOD
 from experiments.trinity.statistics import (
     bootstrap_ci, rayleigh_test, circular_linear_correlation
 )
@@ -50,7 +50,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def generate_synthetic_guides(
+def load_guides(csv_path: str) -> List[Dict]:
     n_guides: int = 1000,
     guide_length: int = 20,
     seed: int = 42
@@ -232,7 +232,7 @@ def main():
     
     # Generate synthetic data
     logger.info("Generating synthetic guide data...")
-    guides = generate_synthetic_guides(
+    guides = load_guides(args.csv)
         n_guides=args.n_guides,
         seed=args.seed
     )
@@ -311,7 +311,6 @@ def main():
     print()
     print(f"Output: {args.output}/")
     print("="*60)
-
 
 if __name__ == "__main__":
     main()
