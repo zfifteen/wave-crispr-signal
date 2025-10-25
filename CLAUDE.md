@@ -2,6 +2,8 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+**Note:** For deep research on this project using Claude Sonnet 4, see the comprehensive instructions in `.claude/claude_instructions_crispr_wave_signal.md`.
+
 ## Repository Overview
 
 This project implements signal-theoretic analysis of DNA mutations using a complex-valued spectral framework called the "Z Framework". The codebase combines bioinformatics (CRISPR guide design, DNA sequence analysis), mathematical frameworks (high-precision calculations with golden ratio convergence), and medical applications (focused ultrasound, MRI analysis, pain management).
