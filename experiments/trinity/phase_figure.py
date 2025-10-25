@@ -50,7 +50,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def generate_synthetic_guides(
+def load_guides(csv_path: str) -> List[Dict]:
     n_guides: int = 1000,
     guide_length: int = 20,
     seed: int = 42
@@ -232,7 +232,7 @@ def main():
     
     # Generate synthetic data
     logger.info("Generating synthetic guide data...")
-    guides = generate_synthetic_guides(
+    guides = load_guides(args.csv)
         n_guides=args.n_guides,
         seed=args.seed
     )
