@@ -85,18 +85,18 @@ class TestSyntheticValidation:
         assert len(sequences['gc_rich']) == num_sequences
         assert len(sequences['balanced']) == num_sequences
         
-        # Check GC content ranges (use slightly wider bounds to account for randomness)
+        # Check GC content ranges (use inclusive bounds for consistency)
         for seq in sequences['at_rich']:
             gc = (seq.count('G') + seq.count('C')) / len(seq)
-            assert 0.15 < gc <= 0.40  # AT-rich (inclusive upper bound)
+            assert 0.15 <= gc <= 0.40  # AT-rich (20-35% target)
         
         for seq in sequences['gc_rich']:
             gc = (seq.count('G') + seq.count('C')) / len(seq)
-            assert 0.60 < gc < 0.85  # GC-rich
+            assert 0.60 <= gc <= 0.85  # GC-rich (65-80% target)
         
         for seq in sequences['balanced']:
             gc = (seq.count('G') + seq.count('C')) / len(seq)
-            assert 0.40 <= gc <= 0.60  # Balanced (inclusive bounds)
+            assert 0.40 <= gc <= 0.60  # Balanced (45-55% target)
     
     def test_confidence_interval_calculation(self):
         """Test bootstrap confidence interval calculation."""

@@ -85,8 +85,8 @@ def process_fasta(fasta_file: str, designer: CRISPRGuideDesigner,
         designer: CRISPRGuideDesigner instance
         num_guides: Number of guides to design per sequence
         
-    Yields:
-        Dictionary with guide design results for each sequence
+    Returns:
+        List of dictionaries with guide design results for each sequence
     """
     sequences = read_fasta(fasta_file)
     results = []

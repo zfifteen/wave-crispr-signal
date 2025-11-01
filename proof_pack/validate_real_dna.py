@@ -315,9 +315,11 @@ def generate_report(results: List[Dict], output_file: Path):
         results: List of analysis results
         output_file: Output markdown file path
     """
+    from datetime import datetime
+    
     with open(output_file, 'w') as f:
         f.write("# Wave-CRISPR Real DNA Validation Report\n\n")
-        f.write(f"**Generated:** {np.datetime64('now')}\n\n")
+        f.write(f"**Generated:** {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')}\n\n")
         f.write(f"**Sequences Analyzed:** {len(results)}\n\n")
         
         f.write("## Executive Summary\n\n")

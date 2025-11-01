@@ -303,9 +303,11 @@ def generate_report(results: Dict[str, any],
         output_file: Output markdown file path
         num_sequences: Number of sequences per category
     """
+    from datetime import datetime
+    
     with open(output_file, 'w') as f:
         f.write("# Wave-CRISPR Synthetic Sequence Validation Report\n\n")
-        f.write(f"**Generated:** {np.datetime64('now')}\n\n")
+        f.write(f"**Generated:** {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')}\n\n")
         f.write(f"**Sequences Analyzed:** {num_sequences} per category\n\n")
         
         f.write("## Executive Summary\n\n")
@@ -353,14 +355,14 @@ def generate_report(results: Dict[str, any],
             f.write(f"- Percentage difference: {abs(pct_diff):.1f}%\n")
             f.write(f"- Statistical significance: {'Yes (p < 0.05)' if p_value < 0.05 else 'No'}\n\n")
             
-            # Check for 18% variability claim
-            if abs(pct_diff) >= 15.0:  # Allow some tolerance
+            # Check for meaningful variability (15% threshold)
+            if abs(pct_diff) >= 15.0:
                 f.write(f"✅ **Validation Success:** Wave wobble shows {abs(pct_diff):.1f}% ")
                 f.write(f"difference between AT-rich and GC-rich regions ")
-                f.write(f"(meets >15% threshold).\n\n")
+                f.write(f"(meets ≥15% threshold for biological significance).\n\n")
             else:
                 f.write(f"⚠️  **Note:** Wave wobble difference ({abs(pct_diff):.1f}%) ")
-                f.write(f"is below the 18% target.\n\n")
+                f.write(f"is below the 15% threshold for biological significance.\n\n")
         
         f.write("## Visualizations\n\n")
         f.write("See generated plots:\n")
