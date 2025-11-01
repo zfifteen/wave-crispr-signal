@@ -28,7 +28,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'applications')
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'scripts'))
 
 from crispr_guide_designer import CRISPRGuideDesigner
-from crispr_physical_z_metrics import read_fasta_with_validation, PhysicalZMetricsCalculator
+from crispr_physical_z_metrics import read_fasta_with_validation
 
 # Set up logging
 logging.basicConfig(
