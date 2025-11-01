@@ -313,7 +313,7 @@ def generate_report(results: Dict[str, any],
         f.write("## Executive Summary\n\n")
         f.write("This report validates the wave-CRISPR signal processing framework using ")
         f.write("synthetic DNA sequences with varying GC content. The analysis measures ")
-        f.write("wave wobble (amplitude variance) in AT-rich vs GC-rich regions.\n\n")
+        f.write("wave wobble (phase variance) in AT-rich vs GC-rich regions.\n\n")
         
         f.write("## Results\n\n")
         f.write("### Wave Wobble Statistics\n\n")
