@@ -253,7 +253,7 @@ def plot_wave_wobble_distributions(results: Dict[str, any],
     for patch, category in zip(bp['boxes'], results.keys()):
         patch.set_facecolor(colors.get(category, '#CCCCCC'))
     
-    ax.set_ylabel('Wave Wobble (σ/μ)', fontsize=12)
+    ax.set_ylabel('Wave Wobble (σ of phase differences)', fontsize=12)
     ax.set_xlabel('Sequence Category', fontsize=12)
     ax.set_title('Wave Wobble Distribution by GC Content', fontsize=14, fontweight='bold')
     ax.grid(True, alpha=0.3)
