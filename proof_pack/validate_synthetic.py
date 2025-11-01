@@ -374,8 +374,8 @@ def generate_report(results: Dict[str, any],
         f.write("controlled GC content using random sampling.\n")
         f.write("2. **Wave Analysis:** Each sequence converted to complex waveform ")
         f.write("using the wave-CRISPR methodology (θ′(n,k) with k≈0.3).\n")
-        f.write("3. **Wobble Metric:** Calculated as σ/μ (coefficient of variation) ")
-        f.write("of wave amplitudes.\n")
+        f.write("3. **Wobble Metric:** Calculated as the standard deviation of phase differences ")
+        f.write("between adjacent bases.\n")
         f.write("4. **Statistical Testing:** Bootstrap confidence intervals (1000 resamples) ")
         f.write("and independent t-tests.\n\n")
         
