@@ -20,7 +20,7 @@ matplotlib.use('Agg')  # Non-interactive backend
 import matplotlib.pyplot as plt
 from scipy import stats
 from pathlib import Path
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List
 import logging
 
 # Add parent directories for imports
