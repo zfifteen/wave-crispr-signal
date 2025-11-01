@@ -23,10 +23,17 @@ except ImportError:
     from crispr_guide_designer import CRISPRGuideDesigner
     from crispr_physical_z_metrics import PhysicalZMetricsCalculator, read_fasta_with_validation
 
+# Import Biopython for enhanced FASTA processing
+try:
+    from Bio import SeqIO
+    BIOPYTHON_AVAILABLE = True
+except ImportError:
+    BIOPYTHON_AVAILABLE = False
+
 
 def read_fasta(filepath: str) -> Dict[str, str]:
     """
-    Read sequences from FASTA file.
+    Read sequences from FASTA file using Biopython if available.
 
     Args:
         filepath: Path to FASTA file
@@ -35,6 +42,18 @@ def read_fasta(filepath: str) -> Dict[str, str]:
         Dictionary mapping sequence names to sequences
     """
     sequences = {}
+    
+    # Use Biopython if available for better FASTA parsing
+    if BIOPYTHON_AVAILABLE:
+        try:
+            for record in SeqIO.parse(filepath, "fasta"):
+                sequences[record.id] = str(record.seq).upper()
+            return sequences
+        except Exception as e:
+            print(f"Warning: Biopython parsing failed ({e}), falling back to simple parser", 
+                  file=sys.stderr)
+    
+    # Fallback to simple parser
     current_name = None
     current_seq = []
 
@@ -47,13 +66,40 @@ def read_fasta(filepath: str) -> Dict[str, str]:
                 current_name = line[1:]  # Remove '>'
                 current_seq = []
             else:
-                current_seq.append(line)
+                current_seq.append(line.upper())
 
         # Add last sequence
         if current_name:
             sequences[current_name] = "".join(current_seq)
 
     return sequences
+
+
+def process_fasta(fasta_file: str, designer: CRISPRGuideDesigner, 
+                 num_guides: int = 5) -> List[Dict]:
+    """
+    Process FASTA file and design guides for each sequence.
+    
+    Args:
+        fasta_file: Path to FASTA file
+        designer: CRISPRGuideDesigner instance
+        num_guides: Number of guides to design per sequence
+        
+    Yields:
+        Dictionary with guide design results for each sequence
+    """
+    sequences = read_fasta(fasta_file)
+    results = []
+    
+    for seq_name, sequence in sequences.items():
+        guides = designer.design_guides(sequence, num_guides=num_guides)
+        results.append({
+            'sequence_name': seq_name,
+            'sequence_length': len(sequence),
+            'guides': guides
+        })
+    
+    return results
 
 
 def json_serializer(obj):
