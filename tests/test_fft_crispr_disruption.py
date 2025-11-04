@@ -16,6 +16,7 @@ import sys
 import os
 import numpy as np
 import pytest
+from scipy.fft import fft
 
 # Add parent directory for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -167,7 +168,6 @@ class TestFFTSpectralAnalysis:
         seq = "ATCGATCGATCG"
         complex_wave = analyzer.encode_dna_complex(seq)
         
-        from scipy.fft import fft
         fft_result = fft(complex_wave)
         fft_magnitude = np.abs(fft_result)
         
