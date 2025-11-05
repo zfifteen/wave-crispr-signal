@@ -11,10 +11,12 @@ import os
 import tempfile
 import csv
 import io
+from pathlib import Path
 from contextlib import redirect_stdout
 
 # Add project root to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Import from the new reference implementation
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "bin"))
@@ -31,6 +33,9 @@ from bin_resonance_test import (
     quartile_edges,
     run
 )
+
+TOLERANCE_R = 0.01
+TOLERANCE_CI = 0.02
 
 
 def test_complex_base_mapping():
@@ -202,7 +207,7 @@ def test_doench_data_loading():
     print("Testing Doench data loading...")
     
     # Test loading actual data file if it exists
-    data = read_data("doench_2016.csv")
+    data = read_data("data/doench2016.csv")
     
     if data:
         # Should have loaded data

@@ -97,7 +97,7 @@ class WaveCRISPRMetrics:
             "spectral_centroid": spectral_centroid,
             "spectral_rolloff": spectral_rolloff,
             "zero_crossing_rate": zcr,
-            "peak_count": self.designer.count_sidelobes(spectrum),
+            "peak_count": int(self.designer.count_sidelobes(spectrum)),
         }
 
     def calculate_harmonic_content(self, sequence: str) -> Dict[str, float]:

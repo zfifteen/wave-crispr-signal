@@ -55,8 +55,6 @@ def test_basic_functionality():
     assert "hdr_efficiency" in repair, "Missing HDR prediction"
     print("✓ Repair outcome prediction works")
 
-    return True
-
 
 def test_metrics_functionality():
     """Test advanced metrics functionality."""
@@ -86,8 +84,6 @@ def test_metrics_functionality():
         f"✓ Comprehensive scoring works (score: {comprehensive['composite_score']:.3f})"
     )
 
-    return True
-
 
 def test_cli_functionality():
     """Test CLI import functionality."""
@@ -98,9 +94,7 @@ def test_cli_functionality():
         print("✓ CLI module imports successfully")
     except ImportError as e:
         print(f"✗ CLI import failed: {e}")
-        return False
-
-    return True
+        assert False, f"CLI import failed: {e}"
 
 
 def test_visualization_imports():
@@ -114,9 +108,7 @@ def test_visualization_imports():
         print("✓ Visualization module imports successfully")
     except ImportError as e:
         print(f"✗ Visualization import failed: {e}")
-        return False
-
-    return True
+        assert False, f"Visualization import failed: {e}"
 
 
 def main():

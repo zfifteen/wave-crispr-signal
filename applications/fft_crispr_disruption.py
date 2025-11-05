@@ -13,7 +13,7 @@ Scientific Gates:
 """
 
 import numpy as np
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List
 from scipy.fft import fft, fftfreq
 from scipy.stats import entropy
 import logging
@@ -122,7 +122,7 @@ class FFTCRISPRDisruptionAnalyzer:
     
     def calculate_theta_prime(self, n: int) -> float:
         """
-        Calculate geometric resolution θ′(n,k) = φ·((n mod φ)/φ)^k.
+        Calculate geometric resolution θ′(n,k) = φ·((n mod φ_period)/φ_period)^k.
         
         Args:
             n: Position index (frequency bin)
@@ -452,8 +452,8 @@ class FFTCRISPRDisruptionAnalyzer:
         codon_magnitude = np.abs(codon_fft)
         
         # Apply golden-ratio phase weights
-        # Use φ = 21 for codon analysis (7 codons ≈ 21 bp)
-        phi_codon = 7.0  # Golden-ratio period in codon space
+        # Use φ_period = 7 for codon analysis (7 codons = 21 bp)
+        phi_codon = 7.0  # Geometric period in codon space
         weighted_codon_spectrum = np.array([
             codon_magnitude[n] * self.phi * ((n % phi_codon) / phi_codon) ** self.k
             for n in range(len(codon_magnitude))

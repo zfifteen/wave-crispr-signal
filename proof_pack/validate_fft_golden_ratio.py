@@ -12,7 +12,7 @@ Author: Z Framework CRISPR Signal Team
 import sys
 import os
 import numpy as np
-from typing import List, Dict, Tuple
+from typing import List, Dict
 
 # Add parent directories for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))

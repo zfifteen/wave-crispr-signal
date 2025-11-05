@@ -103,7 +103,7 @@ class TestGoldenRatioPhase:
     """Test θ′(n,k) geometric resolution calculation."""
     
     def test_theta_prime_calculation(self):
-        """Test θ′(n,k) = φ·((n mod φ)/φ)^k calculation."""
+        """Test θ′(n,k) = φ·((n mod φ_period)/φ_period)^k calculation."""
         analyzer = FFTCRISPRDisruptionAnalyzer(phi_period=21.0, k=0.3)
         
         # Test specific values
@@ -132,7 +132,6 @@ class TestGoldenRatioPhase:
     
     def test_k_parameter_effect(self):
         """Test that k parameter affects resolution."""
-        seq = "ATCGATCGATCGATCGATCG"
         
         analyzer_k03 = FFTCRISPRDisruptionAnalyzer(k=0.3)
         analyzer_k05 = FFTCRISPRDisruptionAnalyzer(k=0.5)
