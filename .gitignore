@@ -1035,3 +1035,12 @@ results/
 /data/get_hg38/zips/upstream1000.fa.gz
 /data/get_hg38/zips/upstream2000.fa.gz
 /data/get_hg38/zips/upstream5000.fa.gz
+
+# Bridge validation runs
+runs/
+figures/
+reproducibility_report_*.txt
+.venv_repro_*
+
+# Data registry cache
+data/processed/
