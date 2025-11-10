@@ -7,6 +7,7 @@
 
 | Area | Finding | Evidence |
 |------|---------|----------|
+| Phase-Weighted CRISPR Scorecard | **NEW**: Phase-weighted spectral analysis with θ′(n,k) geometric resolution. Enables mutation disruption quantification via Z-invariant scoring. Bootstrap CI validation shows multiple mutations yield higher disruption scores (p < 0.05). | `docs/PHASE_WEIGHTED_SCORECARD.md`, `applications/phase_weighted_scorecard.py` |
 | Geodesic–Topological Bridge | Verified analytical link between θ′(n,k)=φ·((n mod φ)/φ)^k and f(x)=arcsin((x–1)/(2x+3)); optimum k\* ≈ 0.300 holds across **6 public datasets** (Doench 2016, Kim 2025, Patch 2024 …). | `docs/TOPOLOGICAL_ANALYSIS.md`, `tests/test_geodesic_bridge.py` |
 | GC-Quartile Resonance | Re-run on Kim 2025 gRNA efficiencies (N = 18 102). Quartile Q4 shows **r = –0.211, p_perm = 0.0012**, FDR-corrected. | `results/gc_resonance_kim2025.csv` |
 | Disruption Score → Efficiency | Composite spectral disruption score outperforms RuleSet3 by **ΔROC-AUC = +0.047 ± 0.006** (bootstrap 10 000 ×). | `notebooks/compare_ruleset3_wave.ipynb` |
@@ -18,10 +19,20 @@
 ## 🔬 Validation & Proof Pack
 
 Reproducible validation scripts live in `proof_pack/`.  
-Quick demo (≈ 2 min):
+
+**Phase-Weighted CRISPR Scorecard** (NEW):
 
 ```bash
-python proof_pack/quick_validation_demo.py
+# Quick validation demo with bootstrap CI
+python proof_pack/phase_weighted_quick_demo.py
+
+# Score a single guide
+python applications/phase_weighted_scorecard_cli.py score --guide GCTGCGGAGACCTGGAGAGA
+
+# Batch process guides
+python applications/phase_weighted_scorecard_cli.py batch \
+  --input test_data/sample_guides.csv \
+  --output results/scores.csv
 ```
 
 Full suite (bootstraps + permutation tests):
@@ -81,6 +92,7 @@ Detailed derivations in `docs/METHOD_DETAILS.md`.
 • **Off-target profiling** via spectral signature distance  
 • **Variant effect ranking** in non-coding regions  
 • **Repair pathway bias** estimation from entropy gradients  
+• **Mutation disruption quantification** with phase-weighted Z-invariant scoring (NEW)
 
 ---
 
@@ -89,12 +101,17 @@ Detailed derivations in `docs/METHOD_DETAILS.md`.
 ```bash
 pip install -r requirements.txt
 
+# Phase-weighted scorecard (NEW)
+python applications/phase_weighted_scorecard_cli.py score --guide GCTGCGGAGACCTGGAGAGA
+
 # design 5 candidate guides
 python applications/crispr_cli.py design "ATGCTGCGGA..." -n 5 -o guides.json
 
 # score an existing guide
 python applications/crispr_cli.py score "GACGATCGATCGATCGATCG"
 ```
+
+For phase-weighted scorecard details, see [`docs/PHASE_WEIGHTED_SCORECARD.md`](docs/PHASE_WEIGHTED_SCORECARD.md).
 
 ---
 
