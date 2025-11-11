@@ -18,7 +18,7 @@ install:
 
 # Run full test suite
 test:
-	python run_tests.py
+	python scripts/run_tests.py
 
 # Run smoke tests for CI
 smoke: mve-smoke test-z-framework-import mri-z5d-smoke fus-enhancer-smoke
