@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DNA Breathing Dynamics Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .input-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 1em;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .parameters {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .param-group {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        input[type="number"], select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="number"]:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .results {
+            display: none;
+            margin-top: 30px;
+        }
+        
+        .results.show {
+            display: block;
+        }
+        
+        .result-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .result-card h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .metric {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .metric-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .metric-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .plot-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .plot-container img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #f5c6cb;
+            display: none;
+        }
+        
+        .error.show {
+            display: block;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .loading.show {
+            display: block;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .info-box {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            border-left: 4px solid #17a2b8;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .examples {
+            margin-top: 15px;
+        }
+        
+        .example-btn {
+            background: #e7e7e7;
+            color: #333;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 0.9em;
+            transition: background 0.3s;
+        }
+        
+        .example-btn:hover {
+            background: #d0d0d0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🧬 DNA Breathing Dynamics</h1>
+            <p class="subtitle">Biophysically-grounded CRISPR activity prediction</p>
+        </header>
+        
+        <div class="content">
+            <div class="info-box">
+                <strong>💡 About:</strong> This demo uses base-pair opening rates (AT: 1ms, GC: 50ms) 
+                and CZT/Goertzel algorithms to analyze DNA at the helical period (10.5 bp). 
+                Features are designed to predict CRISPR on-target activity.
+            </div>
+            
+            <div class="input-section">
+                <label for="sequence">DNA Sequence (A/C/G/T/N only, 15-200 bp):</label>
+                <textarea 
+                    id="sequence" 
+                    rows="4" 
+                    placeholder="Enter DNA sequence (e.g., ATCGATCGATCGATCGATCG)"
+                ></textarea>
+                
+                <div class="examples">
+                    <strong>Examples:</strong>
+                    <button class="example-btn" onclick="loadExample('at_rich')">AT-rich</button>
+                    <button class="example-btn" onclick="loadExample('gc_rich')">GC-rich</button>
+                    <button class="example-btn" onclick="loadExample('mixed')">Mixed</button>
+                    <button class="example-btn" onclick="loadExample('guide')">Guide RNA (24bp)</button>
+                </div>
+                
+                <div class="parameters">
+                    <div class="param-group">
+                        <label for="temperature">Temperature (°C):</label>
+                        <input type="number" id="temperature" value="37" min="0" max="100" step="1">
+                    </div>
+                    
+                    <div class="param-group">
+                        <label for="mg_concentration">Mg²⁺ (mM):</label>
+                        <input type="number" id="mg_concentration" value="2.0" min="0.1" max="100" step="0.1">
+                    </div>
+                    
+                    <div class="param-group">
+                        <label for="method">Analysis Method:</label>
+                        <select id="method">
+                            <option value="true">CZT (Precise)</option>
+                            <option value="false">Goertzel (Fast)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn-primary" onclick="analyzeSequence()">🔬 Analyze</button>
+                    <button class="btn-secondary" onclick="clearResults()">🗑️ Clear</button>
+                </div>
+            </div>
+            
+            <div class="error" id="error"></div>
+            
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Analyzing breathing dynamics...</p>
+            </div>
+            
+            <div class="results" id="results">
+                <div class="result-card">
+                    <h3>📊 Key Metrics</h3>
+                    <div class="metrics" id="metrics"></div>
+                </div>
+                
+                <div class="result-card">
+                    <h3>🎵 Harmonics at 10.5 bp Period</h3>
+                    <div class="metrics" id="harmonics"></div>
+                </div>
+                
+                <div class="plot-container">
+                    <h3>📈 Breathing Spectrum</h3>
+                    <img id="spectrum-plot" alt="DNA breathing dynamics power spectrum showing frequency analysis at 10.5 bp helical period with encoded waveform magnitude and phase">
+                </div>
+                
+                <div class="plot-container">
+                    <h3>🧪 Base Weights (Biophysical)</h3>
+                    <img id="weights-plot" alt="Biophysical base pair weight distribution showing real and imaginary components from opening rates and thermodynamic stability in complex plane">
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        async function analyzeSequence() {
+            // Get inputs
+            const sequence = document.getElementById('sequence').value.trim();
+            const temperature = parseFloat(document.getElementById('temperature').value);
+            const mg_concentration = parseFloat(document.getElementById('mg_concentration').value);
+            const use_czt = document.getElementById('method').value === 'true';
+            
+            // Validate
+            if (!sequence) {
+                showError('Please enter a DNA sequence');
+                return;
+            }
+            
+            // Hide results and error, show loading
+            document.getElementById('error').classList.remove('show');
+            document.getElementById('results').classList.remove('show');
+            document.getElementById('loading').classList.add('show');
+            
+            try {
+                // Call API
+                const response = await fetch('/analyze', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        sequence: sequence,
+                        temperature: temperature,
+                        mg_concentration: mg_concentration,
+                        use_czt: use_czt
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || 'Analysis failed');
+                }
+                
+                // Display results
+                displayResults(data);
+                
+            } catch (error) {
+                showError(error.message);
+            } finally {
+                document.getElementById('loading').classList.remove('show');
+            }
+        }
+        
+        function displayResults(data) {
+            // Show results section
+            document.getElementById('results').classList.add('show');
+            
+            // Helper function to safely format numbers
+            const safeFixed = (value, decimals) => {
+                return (value !== null && value !== undefined && !isNaN(value)) 
+                    ? Number(value).toFixed(decimals) 
+                    : '0.00';
+            };
+            
+            // Display key metrics with null checks
+            const metricsHtml = `
+                <div class="metric">
+                    <div class="metric-value">${safeFixed(data.features?.czt_10_5bp_power, 2)}</div>
+                    <div class="metric-label">10.5 bp Power</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">${safeFixed((data.gc_content || 0) * 100, 1)}%</div>
+                    <div class="metric-label">GC Content</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">${safeFixed(data.features?.phase_coherence, 3)}</div>
+                    <div class="metric-label">Phase Coherence</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">${safeFixed(data.features?.amplitude_variance, 2)}</div>
+                    <div class="metric-label">Amplitude Var</div>
+                </div>
+            `;
+            document.getElementById('metrics').innerHTML = metricsHtml;
+            
+            // Display harmonics with null checks
+            const harmonicsHtml = `
+                <div class="metric">
+                    <div class="metric-value">${safeFixed(data.harmonics?.h1_power, 2)}</div>
+                    <div class="metric-label">H1 (Fundamental)</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">${safeFixed(data.harmonics?.h2_power, 2)}</div>
+                    <div class="metric-label">H2 (2nd Harmonic)</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">${safeFixed(data.harmonics?.h3_power, 2)}</div>
+                    <div class="metric-label">H3 (3rd Harmonic)</div>
+                </div>
+            `;
+            document.getElementById('harmonics').innerHTML = harmonicsHtml;
+            
+            // Display plots
+            document.getElementById('spectrum-plot').src = 'data:image/png;base64,' + data.plots.spectrum;
+            document.getElementById('weights-plot').src = 'data:image/png;base64,' + data.plots.weights;
+        }
+        
+        function showError(message) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = '❌ Error: ' + message;
+            errorDiv.classList.add('show');
+        }
+        
+        function clearResults() {
+            document.getElementById('sequence').value = '';
+            document.getElementById('results').classList.remove('show');
+            document.getElementById('error').classList.remove('show');
+        }
+        
+        async function loadExample(type) {
+            try {
+                const response = await fetch(`/example/${type}`);
+                const data = await response.json();
+                document.getElementById('sequence').value = data.sequence;
+            } catch (error) {
+                showError('Failed to load example');
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+  File "/Users/velocityworks/IdeaProjects/wave-crispr-signal/experiments/test_breathing_dynamics_encoding.py", line 189
+    seq_length: int = 20) -> List[str]:
+                        ^
+SyntaxError: unmatched ')'

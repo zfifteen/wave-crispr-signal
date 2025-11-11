@@ -1,0 +1,14 @@
+{
+  "model": "claude-sonnet-4-20250514",
+  "purpose": "deep-research",
+  "description": "Claude Sonnet 4 configured for deep research on WAVE-CRISPR signal-theoretic DNA analysis framework",
+  "capabilities": [
+    "scientific-analysis",
+    "statistical-validation",
+    "code-generation",
+    "experimental-design",
+    "literature-review",
+    "hypothesis-testing"
+  ],
+  "instruction_file": "claude_instructions_crispr_wave_signal.md"
+}

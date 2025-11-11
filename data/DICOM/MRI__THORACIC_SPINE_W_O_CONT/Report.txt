@@ -1,0 +1,128 @@
+1^MRI: THORACIC SPINE W/O CONT^[PATIENT_NAME]
+Group ID# [GROUP_ID]
+_______________________________________________________________________________
+[PATIENT_NAME]  [SSN]    DOB-[DOB] M
+Exm Date: [EXAM_DATE]@12:31
+Req Phys: [PHYSICIAN_NAME]         Pat Loc: [LOCATION]
+                                         Img Loc: MRI
+                                         Service: Unknown
+
+                             [HOSPITAL_NAME]
+                                  [ADDRESS]
+                                      [PHONE]
+
+
+(Case [CASE_ID] COMPLETE)MRI: THORACIC SPINE W/O CONT     (MRI  Detailed) CPT:72146
+     Reason for Study: Severe back pain; hx of vertebral fracture
+
+    Clinical History:
+      Weight: 181.88 lb [82.50 kg] ([DATE] 10:14) Height: 76.772 in
+      [195.0 cm] ([DATE] 10:14) Age: 50   Patient Phone#: [PHONE]
+
+      Clinic/Service: Neurology
+
+      Ordering Provider: [PHYSICIAN_NAME]
+                  Pager: [PAGER]
+
+      Attending Provider: Same as Ordering Provider
+                   Pager: Same as Ordering Provider
+
+      Previous MRI: Unknown.
+
+      SEX: MALE
+
+      CREATININE-eGFR             [DATE] 14:19    1.19 H  PLASMA eGFR
+      CKD-EPI 2021           [DATE] 14:19    74   PLASMA
+
+
+              ABSOLUTE CONTRAINDICATIONS:
+
+      Cardiac Pacemaker/Defibrillator/Pacing Wires?
+        No Cochlear Implant?
+        No     Metal or rust removed from eyes, or current metallic
+      foreign body? (Please order orbit x-rays if required)
+        No Heart valve? (Documentation of make/model will be required)
+        No Aneurysm clips? (Documentation of make/model will be
+      required)
+        No Metal Implants not listed above?
+       No     Party answering safety questions?
+        Patient Claustrophobia?
+        No
+
+      ******************* END OF REQUEST INFORMATION
+      **************************
+
+    Report Status: Verified                   Date Reported: [REPORT_DATE]
+                                              Date Verified: [VERIFY_DATE]
+    Verifier E-Sig:/ES/[VERIFIER_NAME]
+
+    Report:
+      Clinical indication:History of vertebral body fracture., Severe
+      back pain
+
+      Comparison exam:Right film examination of [DATE]
+
+      Technique:Localizer, T2 TSE sagittal, T2 STIR sagittal, T1 TSE
+      sagittal, T2 TSE axial, T1 TSE axial
+
+      Findings: There is some mild right curvature.
+
+      Sagittal:The vertebral bodies of normal height, alignment and
+      signal intensity. The intervertebral disc spaces are well
+      preserved. There is no abnormal signal in the cord.
+
+      Axial:
+
+      T1-T2: There is no neural foraminal narrowing or canal
+      compromise.
+
+      T2-T3:No neural foraminal narrowing or canal compromise.
+
+      T3-T4:No neural foraminal narrowing or canal compromise.
+
+      T4-T5:No neural foraminal narrowing or canal compromise.
+
+      T5-T6:No neural foraminal narrowing or canal compromise.
+
+      T6-T7:No neural foraminal narrowing or canal compromise.
+
+      T7-T8:There is a right paracentral disc protrusion causing
+      ventral dural impress. There is no significant neural foraminal
+      narrowing or canal compromise.
+
+      T8-T9:No neural foraminal narrowing or canal compromise.
+
+      T9-T10:No neural foraminal narrowing or canal compromise.
+
+      T10-T11:No neural foraminal narrowing or canal compromise.
+
+      T11-T12:No neural foraminal narrowing or canal compromise.
+
+      T12-L1:No neural foraminal narrowing or canal compromise.
+
+
+
+    Impression:
+
+
+      There is a right paracentral disc protrusion causing ventral
+      dural impress. There is no significant neural foraminal narrowing
+      or canal compromise
+
+      Some mild right curvature.
+
+
+
+
+
+      [PHYSICIAN_NAME]
+       [REPORT_TIMESTAMP]
+
+    Primary Diagnostic Code:
+
+Primary Interpreting Staff:
+  [PHYSICIAN_NAME], MSK radiologist (Verifier)
+/[INITIALS]
+
+
+** END REPORT [END_TIMESTAMP] **

@@ -1,0 +1,67 @@
+# Repository metadata to help LLMs discover structure, content and domain context.
+
+repo:
+  name: "wave-crispr-signal"
+  owner: "zfifteen"
+  id: 1027305912
+  description: >
+    A simulation and analysis framework for CRISPR signal processing
+    using wave-based normalization (Z Framework).
+
+framework:
+  name: "Z Framework"
+  core_principle: "Normalize observations via Z = A(B/c); A = frame-dependent, B = rate/shift, c = invariant"
+  guidelines:
+    - empirical_validation:
+        description: "Include reproducible tests (use mpmath with precision <1e-16). Label hypotheses clearly."
+    - domain_specific_forms:
+        physical: "Z = T(v/c) with causality checks; raise ValueError for |v| ≥ c."
+        discrete: "Z = n(Δₙ/Δₘₐₓ), κ(n)=d(n)·ln(n+1)/e²; guard against zero divisions."
+    - geometric_resolution: "θ′(n,k)=φ·((n mod φ)/φ)^k with k≈0.3 for prime-density mapping."
+    - style_tone: "Precise, scientific; prefer simple solutions; document deviations."
+  tools_datasets:
+    - "mpmath"
+    - "numpy"
+    - "sympy"
+    - "data/zeta_zeros.csv"
+    - "data/true_prime_counts.csv"
+    - "notebooks/Z5D_Reference_Impl-2.ipynb"
+
+languages:
+  - Python
+  - Jupyter Notebook
+  - YAML
+
+structure:
+  src/:
+    - wave_crispr_signal/
+      - core.py
+      - normalization.py
+      - domain_forms.py
+      - geometric_resolution.py
+  tests/:
+    - test_core.py
+    - test_normalization.py
+  data/:
+    - zeta_zeros.csv
+    - true_prime_counts.csv
+  notebooks/:
+    - Z5D_Reference_Impl-2.ipynb
+  docs/:
+    - architecture.md
+    - usage.md
+
+entry_points:
+  - "src/wave_crispr_signal/core.py"
+  - "src/wave_crispr_signal/normalization.py"
+
+test_command: "pytest --maxfail=1 --disable-warnings -q"
+
+keywords:
+  - Z Framework
+  - normalization
+  - CRISPR
+  - wave signal
+  - empirical validation
+
+# End of metadata

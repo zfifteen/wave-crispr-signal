@@ -1,0 +1,202 @@
+# DICOM Metadata Dump
+# Source file: /Users/velocityworks/IdeaProjects/wave-crispr-signal/data/DICOM/CT_HEAD_W_O_CONT/DICOM/SERIES_202/209585333.dcm
+# Extracted: 2025-09-14T21:46:20.565120Z
+
+SOPClassUID: 1.2.840.10008.5.1.4.1.1.2
+SOPInstanceUID: 1.3.46.670589.33.1.63893112111582245300001.5597233806220822047
+StudyInstanceUID: 1.3.46.670589.33.1.63893111959689504700001.5564885384967102223
+SeriesInstanceUID: 1.3.46.670589.33.1.63893112076320849100003.4627256350473290286
+Modality: CT
+Manufacturer: Philips
+ManufacturerModelName: Ingenuity CT
+Rows: 378
+Columns: 416
+NumberOfFrames: None
+SamplesPerPixel: 1
+BitsAllocated: 16
+BitsStored: 12
+HighBit: 11
+PixelRepresentation: 0
+PhotometricInterpretation: MONOCHROME2
+PlanarConfiguration: None
+RescaleSlope: 1
+RescaleIntercept: -1024
+WindowCenter: [40, 40]
+WindowWidth: [80, 80]
+PixelSpacing: [0.4785714, 0.4785714]
+SliceThickness: 4
+SpacingBetweenSlices: 3
+ImagePositionPatient: [-102.06109389237, 114.101417547593, 300.933398892826]
+ImageOrientationPatient: [1, 3.465777E-18, 1.935962E-16, 1.83691E-16, -0.3331578, -0.9428711]
+SliceLocation: None
+
+### Full Dataset ###
+Dataset.file_meta -------------------------------
+(0002,0000) File Meta Information Group Length  UL: 212
+(0002,0001) File Meta Information Version       OB: b'\x00\x01'
+(0002,0002) Media Storage SOP Class UID         UI: CT Image Storage
+(0002,0003) Media Storage SOP Instance UID      UI: 1.3.46.670589.33.1.63893112111582245300001.5597233806220822047
+(0002,0010) Transfer Syntax UID                 UI: Implicit VR Little Endian
+(0002,0012) Implementation Class UID            UI: 1.2.840.114089.1.0.0.3.3.68
+(0002,0013) Implementation Version Name         SH: 'DCF 3.3.68c'
+(0002,0016) Source Application Entity Title     AE: 'DCF'
+-------------------------------------------------
+(0008,0005) Specific Character Set              CS: 'ISO_IR 100'
+(0008,0008) Image Type                          CS: ['DERIVED', 'SECONDARY', 'MPR']
+(0008,0012) Instance Creation Date              DA: '20250910'
+(0008,0013) Instance Creation Time              TM: '144151.582'
+(0008,0016) SOP Class UID                       UI: CT Image Storage
+(0008,0018) SOP Instance UID                    UI: 1.3.46.670589.33.1.63893112111582245300001.5597233806220822047
+(0008,0020) Study Date                          DA: '20250910'
+(0008,0022) Acquisition Date                    DA: '20250910'
+(0008,0023) Content Date                        DA: '20250910'
+(0008,002A) Acquisition DateTime                DT: '20250910144051.040'
+(0008,0030) Study Time                          TM: '143922.246'
+(0008,0032) Acquisition Time                    TM: '144051'
+(0008,0033) Content Time                        TM: '144055.347'
+(0008,0050) Accession Number                    SH: 'ANONYMIZED'
+(0008,0060) Modality                            CS: 'CT'
+(0008,0070) Manufacturer                        LO: 'Philips'
+(0008,0080) Institution Name                    LO: 'ANONYMIZED'
+(0008,0081) Institution Address                 ST: 'ANONYMIZED'
+(0008,0090) Referring Physician's Name          PN: 'ANONYMIZED'
+(0008,1010) Station Name                        SH: 'HOST-320458'
+(0008,1030) Study Description                   LO: 'CT HEAD W/O CONT'
+(0008,103E) Series Description                  LO: 'COR, iDose (1)'
+(0008,1040) Institutional Department Name       LO: 'Radiology'
+(0008,1070) Operators' Name                     PN: 'ANONYMIZED'
+(0008,1090) Manufacturer's Model Name           LO: 'Ingenuity CT'
+(0008,1111)  Referenced Performed Procedure Step Sequence  1 item(s) ---- 
+   (0008,1150) Referenced SOP Class UID            UI: Modality Performed Procedure Step SOP Class
+   (0008,1155) Referenced SOP Instance UID         UI: 1.3.46.670589.33.1.63893111959731517900001.5497147520678263569
+   ---------
+(0008,1140)  Referenced Image Sequence  1 item(s) ---- 
+   (0008,1150) Referenced SOP Class UID            UI: CT Image Storage
+   (0008,1155) Referenced SOP Instance UID         UI: 1.3.46.670589.33.1.63893111996003152000001.5388360168823823251
+   ---------
+(0008,3010) Irradiation Event UID               UI: 1.3.46.670589.33.1.63893112040153434300001.5282644467777229631
+(0010,0010) Patient's Name                      PN: 'ANONYMIZED'
+(0010,0020) Patient ID                          LO: 'ANONYMIZED'
+(0010,0030) Patient's Birth Date                DA: ''
+(0010,0040) Patient's Sex                       CS: 'ANONYMIZED'
+(0010,1000) Other Patient IDs                   LO: 'ANONYMIZED'
+(0010,1010) Patient's Age                       AS: 'ANONYMIZED'
+(0010,1030) Patient's Weight                    DS: '88.61'
+(0010,1040) Patient's Address                   LO: 'ANONYMIZED'
+(0010,21B0) Additional Patient History          LT: 'ANONYMIZED'
+(0018,0015) Body Part Examined                  CS: 'BRAIN'
+(0018,0022) Scan Options                        CS: 'HELIX'
+(0018,0050) Slice Thickness                     DS: '4'
+(0018,0060) KVP                                 DS: '120'
+(0018,0088) Spacing Between Slices              DS: '3'
+(0018,0090) Data Collection Diameter            DS: '500'
+(0018,1000) Device Serial Number                LO: '320458'
+(0018,1020) Software Versions                   LO: '4.1.10'
+(0018,1030) Protocol Name                       LO: 'BRAIN WO /Head'
+(0018,1100) Reconstruction Diameter             DS: '296'
+(0018,1110) Distance Source to Detector         DS: '1040'
+(0018,1111) Distance Source to Patient          DS: '570'
+(0018,1120) Gantry/Detector Tilt                DS: '0'
+(0018,1130) Table Height                        DS: '140.3'
+(0018,1150) Exposure Time                       IS: '1415'
+(0018,1151) X-Ray Tube Current                  IS: '301'
+(0018,1152) Exposure                            IS: '426'
+(0018,1160) Filter Type                         SH: 'UC'
+(0018,1210) Convolution Kernel                  SH: 'UC'
+(0018,5100) Patient Position                    CS: 'HFS'
+(0018,9305) Revolution Time                     FD: 0.42
+(0018,9306) Single Collimation Width            FD: 0.625
+(0018,9307) Total Collimation Width             FD: 40.0
+(0018,9309) Table Speed                         FD: 28.3
+(0018,9310) Table Feed per Rotation             FD: 11.879999999999999
+(0018,9311) Spiral Pitch Factor                 FD: 0.297
+(0018,9334) Fluoroscopy Flag                    CS: 'NO'
+(0018,9345) CTDIvol                             FD: 54.9
+(0018,9346)  CTDI Phantom Type Code Sequence  1 item(s) ---- 
+   (0008,0100) Code Value                          SH: '113690'
+   (0008,0102) Coding Scheme Designator            SH: 'DCM'
+   (0008,0103) Coding Scheme Version               SH: '20061023'
+   (0008,0104) Code Meaning                        LO: 'IEC Head Dosimetry Phantom'
+   ---------
+(0018,A001)  Contributing Equipment Sequence  1 item(s) ---- 
+   (0008,0070) Manufacturer                        LO: 'PHILIPS'
+   (0008,0080) Institution Name                    LO: 'BRILLIANCE4'
+   (0008,0081) Institution Address                 ST: 'BRILLIANCE4'
+   (0008,1010) Station Name                        SH: 'HOST-320458'
+   (0008,1040) Institutional Department Name       LO: 'BRILLIANCE4'
+   (0008,1090) Manufacturer's Model Name           LO: 'BRILLIANCE4'
+   (0018,1000) Device Serial Number                LO: 'BRILLIANCE4'
+   (0018,1020) Software Versions                   LO: '4.5.0.30020'
+   (0040,A170)  Purpose of Reference Code Sequence  1 item(s) ---- 
+      (0008,0100) Code Value                          SH: '109102'
+      (0008,0102) Coding Scheme Designator            SH: 'DCM'
+      (0008,0104) Code Meaning                        LO: 'Processing Equipment'
+      ---------
+   ---------
+(0020,000D) Study Instance UID                  UI: 1.3.46.670589.33.1.63893111959689504700001.5564885384967102223
+(0020,000E) Series Instance UID                 UI: 1.3.46.670589.33.1.63893112076320849100003.4627256350473290286
+(0020,0010) Study ID                            SH: 'ANONYMIZED'
+(0020,0011) Series Number                       IS: '202'
+(0020,0012) Acquisition Number                  IS: '2'
+(0020,0013) Instance Number                     IS: '26'
+(0020,0032) Image Position (Patient)            DS: [-102.06109389237, 114.101417547593, 300.933398892826]
+(0020,0037) Image Orientation (Patient)         DS: [1, 3.465777E-18, 1.935962E-16, 1.83691E-16, -0.3331578, -0.9428711]
+(0020,0052) Frame of Reference UID              UI: 1.3.46.670589.33.1.63893111965563672900002.5607418585380712908
+(0020,1040) Position Reference Indicator        LO: ''
+(0020,4000) Image Comments                      LT: 'COR'
+(0028,0002) Samples per Pixel                   US: 1
+(0028,0004) Photometric Interpretation          CS: 'MONOCHROME2'
+(0028,0010) Rows                                US: 378
+(0028,0011) Columns                             US: 416
+(0028,0030) Pixel Spacing                       DS: [0.4785714, 0.4785714]
+(0028,0100) Bits Allocated                      US: 16
+(0028,0101) Bits Stored                         US: 12
+(0028,0102) High Bit                            US: 11
+(0028,0103) Pixel Representation                US: 0
+(0028,1050) Window Center                       DS: [40, 40]
+(0028,1051) Window Width                        DS: [80, 80]
+(0028,1052) Rescale Intercept                   DS: '-1024'
+(0028,1053) Rescale Slope                       DS: '1'
+(0028,1054) Rescale Type                        LO: 'HU'
+(0028,2110) Lossy Image Compression             CS: '00'
+(0032,1020) Scheduled Study Location            LO: '646'
+(0032,1032) Requesting Physician                PN: 'PIPPI^ERIC'
+(0032,1060) Requested Procedure Description     LO: 'CT HEAD/BRAIN W/O DYE'
+(0040,0275)  Request Attributes Sequence  1 item(s) ---- 
+   (0032,1060) Requested Procedure Description     LO: 'CT HEAD/BRAIN W/O DYE'
+   (0032,1064)  Requested Procedure Code Sequence  1 item(s) ---- 
+      (0008,0100) Code Value                          SH: '70450'
+      (0008,0102) Coding Scheme Designator            SH: 'C4'
+      (0008,0104) Code Meaning                        LO: 'CT HEAD/BRAIN W/O DYE'
+      ---------
+   (0040,0007) Scheduled Procedure Step Descriptio LO: 'CT HEAD W/O CONT'
+   (0040,0008)  Scheduled Protocol Code Sequence  1 item(s) ---- 
+      (0008,0100) Code Value                          SH: '43'
+      (0008,0102) Coding Scheme Designator            SH: 'L'
+      (0008,0104) Code Meaning                        LO: 'CT HEAD W/O CONT'
+      ---------
+   (0040,0009) Scheduled Procedure Step ID         SH: '646-091025-1263'
+   (0040,1001) Requested Procedure ID              SH: '1263'
+   ---------
+(00E1,0010) Private Creator                     LO: 'ELSCINT1'
+(00E1,1036) Private tag data                    UN: b'NO'
+(00E1,1040) [Image Label]                       SH: 'COR'
+(00E1,1046) Private tag data                    UN: Array of 1024 elements
+(01F1,0010) Private Creator                     LO: 'ELSCINT1'
+(01F1,1001) [Acquisition Type]                  CS: 'SPIRAL'
+(01F1,1002) [Resolution]                        CS: 'STANDARD'
+(01F1,100E) [Recon Enhancement]                 FL: 0.0
+(01F1,1027) [Rotation Time]                     DS: '0.42'
+(01F1,1032) [View Convention]                   CS: 'VIEW_FROM_FEET'
+(01F1,104A) [Unknown]                           SH: 'NONE'
+(01F1,104B) [Collimation]                       SH: '64x0.625'
+(01F1,104D) [Adaptive Filter]                   SH: 'NO'
+(01F1,104E) [Scan Type]                         SH: 'Head'
+(01F1,1055) Private tag data                    UN: b'12.7657191008329'
+(01F7,0010) Private Creator                     LO: 'ELSCINT1'
+(01F7,1022) [Unknown]                           UI: 1.3.46.670589.33.1.63893112040153434300001.5282644467777229631
+(01F7,109B) [iDose Level]                       IS: '1'
+(01F7,10D4) Private tag data                    UN: b'head'
+(07A1,0010) Private Creator                     LO: 'ELSCINT1'
+(07A1,1010) [Tamar Software Version]            LO: '4.0.0'
+(7FE0,0010) Pixel Data                          OW: Array of 314496 elements

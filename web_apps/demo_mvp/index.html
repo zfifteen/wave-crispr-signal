@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRISPR Breathing Dynamics Demo</title>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        
+        .tagline {
+            color: #7f8c8d;
+            font-size: 1.2em;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+        }
+        
+        .panel {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .panel h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            font-weight: 600;
+            color: #34495e;
+            margin-bottom: 8px;
+        }
+        
+        input[type="text"],
+        input[type="number"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ecf0f1;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        textarea {
+            resize: vertical;
+            font-family: 'Courier New', monospace;
+            min-height: 80px;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .results-panel {
+            display: none;
+        }
+        
+        .results-panel.active {
+            display: block;
+        }
+        
+        .metric-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .metric-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+        
+        .metric-value {
+            font-size: 2em;
+            font-weight: bold;
+        }
+        
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .chart-container {
+            margin: 20px 0;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+        }
+        
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .info-box h3 {
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+        
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: help;
+            color: #667eea;
+            font-weight: bold;
+        }
+        
+        .tooltip:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #34495e;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 5px;
+            white-space: nowrap;
+            font-size: 0.85em;
+            z-index: 1000;
+            margin-bottom: 5px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .advanced-controls {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #ecf0f1;
+        }
+        
+        .advanced-toggle {
+            color: #667eea;
+            cursor: pointer;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .advanced-content {
+            display: none;
+        }
+        
+        .advanced-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧬 CRISPR Breathing Dynamics Demo</h1>
+            <p class="tagline">Discover the 10.5-bp spectral peak in DNA helical structure</p>
+        </div>
+        
+        <div class="main-content">
+            <!-- Input Panel -->
+            <div class="panel">
+                <h2>Sequence Input</h2>
+                
+                <form id="analyze-form" hx-post="/analyze" hx-target="#results" hx-swap="innerHTML">
+                    <div class="form-group">
+                        <label for="guide">
+                            Guide RNA (sgRNA) 
+                            <span class="tooltip" data-tooltip="20-30 nt, use A/C/G/U for RNA">ℹ️</span>
+                        </label>
+                        <textarea 
+                            id="guide" 
+                            name="guide" 
+                            required 
+                            minlength="10" 
+                            maxlength="50"
+                            placeholder="GACGAUCGAUCGAUCGAUCG">GACGAUCGAUCGAUCGAUCG</textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="target">
+                            Target DNA Sequence 
+                            <span class="tooltip" data-tooltip="30-100 bp, use A/C/G/T for DNA">ℹ️</span>
+                        </label>
+                        <textarea 
+                            id="target" 
+                            name="target" 
+                            required 
+                            minlength="20" 
+                            maxlength="200"
+                            placeholder="ATGCGATCGATCGATCGATCGCTAGCTAGCTA">ATGCGATCGATCGATCGATCGCTAGCTAGCTA</textarea>
+                    </div>
+                    
+                    <div class="advanced-controls">
+                        <div class="advanced-toggle" onclick="toggleAdvanced()">
+                            ⚙️ Advanced Parameters
+                        </div>
+                        
+                        <div class="advanced-content" id="advanced-params">
+                            <div class="form-group">
+                                <label for="rate_ratio">
+                                    Rate Ratio (r) 
+                                    <span class="tooltip" data-tooltip="Dimensionless k_GC/k_AT ratio, typical: 5-200">ℹ️</span>
+                                </label>
+                                <input type="number" id="rate_ratio" name="rate_ratio" value="20.0" min="1" max="1000" step="0.1">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="weight_mode">Weight Mode</label>
+                                <select id="weight_mode" name="weight_mode">
+                                    <option value="rate_ratio">Rate Ratio (dimensionless)</option>
+                                    <option value="nn_thermo" disabled>NN Thermodynamics (future)</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="log_consent" name="log_consent" value="true">
+                                    Allow privacy-safe logging (SHA256 only)
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="submit">🔬 Analyze Sequence</button>
+                </form>
+                
+                <div class="info-box" style="margin-top: 20px;">
+                    <h3>Why This Matters</h3>
+                    <p>DNA breathing dynamics (AT vs GC opening rates) create spectral signatures 
+                    at the helical period of <strong>10.5 bp/turn</strong>. This demo reveals how 
+                    rotational phasing affects CRISPR guide efficiency.</p>
+                </div>
+            </div>
+            
+            <!-- Results Panel -->
+            <div class="panel">
+                <h2>Analysis Results</h2>
+                <div id="results">
+                    <div class="loading">
+                        <p>👆 Enter sequences and click "Analyze Sequence" to see results</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function toggleAdvanced() {
+            const content = document.getElementById('advanced-params');
+            content.classList.toggle('active');
+        }
+        
+        // Handle HTMX form submission
+        document.body.addEventListener('htmx:afterRequest', function(event) {
+            if (event.detail.successful) {
+                const response = JSON.parse(event.detail.xhr.response);
+                if (response.success) {
+                    displayResults(response);
+                }
+            } else {
+                displayError(event.detail.xhr.response);
+            }
+        });
+        
+        // Override HTMX to handle JSON properly
+        document.getElementById('analyze-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const payload = {
+                guide: formData.get('guide'),
+                target: formData.get('target'),
+                rate_ratio: parseFloat(formData.get('rate_ratio')),
+                weight_mode: formData.get('weight_mode'),
+                log_consent: formData.get('log_consent') === 'true'
+            };
+            
+            document.getElementById('results').innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Analyzing sequences...</p>
+                </div>
+            `;
+            
+            try {
+                const response = await fetch('/analyze', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    displayResults(data);
+                } else {
+                    displayError(data.detail || 'Analysis failed');
+                }
+            } catch (error) {
+                displayError(error.message);
+            }
+        });
+        
+        function displayResults(data) {
+            const resultsDiv = document.getElementById('results');
+            
+            resultsDiv.innerHTML = `
+                <div class="metric-grid">
+                    <div class="metric-card">
+                        <div class="metric-label">10.5 bp Peak</div>
+                        <div class="metric-value">${data.peak.p10.toFixed(4)}</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">5.25 bp Peak</div>
+                        <div class="metric-value">${data.peak.p5_25.toFixed(4)}</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">3.5 bp Peak</div>
+                        <div class="metric-value">${data.peak.p3_5.toFixed(4)}</div>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <div id="polar-chart"></div>
+                </div>
+                
+                <div class="chart-container">
+                    <div id="bar-chart"></div>
+                </div>
+                
+                <div class="info-box">
+                    <h3>Sequence Properties</h3>
+                    <p><strong>Target Length:</strong> ${data.breathing_features.length} bp</p>
+                    <p><strong>GC Content:</strong> ${(data.breathing_features.gc_content * 100).toFixed(1)}%</p>
+                    <p><strong>Breathing Score:</strong> ${data.meta.breathing_score.toFixed(4)}</p>
+                    <p><strong>Phase Angle:</strong> ${data.peak.angle.toFixed(4)} rad</p>
+                </div>
+            `;
+            
+            // Create polar plot for rotational phase wheel
+            const polarData = [{
+                type: 'scatterpolar',
+                r: data.rotation.curve,
+                theta: data.rotation.phi.map(x => x * 180 / Math.PI),
+                fill: 'toself',
+                fillcolor: 'rgba(102, 126, 234, 0.3)',
+                line: {
+                    color: '#667eea',
+                    width: 3
+                },
+                name: 'Phase Curve'
+            }];
+            
+            const polarLayout = {
+                title: {
+                    text: '🔄 Rotational Phase Wheel',
+                    font: { size: 18, color: '#2c3e50' }
+                },
+                polar: {
+                    radialaxis: {
+                        visible: true,
+                        range: [0, Math.max(...data.rotation.curve) * 1.1]
+                    }
+                },
+                showlegend: false,
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0)'
+            };
+            
+            Plotly.newPlot('polar-chart', polarData, polarLayout, {responsive: true});
+            
+            // Create bar chart for spectral peaks
+            const barData = [{
+                x: ['10.5 bp<br>(fundamental)', '5.25 bp<br>(2nd harmonic)', '3.5 bp<br>(3rd harmonic)'],
+                y: [data.peak.p10, data.peak.p5_25, data.peak.p3_5],
+                type: 'bar',
+                marker: {
+                    color: ['#667eea', '#764ba2', '#f093fb'],
+                    line: {
+                        color: '#34495e',
+                        width: 2
+                    }
+                }
+            }];
+            
+            const barLayout = {
+                title: {
+                    text: '📊 Spectral Peaks (Helical Periodicity)',
+                    font: { size: 18, color: '#2c3e50' }
+                },
+                xaxis: {
+                    title: 'Period'
+                },
+                yaxis: {
+                    title: 'Normalized Power'
+                },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                showlegend: false
+            };
+            
+            Plotly.newPlot('bar-chart', barData, barLayout, {responsive: true});
+        }
+        
+        function displayError(message) {
+            document.getElementById('results').innerHTML = `
+                <div class="info-box" style="background: #ffebee; border-left-color: #f44336;">
+                    <h3 style="color: #c62828;">Error</h3>
+                    <p>${message}</p>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

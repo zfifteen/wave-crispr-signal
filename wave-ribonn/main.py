@@ -9,13 +9,15 @@ import random
 # =====================
 # WAVECRISPR-SIGNAL CORE
 # =====================
-weights = {'A': 1 + 0j, 'T': -1 + 0j, 'C': 0 + 1j, 'G': 0 - 1j}
+weights = {"A": 1 + 0j, "T": -1 + 0j, "C": 0 + 1j, "G": 0 - 1j}
 
 
 def build_waveform(seq):
     """Convert DNA sequence to complex waveform"""
     s = np.cumsum([0.34] * len(seq))
-    return np.array([weights[base] * np.exp(2j * np.pi * s[i]) for i, base in enumerate(seq)])
+    return np.array(
+        [weights[base] * np.exp(2j * np.pi * s[i]) for i, base in enumerate(seq)]
+    )
 
 
 def compute_spectrum(waveform):
@@ -31,10 +33,10 @@ def spectral_features(seq):
 
     # Skip DC component (index 0)
     return {
-        'entropy': entropy(ps[1:], base=2),
-        'sidelobes': np.sum(spec[1:] > (0.25 * np.max(spec[1:]))),
-        'dominant_freq': np.argmax(spec[1:]) + 1,
-        'harmonic_power': np.mean(spec[10:30])  # Mid-frequency harmonics
+        "entropy": entropy(ps[1:], base=2),
+        "sidelobes": np.sum(spec[1:] > (0.25 * np.max(spec[1:]))),
+        "dominant_freq": np.argmax(spec[1:]) + 1,
+        "harmonic_power": np.mean(spec[10:30]),  # Mid-frequency harmonics
     }
 
 
@@ -43,17 +45,72 @@ def spectral_features(seq):
 # ==============================
 def codon_adaptation_index(seq):
     """Calculate codon adaptation index (simplified)"""
-    optimal_codons = ['GCT', 'GCC', 'CGT', 'CGC', 'CGA', 'CGG', 'AGA', 'AGG',
-                      'AAT', 'AAC', 'GAT', 'GAC', 'TGT', 'TGC', 'CAA', 'CAG',
-                      'GAA', 'GAG', 'GGT', 'GGC', 'GGA', 'GGG', 'CAT', 'CAC',
-                      'ATT', 'ATC', 'ATA', 'AAA', 'AAG', 'TTG', 'CTT', 'CTC',
-                      'CTA', 'CTG', 'TTA', 'ATG', 'TTC', 'CCT', 'CCC', 'CCA',
-                      'CCG', 'TCT', 'TCC', 'TCA', 'TCG', 'AGT', 'AGC', 'ACT',
-                      'ACC', 'ACA', 'ACG', 'TGG', 'TAT', 'TAC', 'GTT', 'GTC',
-                      'GTA', 'GTG', 'TAA', 'TAG', 'TGA']
+    optimal_codons = [
+        "GCT",
+        "GCC",
+        "CGT",
+        "CGC",
+        "CGA",
+        "CGG",
+        "AGA",
+        "AGG",
+        "AAT",
+        "AAC",
+        "GAT",
+        "GAC",
+        "TGT",
+        "TGC",
+        "CAA",
+        "CAG",
+        "GAA",
+        "GAG",
+        "GGT",
+        "GGC",
+        "GGA",
+        "GGG",
+        "CAT",
+        "CAC",
+        "ATT",
+        "ATC",
+        "ATA",
+        "AAA",
+        "AAG",
+        "TTG",
+        "CTT",
+        "CTC",
+        "CTA",
+        "CTG",
+        "TTA",
+        "ATG",
+        "TTC",
+        "CCT",
+        "CCC",
+        "CCA",
+        "CCG",
+        "TCT",
+        "TCC",
+        "TCA",
+        "TCG",
+        "AGT",
+        "AGC",
+        "ACT",
+        "ACC",
+        "ACA",
+        "ACG",
+        "TGG",
+        "TAT",
+        "TAC",
+        "GTT",
+        "GTC",
+        "GTA",
+        "GTG",
+        "TAA",
+        "TAG",
+        "TGA",
+    ]
     codon_count = 0
     for i in range(0, len(seq) - 2, 3):
-        if seq[i:i + 3] in optimal_codons:
+        if seq[i : i + 3] in optimal_codons:
             codon_count += 1
     return codon_count / (len(seq) // 3) if len(seq) > 2 else 0
 
@@ -61,7 +118,7 @@ def codon_adaptation_index(seq):
 def extract_features(seq):
     """Extract combined features for TE prediction"""
     # Traditional sequence features
-    gc_content = (seq.count('G') + seq.count('C')) / len(seq)
+    gc_content = (seq.count("G") + seq.count("C")) / len(seq)
     utr_length = len(seq)
     cai = codon_adaptation_index(seq)
 
@@ -72,9 +129,9 @@ def extract_features(seq):
         gc_content,
         utr_length,
         cai,
-        spec_feats['entropy'],
-        spec_feats['sidelobes'],
-        spec_feats['harmonic_power']
+        spec_feats["entropy"],
+        spec_feats["sidelobes"],
+        spec_feats["harmonic_power"],
     ]
 
 
@@ -83,7 +140,7 @@ def extract_features(seq):
 # ========================
 def generate_sequence(length=50):
     """Generate random DNA sequence"""
-    return ''.join(random.choices('ATCG', k=length))
+    return "".join(random.choices("ATCG", k=length))
 
 
 def synthetic_te(features):
@@ -143,24 +200,35 @@ def run_proof_of_concept():
 
     # Visualization
     plt.figure(figsize=(10, 6))
-    plt.scatter(y, y_pred_trad, alpha=0.5, label=f'Traditional Features (R²={r2_trad:.3f})')
-    plt.scatter(y, y_pred_combined, alpha=0.5, label=f'Combined Features (R²={r2_combined:.3f})')
-    plt.plot([min(y), max(y)], [min(y), max(y)], 'k--', lw=1)
-    plt.xlabel('True TE (Synthetic)')
-    plt.ylabel('Predicted TE')
-    plt.title('TE Prediction: Traditional vs Spectral-Enhanced Features')
+    plt.scatter(
+        y, y_pred_trad, alpha=0.5, label=f"Traditional Features (R²={r2_trad:.3f})"
+    )
+    plt.scatter(
+        y, y_pred_combined, alpha=0.5, label=f"Combined Features (R²={r2_combined:.3f})"
+    )
+    plt.plot([min(y), max(y)], [min(y), max(y)], "k--", lw=1)
+    plt.xlabel("True TE (Synthetic)")
+    plt.ylabel("Predicted TE")
+    plt.title("TE Prediction: Traditional vs Spectral-Enhanced Features")
     plt.legend()
     plt.grid(alpha=0.3)
     plt.tight_layout()
 
     # Feature importance
     plt.figure(figsize=(10, 4))
-    features = ['GC Content', 'UTR Length', 'CAI', 'Spectral Entropy', 'Sidelobes', 'Harmonic Power']
+    features = [
+        "GC Content",
+        "UTR Length",
+        "CAI",
+        "Spectral Entropy",
+        "Sidelobes",
+        "Harmonic Power",
+    ]
     importance = np.abs(model_combined.coef_)
     plt.bar(features, importance / np.sum(importance))
-    plt.title('Feature Importance in Combined Model')
-    plt.ylabel('Normalized Importance')
-    plt.xticks(rotation=45, ha='right')
+    plt.title("Feature Importance in Combined Model")
+    plt.ylabel("Normalized Importance")
+    plt.xticks(rotation=45, ha="right")
     plt.tight_layout()
 
     # Sequence-spectrum example
@@ -170,8 +238,8 @@ def run_proof_of_concept():
     spec = compute_spectrum(wave)
     plt.plot(spec[1:50])
     plt.title(f'Frequency Spectrum: High-TE Sequence\n"{sample_seq[:15]}..."')
-    plt.xlabel('Frequency Index')
-    plt.ylabel('Magnitude')
+    plt.xlabel("Frequency Index")
+    plt.ylabel("Magnitude")
     plt.grid(alpha=0.3)
     plt.tight_layout()
 
@@ -179,9 +247,9 @@ def run_proof_of_concept():
 
     # Return performance metrics
     return {
-        'traditional_r2': r2_trad,
-        'combined_r2': r2_combined,
-        'improvement': r2_combined - r2_trad
+        "traditional_r2": r2_trad,
+        "combined_r2": r2_combined,
+        "improvement": r2_combined - r2_trad,
     }
 
 

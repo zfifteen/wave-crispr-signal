@@ -1,0 +1,57 @@
+1^SPINE THORACIC 2 VIEWS^[PATIENT_NAME]
+Group ID# [GROUP_ID]
+_______________________________________________________________________________
+[PATIENT_NAME]  [SSN]    DOB-[DOB] M
+Exm Date: [EXAM_DATE]@14:10
+Req Phys: [PHYSICIAN_NAME]               Pat Loc: [LOCATION]
+                                         Img Loc: DEXA SCAN
+                                         Service: Unknown
+
+                             [HOSPITAL_NAME]
+                                  [ADDRESS]
+                                      [PHONE]
+
+
+(Case [CASE_ID] COMPLETE)SPINE THORACIC 2 VIEWS           (RAD  Detailed) CPT:72070
+     Proc Modifiers : LATERAL, AP
+     Reason for Study: Pain
+
+    Clinical History:
+
+    Report Status: Verified                   Date Reported: [REPORT_DATE]
+                                              Date Verified: [VERIFY_DATE]
+    Verifier E-Sig:/ES/[VERIFIER_NAME]
+
+    Report:
+      Examination: Thoracic spine-3 views
+
+
+      Clinical History: Pain
+
+
+      Comparison:  None]
+
+
+      FindingsThe stature and alignment of the thoracic vertebra is
+      normal. There is no evidence of wedge compression deformity. No
+      paraspinous mass is seen. The thoracic intervertebral disks are
+      of normal stature.
+
+
+
+
+
+
+    Impression:
+      Normal thoracic spine
+
+
+      [PHYSICIAN_NAME]
+       [REPORT_TIMESTAMP]
+
+Primary Interpreting Staff:
+  [PHYSICIAN_NAME], Staff Physician (Verifier)
+/
+
+
+** END REPORT [END_TIMESTAMP] **

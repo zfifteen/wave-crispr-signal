@@ -1,0 +1,25 @@
+# Repository Code Ownership for wave-crispr-signal
+# Ensures human review for critical structural changes
+
+# Core GitHub configuration and policies
+.github/* @zfifteen Dionisio Alberto Lopez III
+
+# Documentation requiring review
+docs/ @zfifteen Dionisio Alberto Lopez III
+*.md @zfifteen Dionisio Alberto Lopez III
+
+# Core scientific modules (root level)
+z_framework.py @zfifteen Dionisio Alberto Lopez III
+topological_analysis.py @zfifteen Dionisio Alberto Lopez III
+invariant_features.py @zfifteen Dionisio Alberto Lopez III
+molecular_dynamics_framework.py @zfifteen Dionisio Alberto Lopez III
+*_validation.py @zfifteen Dionisio Alberto Lopez III
+
+# Repository structure enforcement
+.github/REPOSITORY_POLICY.md @zfifteen Dionisio Alberto Lopez III
+.github/copilot-instructions.yml @zfifteen Dionisio Alberto Lopez III
+tools/check_repo_policy.py @zfifteen Dionisio Alberto Lopez III
+
+# Critical configuration files
+requirements.txt @zfifteen Dionisio Alberto Lopez III
+.pre-commit-config.yaml @zfifteen Dionisio Alberto Lopez III
