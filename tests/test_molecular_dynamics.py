@@ -16,13 +16,13 @@ import numpy as np
 import random
 import json
 
-from molecular_dynamics_framework import (
+from modules.molecular_dynamics_framework import (
     MolecularDynamicsZFramework,
     compare_md_vs_base_framework,
     MOLECULAR_DYNAMICS_PARAMETERS,
     MD_ENVIRONMENT,
 )
-from z_framework import format_mpmath_for_display
+from scripts.z_framework import format_mpmath_for_display
 
 
 def test_md_framework_basic():

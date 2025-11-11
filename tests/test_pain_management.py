@@ -12,13 +12,13 @@ import pytest
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from pain_management_application import (
+from experiments.pain_management_application import (
     PainManagementAnalyzer,
     PainManagementTarget,
     demo_pain_management_analysis,
     format_pain_analysis_results,
 )
-from z_framework import format_mpmath_for_display
+from scripts.z_framework import format_mpmath_for_display
 import mpmath as mp
 import numpy as np
 
@@ -154,7 +154,7 @@ def test_bootstrap_validation(analyzer):
         )
 
         # Calculate density boost for resampled sequence
-        from pain_management_application import compute_density_boost
+        from experiments.pain_management_application import compute_density_boost
 
         boost = compute_density_boost(resampled_seq)
         boosts.append(boost)

@@ -19,7 +19,7 @@ import numpy as np
 # Add current directory to path for imports
 sys.path.append('.')
 
-from fus_enhancer import (
+from scripts.fus_enhancer import (
     VectorizedConfig, VectorizedAcousticGrid, VectorizedZFramework,
     VectorizedTargetingModels, VectorizedStatistics, VectorizedFUSExperiment
 )

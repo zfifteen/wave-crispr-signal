@@ -22,7 +22,7 @@ from scipy.fft import fft
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'applications'))
 
-from fft_crispr_disruption import (
+from applications.fft_crispr_disruption import (
     FFTCRISPRDisruptionAnalyzer,
     calculate_grna_off_target_score,
     PHI,

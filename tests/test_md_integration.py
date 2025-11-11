@@ -14,11 +14,11 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "scripts"))
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from molecular_dynamics_framework import (
+from modules.molecular_dynamics_framework import (
     MolecularDynamicsZFramework,
     compare_md_vs_base_framework,
 )
-from z_framework import format_mpmath_for_display
+from scripts.z_framework import format_mpmath_for_display
 
 
 def quick_md_integration_test():

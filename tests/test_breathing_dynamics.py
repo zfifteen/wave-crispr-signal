@@ -14,7 +14,7 @@ import os
 # Add experiments directory to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'experiments'))
 
-from test_breathing_dynamics_encoding import (
+from experiments.test_breathing_dynamics_encoding import (
     BreathingDynamicsEncoder,
     ArbitraryEncoder,
     HELICAL_PERIOD
@@ -231,7 +231,7 @@ class TestIntegration(unittest.TestCase):
 
     def test_full_mutation_analysis(self):
         """Test complete mutation analysis workflow"""
-        from test_breathing_dynamics_encoding import BreathingDynamicsValidator
+        from experiments.test_breathing_dynamics_encoding import BreathingDynamicsValidator
 
         validator = BreathingDynamicsValidator()
 

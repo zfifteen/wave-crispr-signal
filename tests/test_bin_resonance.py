@@ -21,7 +21,7 @@ PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Import from the new reference implementation
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "bin"))
 
-from bin_resonance_test import (
+from bin.bin_resonance_test import (
     MAP,
     phase_coherence,
     gc_fraction,
