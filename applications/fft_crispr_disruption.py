@@ -3,12 +3,12 @@
 FFT-Based CRISPR Disruption Metrics with Golden-Ratio Phase Analysis
 
 This module implements frequency-domain analysis of CRISPR-Cas9 edited DNA sequences
-using FFT with golden-ratio-derived phase weighting θ′(n,k) = φ·((n mod φ)/φ)^k
+using FFT with golden-ratio-derived phase weighting θ′(n,k) = φ·((n mod φ_period)/φ_period)^k
 to detect off-target periodicities and insertion/deletion disruptions.
 
 Scientific Gates:
 - Human DNA only (A/C/G/T for DNA sequences)
-- Geometric resolution: θ′(n,k) with k ≈ 0.3 (default φ = 21 for 21-nt guides)
+- Geometric resolution: θ′(n,k) with k ≈ 0.3 (default φ_period = 21 for 21-nt guides)
 - Z invariants: Z = A(B/e²) with documented parameters
 """
 
@@ -37,7 +37,7 @@ class FFTCRISPRDisruptionAnalyzer:
     Analyze CRISPR editing disruptions using FFT with golden-ratio phase weighting.
     
     This analyzer detects off-target periodicities and disruptions in DNA sequences
-    by applying θ′(n,k) = φ·((n mod φ)/φ)^k phase weighting to FFT spectrum bins.
+    by applying θ′(n,k) = φ·((n mod φ_period)/φ_period)^k phase weighting to FFT spectrum bins.
     """
     
     def __init__(self, phi_period: float = DEFAULT_PHI_PERIOD, k: float = DEFAULT_K):
