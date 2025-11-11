@@ -9,7 +9,7 @@
 
 ## Executive Summary
 
-Successfully implemented a comprehensive FFT-based frequency-domain analysis system for detecting CRISPR-Cas9 off-target periodicities and quantifying insertion/deletion disruptions using golden-ratio-derived phase weighting θ′(n,k) = φ·((n mod φ)/φ)^k with k ≈ 0.3.
+Successfully implemented a comprehensive FFT-based frequency-domain analysis system for detecting CRISPR-Cas9 off-target periodicities and quantifying insertion/deletion disruptions using golden-ratio-derived phase weighting θ′(n,k) = φ·((n mod φ_period)/φ_period)^k with k ≈ 0.3.
 
 The implementation provides:
 - 10-25% expected improvement in off-target detection over baseline models
@@ -237,7 +237,7 @@ def calculate_grna_off_target_score(grna_sequence: str, phi_period: float = 21.0
 - ✓ e² = 7.3890560989306495 (constant defined)
 
 #### 3. Geometric Resolution
-- ✓ θ′(n,k) = φ·((n mod φ)/φ)^k implemented exactly
+- ✓ θ′(n,k) = φ·((n mod φ_period)/φ_period)^k implemented exactly
 - ✓ Default k ≈ 0.3 as specified
 - ✓ φ-period = 21 for 21-nt guides (documented)
 - ✓ Golden ratio φ = 1.618033988749894848... (high precision)
