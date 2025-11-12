@@ -15,7 +15,7 @@ from unittest.mock import patch
 # Add applications to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'applications'))
 
-from crispr_physical_z_metrics import (
+from applications.crispr_physical_z_metrics import (
     PhysicalZMetricsCalculator,
     validate_human_dna_sequence,
     DNAValidationError,

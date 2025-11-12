@@ -123,8 +123,8 @@ class TopologicalAnalyzer:
             Geodesic resolution value
         """
         if n == 0:
-            # Handle n=0 case to avoid modulo issues
-            return self.phi * (self.geodesic_n0_offset ** mp.mpf(k))
+            # Handle n=0 with ratio=0 (since (0 mod phi)/phi = 0)
+            return mp.mpf(0)
 
         n_mod_phi = mp.fmod(mp.mpf(n), self.phi)
         ratio = n_mod_phi / self.phi
@@ -241,8 +241,8 @@ class TopologicalAnalyzer:
         by analyzing f(x) behavior in geodesic-mapped space
         """
         # Generate test points in valid domain
-        # Use interval (0, 2) which is in valid domain
-        x_start = self.DOMAIN_X_START  # Start slightly above 0 to avoid edge cases
+        # Use interval (0, 2) which is in valid domain (arcsin argument remains within [-1,1])
+        x_start = mp.mpf('0.001')  # Start slightly above 0 to avoid edge cases
         x_end = mp.mpf(2.0)  # Safe upper bound
 
         x_values = [
@@ -293,18 +293,11 @@ class TopologicalAnalyzer:
         logger.info(f"  Baseline variance: {float(baseline_variance)}")
         logger.info(f"  Enhanced variance (k=0.3): {float(enhanced_variance)}")
         logger.info(f"  Enhancement: {float(enhancement_percentage)}%")
-        logger.info(
-            f"  Baseline variance: {self._format_mpf_for_log(baseline_variance)}"
-        )
-        logger.info(
-            f"  Enhanced variance (k=0.3): {self._format_mpf_for_log(enhanced_variance)}"
-        )
-        logger.info(
-            f"  Enhancement: {self._format_mpf_for_log(enhancement_percentage, precision=2)}%"
-        )
-        logger.info(
-            f"  Target achievement: {self._format_mpf_for_log(results['achievement_ratio'], precision=2)}"
-        )
+        # Simplified logging without custom formatter (removed broken _format_mpf_for_log)
+        logger.info(f"  Baseline variance: {baseline_variance}")
+        logger.info(f"  Enhanced variance (k=0.3): {enhanced_variance}")
+        logger.info(f"  Enhancement: {enhancement_percentage}%")
+        logger.info(f"  Target achievement: {results['achievement_ratio']}")
 
         return results
 
