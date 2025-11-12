@@ -53,7 +53,7 @@ This framework encodes DNA as a **complex waveform** and interrogates it with FF
 • Topology extension … `topological_analysis.py`  
 • CRISPR apps        … `applications/` (designer, metrics, viz, **fft_crispr_disruption**)  
 • Validation         … `proof_pack/`, `tests/`  
-• Docs               … `docs/`
+• Docs               … `docs/` (see [`WAVE_CRISPR_SIGNAL_TLDR.md`](docs/WAVE_CRISPR_SIGNAL_TLDR.md) for project overview)
 
 Run all tests:
 
