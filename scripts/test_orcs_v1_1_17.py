@@ -41,6 +41,7 @@ import subprocess
 # Add project root to path for imports
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
+sys.path.insert(0, os.path.join(project_root, 'scripts'))
 
 from z_framework import ZFrameworkCalculator
 

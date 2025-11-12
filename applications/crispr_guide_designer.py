@@ -13,9 +13,25 @@ import sys
 import os
 from typing import List, Dict, Tuple, Optional
 
+
+def make_json_serializable(obj):
+    """Convert numpy types to JSON-serializable Python types."""
+    if isinstance(obj, np.integer):
+        return int(obj)
+    elif isinstance(obj, np.floating):
+        return float(obj)
+    elif isinstance(obj, np.ndarray):
+        return obj.tolist()
+    elif isinstance(obj, dict):
+        return {key: make_json_serializable(value) for key, value in obj.items()}
+    elif isinstance(obj, (list, tuple)):
+        return [make_json_serializable(item) for item in obj]
+    else:
+        return obj
+
 # Add parent directory for invariant features import
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from invariant_features import InvariantFeatureSet
+from scripts.invariant_features import InvariantFeatureSet
 
 
 class CRISPRGuideDesigner:
@@ -52,6 +68,9 @@ class CRISPRGuideDesigner:
         Returns:
             Complex waveform array
         """
+        if not seq:
+            raise ValueError("Input sequence cannot be empty.")
+
         if zn_map is None:
             spacings = [d] * len(seq)
         else:
@@ -69,6 +88,8 @@ class CRISPRGuideDesigner:
 
     def normalized_entropy(self, spectrum: np.ndarray) -> float:
         """Calculate normalized entropy of spectrum."""
+        if len(spectrum) == 0:
+            return np.nan
         ps = spectrum / np.sum(spectrum)
         return entropy(ps, base=2)
 
@@ -365,17 +386,17 @@ class CRISPRGuideDesigner:
                 if 0.2 <= gc_content <= 0.8 and not has_poly_t:
                     guide_data = {
                         "sequence": guide_seq,
-                        "position": guide_start,
-                        "pam_position": pam_pos,
+                        "position": int(guide_start),
+                        "pam_position": int(pam_pos),
                         "pam_sequence": pam_seq,
-                        "comprehensive_score": primary_score,
-                        "on_target_score": score_data[
+                        "comprehensive_score": float(primary_score),
+                        "on_target_score": float(score_data[
                             "base_score"
-                        ],  # Keep traditional score for comparison
-                        "gc_content": gc_content,
-                        "length": len(guide_seq),
-                        **score_data,  # Include all scoring metrics
-                        **gc_analysis,  # Include G→C analysis
+                        ]),  # Keep traditional score for comparison
+                        "gc_content": float(gc_content),
+                        "length": int(len(guide_seq)),
+                        **make_json_serializable(score_data),  # Include all scoring metrics
+                        **make_json_serializable(gc_analysis),  # Include G→C analysis
                     }
                     guides.append(guide_data)
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import csv, math, random, argparse, statistics as stats
-from typing import List, Tuple, Dict
+from typing import List, Tuple, Dict, Any
 
 
 def complex_base_mapping(base: str) -> complex:

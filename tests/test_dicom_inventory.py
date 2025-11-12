@@ -105,15 +105,20 @@ def test_dicom_analysis():
     )
     
     print(f"\n🎯 Overall Test Result: {'✅ ALL TESTS PASSED' if all_tests_passed else '❌ SOME TESTS FAILED'}")
-    
+
     # Additional statistics
     print(f"\n📈 Summary Statistics:")
     print(f"  Total DICOM dataset size: {inventory['summary_stats']['total_size_gb']:.2f} GB")
     print(f"  Number of series: {inventory['summary_stats']['total_series']}")
     print(f"  Patient ID: {inventory['patient_id']}")
-    
-    return all_tests_passed
+
+    assert all_tests_passed, "DICOM analysis validation failed"
 
 if __name__ == '__main__':
-    success = test_dicom_analysis()
-    sys.exit(0 if success else 1)
+    try:
+        test_dicom_analysis()
+        print("✅ All tests passed")
+        sys.exit(0)
+    except AssertionError as e:
+        print(f"❌ Test failed: {e}")
+        sys.exit(1)

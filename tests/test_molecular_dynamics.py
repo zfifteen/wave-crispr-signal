@@ -16,13 +16,13 @@ import numpy as np
 import random
 import json
 
-from molecular_dynamics_framework import (
+from modules.molecular_dynamics_framework import (
     MolecularDynamicsZFramework,
     compare_md_vs_base_framework,
     MOLECULAR_DYNAMICS_PARAMETERS,
     MD_ENVIRONMENT,
 )
-from z_framework import format_mpmath_for_display
+from scripts.z_framework import format_mpmath_for_display
 
 
 def test_md_framework_basic():
@@ -209,8 +209,6 @@ def test_md_weight_sensitivity():
     print("MD WEIGHT SENSITIVITY ANALYSIS COMPLETED")
     print("=" * 70)
 
-    return results
-
 
 def test_comparative_analysis():
     """Compare MD-enhanced vs base Z Framework on multiple sequences."""
@@ -279,8 +277,6 @@ def test_comparative_analysis():
     print("\n" + "=" * 70)
     print("COMPARATIVE ANALYSIS COMPLETED")
     print("=" * 70)
-
-    return comparison_results
 
 
 def test_random_vs_real_sequences():
@@ -401,8 +397,6 @@ def test_random_vs_real_sequences():
     print("\n" + "=" * 70)
     print("RANDOM vs REAL SEQUENCE ANALYSIS COMPLETED")
     print("=" * 70)
-
-    return {"random_results": random_results, "real_results": real_results}
 
 
 def test_md_parameter_validation():

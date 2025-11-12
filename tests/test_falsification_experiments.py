@@ -22,7 +22,7 @@ import os
 # Add project root to path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from falsification_experiments import FalsificationExperiment
+from experiments.falsification_experiments import FalsificationExperiment
 
 
 class TestFalsificationExperiments(unittest.TestCase):
@@ -193,7 +193,7 @@ class TestIntegration(unittest.TestCase):
         """Test the complete falsification workflow."""
         print("\n🧪 Testing complete falsification workflow...")
 
-        from falsification_experiments import run_complete_falsification_study
+        from experiments.falsification_experiments import run_complete_falsification_study
 
         # This should run without errors and produce files
         try:

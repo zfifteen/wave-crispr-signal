@@ -19,7 +19,7 @@ import numpy as np
 # Add current directory to path for imports
 sys.path.append('.')
 
-from fus_enhancer import (
+from scripts.fus_enhancer import (
     VectorizedConfig, VectorizedAcousticGrid, VectorizedZFramework,
     VectorizedTargetingModels, VectorizedStatistics, VectorizedFUSExperiment
 )
@@ -188,8 +188,8 @@ class TestVectorizedStatistics(unittest.TestCase):
             x, y, n_boot=100
         )
         
-        # Check correlation is reasonable
-        self.assertTrue(0.6 < correlation < 0.8)
+        # Check correlation is reasonable (theoretical ~0.92 for y=0.7x+0.3e with Var=1)
+        self.assertTrue(0.85 < correlation < 0.97)
         self.assertTrue(ci_low < correlation < ci_high)
         self.assertTrue(0 <= p_value <= 1)
         

@@ -62,9 +62,9 @@ This framework encodes DNA as a **complex waveform** and interrogates it with FF
 
 • Core algorithms …… `z_framework.py`, `spectral_features.py`  
 • Topology extension … `topological_analysis.py`  
-• CRISPR apps        … `applications/` (designer, metrics, viz)  
+• CRISPR apps        … `applications/` (designer, metrics, viz, **fft_crispr_disruption**)  
 • Validation         … `proof_pack/`, `tests/`  
-• Docs               … `docs/`
+• Docs               … `docs/` (see [`WAVE_CRISPR_SIGNAL_TLDR.md`](docs/WAVE_CRISPR_SIGNAL_TLDR.md) for project overview)
 
 Run all tests:
 
@@ -79,17 +79,18 @@ python -m pytest -q
 1. Complex encoding (A,T,C,G → 1, –1, +i, –i)  
 2. Position-dependent phase shift: θ′(n,k) with k≈0.3  
 3. FFT → extract ΔEntropy, Δf₁, sidelobe count  
-4. Composite disruption score = Σ weighted spectral deltas  
-5. Bootstrap CI + permutation-based p-values  
+4. Golden-ratio phase weighting for off-target detection  
+5. Composite disruption score = Σ weighted spectral deltas  
+6. Bootstrap CI + permutation-based p-values  
 
-Detailed derivations in `docs/METHOD_DETAILS.md`.
+Detailed derivations in `docs/METHOD_DETAILS.md` and `docs/FFT_GOLDEN_RATIO_CRISPR.md`.
 
 ---
 
 ## 🎯 Use Cases
 
 • **gRNA on-target prediction** (AUC↑)  
-• **Off-target profiling** via spectral signature distance  
+• **Off-target profiling** via spectral signature distance and FFT-based periodicity detection  
 • **Variant effect ranking** in non-coding regions  
 • **Repair pathway bias** estimation from entropy gradients  
 • **Mutation disruption quantification** with phase-weighted Z-invariant scoring (NEW)
@@ -109,6 +110,12 @@ python applications/crispr_cli.py design "ATGCTGCGGA..." -n 5 -o guides.json
 
 # score an existing guide
 python applications/crispr_cli.py score "GACGATCGATCGATCGATCG"
+
+# FFT-based off-target analysis with golden-ratio phase weighting
+python applications/example_fft_crispr_usage.py
+
+# validate FFT disruption metrics
+python proof_pack/validate_fft_golden_ratio.py
 ```
 
 For phase-weighted scorecard details, see [`docs/PHASE_WEIGHTED_SCORECARD.md`](docs/PHASE_WEIGHTED_SCORECARD.md).

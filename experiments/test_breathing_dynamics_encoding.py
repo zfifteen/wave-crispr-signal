@@ -100,7 +100,7 @@ class BreathingDynamicsEncoder:
         self.weights = {}
 
         for base in 'ATCG':
-            freq = BREATHING_FREQ[base]
+            freq = BREATHING_RATE_RATIO[base]
 
             # Real part: log-normalized frequency (captures magnitude)
             # Map 10^7 to 10^9 Hz -> -10 to +10 range
@@ -118,7 +118,7 @@ class BreathingDynamicsEncoder:
         print("Breathing Dynamics Encoding Weights:")
         for base in 'ATCG':
             w = self.weights[base]
-            freq = BREATHING_FREQ[base]
+            freq = BREATHING_RATE_RATIO[base]
             print(f"  {base}: {w.real:+.2f}{w.imag:+.2f}j (freq: {freq:.0e} Hz)")
 
     def encode_sequence(self, sequence: str) -> np.ndarray:
@@ -188,7 +188,9 @@ class ArbitraryEncoder:
 class BreathingDynamicsValidator:
     """Test breathing dynamics encoding against arbitrary controls"""
     def __init__(self):
-                                   seq_length: int = 20) -> List[str]:
+        self.encoder = BreathingDynamicsEncoder()
+
+    def generate_crispr_sequences(self, n_sequences: int, seq_length: int = 20) -> List[str]:
         """Generate CRISPR guide sequences from real human cDNA"""
         records = list(SeqIO.parse('data/test_human_cdna.fasta', 'fasta'))
         sequences = []
@@ -203,7 +205,9 @@ class BreathingDynamicsValidator:
             seq = ''.join(c for c in seq if c in 'ATCG')
             if len(seq) == seq_length:
                 sequences.append(seq)
-        return sequences    def compute_spectrum(self, encoded_seq: np.ndarray) -> np.ndarray:
+        return sequences
+
+    def compute_spectrum(self, encoded_seq: np.ndarray) -> np.ndarray:
         """Compute FFT spectrum"""
         return np.abs(fft(encoded_seq))
 

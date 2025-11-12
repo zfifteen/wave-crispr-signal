@@ -19,7 +19,7 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 sys.path.insert(0, str(project_root / 'scripts'))
 
-from test_orcs_v1_1_17 import (
+from scripts.test_orcs_v1_1_17 import (
     load_orcs_index, 
     select_screens, 
     seqs_by_symbol_from_fasta,
@@ -120,7 +120,7 @@ class TestHumanDNAValidation(unittest.TestCase):
         # This might fail if validate_seq expects uppercase - let's see
         try:
             # enumerate_spcas9_guides converts to uppercase before validation
-            from test_orcs_v1_1_17 import enumerate_spcas9_guides
+            from scripts.test_orcs_v1_1_17 import enumerate_spcas9_guides
             # This should work because it converts to uppercase
             enumerate_spcas9_guides("atcgatcgatcgatcgatcggg")
         except ValueError as e:

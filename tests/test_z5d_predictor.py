@@ -7,7 +7,7 @@ to ensure correctness and reproducibility.
 
 import unittest
 import numpy as np
-from z5d_prime_predictor_experiment import (
+from experiments.z5d_prime_predictor_experiment import (
     Z5DPredictor,
     LIPredictor,
     Z5DPerformanceExperiment,
