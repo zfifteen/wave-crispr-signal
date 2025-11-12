@@ -1,0 +1,253 @@
+# Bridge Configuration - Geodesic-Topological Bridge Validation
+# Purpose: k* stability study, RuleSet3 benchmark, and ablation experiments
+# Version: 1.0
+# Date: 2025-11-05
+
+experiment:
+  name: "geodesic_topological_bridge"
+  description: "Validation of k* ≈ 0.3 across CRISPR datasets"
+  seeds: [0, 1, 2, 3, 4]  # Fixed seeds for reproducibility
+  pythonhashseed: 0
+  
+# Feature configuration
+features:
+  theta_prime:
+    # k* search parameters
+    k_star: 0.3                # Optimal parameter
+    k_range: [0.1, 0.6]        # Search range
+    k_step: 0.02               # Grid step size
+    k_golden_section: true     # Use golden section refinement
+    
+    # Mathematical parameters
+    phi: null                  # Use golden ratio (default)
+    precision_dps: 50          # High precision for mpmath
+    
+  kappa:
+    mode: discrete             # discrete|continuous
+    scale: null                # Use default 1/φ
+    precision_dps: 50
+    
+  coupling:
+    mode: multiplicative       # multiplicative|additive
+    ablations:
+      - additive
+      - multiplicative
+
+# Dataset configuration
+datasets:
+  # Primary validation datasets
+  - name: doench_2016
+    enabled: true
+    path: data/doench_2016.csv
+    sha256: ""  # Will be computed on first load
+    species: Homo_sapiens
+    version: "1.0"
+    n_guides_expected: 6819
+    
+  - name: kim_2025
+    enabled: true
+    path: data/kim_2025.csv
+    sha256: ""
+    species: Homo_sapiens
+    version: "preprint"
+    n_guides_expected: 18102
+    
+  - name: patch_2024
+    enabled: true
+    path: data/patch_2024.csv
+    sha256: ""
+    species: Homo_sapiens
+    version: "1.0"
+    n_guides_expected: 8456
+    
+  - name: hart_2017
+    enabled: false  # Disable for quick runs
+    path: data/hart_2017.csv
+    sha256: ""
+    species: Homo_sapiens
+    version: "1.0"
+    n_guides_expected: 5124
+    
+  - name: sanson_2018
+    enabled: false
+    path: data/sanson_2018.csv
+    sha256: ""
+    species: Homo_sapiens
+    version: "1.0"
+    n_guides_expected: 3891
+    
+  - name: aguirre_2016
+    enabled: false
+    path: data/aguirre_2016.csv
+    sha256: ""
+    species: Homo_sapiens
+    version: "1.0"
+    n_guides_expected: 2914
+  
+  # CI smoke test dataset
+  - name: smoke_test
+    enabled: true
+    path: data/smoke_test.csv
+    sha256: ""
+    species: Homo_sapiens
+    version: "synthetic"
+    n_guides_expected: 100
+    ci_only: true
+
+# Split configuration (prevent data leakage)
+splits:
+  strategy: split_by_gene      # split_by_gene|split_by_screen|split_by_guide
+  train_ratio: 0.7
+  val_ratio: 0.15
+  test_ratio: 0.15
+  shuffle: true
+  stratify_by: null            # Optional: stratify by label
+
+# Statistical validation
+validation:
+  bootstrap:
+    n_resamples: 5000          # CI computation
+    confidence_level: 0.95
+    method: percentile
+    
+  permutation:
+    n_permutations: 1000       # Empirical p-values
+    alternative: two-sided
+    
+  correlation:
+    methods:
+      - pearson                # Primary
+      - spearman              # Robustness check
+    control_for:               # Partial correlation
+      - gc_percent
+      - guide_length
+      - guide_position
+    
+  effect_size:
+    compute_cohens_d: true
+    confidence_level: 0.95
+    
+  multiple_testing:
+    method: fdr_bh             # Benjamini-Hochberg FDR
+    alpha: 0.05
+
+# Benchmark configuration
+benchmark:
+  baseline: ruleset3           # Comparison baseline
+  metrics:
+    - roc_auc
+    - spearman_r
+    - pearson_r
+    - mse
+    - mae
+  target_delta_auc: 0.047      # Expected improvement
+  significance_threshold: 0.01
+
+# Ablation studies
+ablations:
+  # Feature ablations
+  features:
+    - name: theta_only
+      enabled: [theta_prime]
+      disabled: [kappa]
+      
+    - name: kappa_only
+      enabled: [kappa]
+      disabled: [theta_prime]
+      
+    - name: coupled
+      enabled: [theta_prime, kappa]
+      disabled: []
+  
+  # Coupling mode ablations
+  coupling:
+    - additive
+    - multiplicative
+  
+  # k parameter ablations
+  k_values:
+    - 0.1
+    - 0.2
+    - 0.3   # k*
+    - 0.4
+    - 0.5
+
+# Output configuration
+output:
+  # Directory structure
+  base_dir: runs
+  run_dir_format: "%Y%m%d_%H%M%S"  # strftime format
+  
+  # Files to save
+  save_config: true
+  save_metrics: true
+  save_figures: true
+  save_models: false          # Large, disable unless needed
+  save_logs: true
+  
+  # Logging
+  log_level: INFO
+  log_format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  trace_format: jsonl        # Structured logging
+  
+  # Metrics
+  metrics_file: metrics.json
+  summary_file: summary.csv
+  
+  # Figures
+  figures_dir: figures
+  figure_formats: [svg, png]
+  figure_dpi: 300
+
+# CI configuration
+ci:
+  enabled: true
+  quick_mode: false            # Set via --quick flag
+  
+  quick_config:
+    max_guides: 100
+    seeds: [0]                 # Single seed
+    bootstrap_resamples: 100
+    permutation_tests: 100
+    datasets: [smoke_test]
+    
+  timeout_seconds: 300         # 5 minutes for CI
+  
+  failure_conditions:
+    # Hard stops
+    k_star_deviation: 0.06     # Flag if |k* - 0.3| > 0.06
+    auc_regression: 0.01       # Flag if AUC drops > 0.01
+    reproducibility_delta: 0.005  # CI should match within ±0.005 AUC
+
+# Numeric policy
+numeric:
+  high_precision: true         # Use mpmath
+  precision_dps: 50
+  disallow_float_cast: true    # No float() on κ/θ′ intermediates
+  guard_division_by_zero: true
+  nan_policy: raise            # Fail on NaN
+
+# Sanity thresholds
+sanity:
+  k_star_range: [0.24, 0.36]   # Warning if outside
+  variance_reduction_min: 0.12  # Expected ~15%, warn if <12%
+  correlation_min: 0.80        # Expected ~0.93 (zeta) or ~0.85 (bio)
+  auc_improvement_min: 0.03    # Expected +0.047, warn if <0.03
+
+# Environment
+environment:
+  python_version: "3.12"
+  requirements_file: requirements.txt
+  lock_dependencies: true
+  
+  pre_run_checks:
+    - check_pythonhashseed
+    - check_dependencies
+    - check_dataset_checksums
+    - check_git_status
+  
+  post_run_actions:
+    - save_pip_freeze
+    - save_git_commit
+    - save_runtime_info
+    - validate_outputs

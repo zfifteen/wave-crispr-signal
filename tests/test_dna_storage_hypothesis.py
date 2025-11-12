@@ -14,8 +14,14 @@ Uses bootstrap resampling and statistical validation following Z Framework princ
 import unittest
 import logging
 import numpy as np
-from dna_storage_hypothesis import DNAStorageHypothesis, DNAStorageResults
-from z_framework import ZFrameworkCalculator
+import sys
+import os
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "modules"))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "scripts"))
+
+from modules.dna_storage_hypothesis import DNAStorageHypothesis, DNAStorageResults
+from scripts.z_framework import ZFrameworkCalculator
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

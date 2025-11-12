@@ -8,7 +8,7 @@ and geodesic curvature in the Z Framework.
 import unittest
 import numpy as np
 import mpmath as mp
-from topological_analysis import TopologicalAnalyzer
+from scripts.topological_analysis import TopologicalAnalyzer
 
 
 class TestTopologicalAnalysis(unittest.TestCase):

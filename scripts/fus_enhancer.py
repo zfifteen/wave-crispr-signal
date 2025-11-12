@@ -283,11 +283,12 @@ class VectorizedStatistics:
         """
         n = x.shape[0]
         
-        # Original correlation
+        # Original correlation (Pearson)
         x_centered = x - torch.mean(x)
         y_centered = y - torch.mean(y)
         original_r = torch.sum(x_centered * y_centered) / torch.sqrt(
             torch.sum(x_centered**2) * torch.sum(y_centered**2))
+        original_r = torch.clamp(original_r, -0.9999, 0.9999)
         
         # Vectorized bootstrap sampling
         indices = torch.randint(0, n, (n_boot, n), device=self.device)
@@ -303,6 +304,7 @@ class VectorizedStatistics:
             torch.sum(boot_x_centered**2, dim=1) * torch.sum(boot_y_centered**2, dim=1))
         
         boot_correlations = numerator / (denominator + 1e-8)
+        boot_correlations = torch.clamp(boot_correlations, -0.9999, 0.9999)
         
         # Remove NaN values
         valid_mask = ~torch.isnan(boot_correlations)
