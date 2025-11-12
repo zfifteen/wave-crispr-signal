@@ -4,7 +4,7 @@
 
 ### What
 
-Treat DNA as a waveform; quantify "breathing"/disruption with spectral features normalized by the Z Framework (Z = A(B/c)).
+Treat DNA as a waveform; quantify "breathing"/disruption with spectral features normalized by the Z Framework (discrete/biological domain: Z = A(B/e²), where e is Euler's number and e² ≈ 7.389). Here, A is a scaling factor (experiment-specific), and B is the raw spectral disruption score.
 
 This framework encodes DNA sequences as complex-valued signals and applies signal processing techniques (FFT, spectral analysis) to quantify local mutational disruption and structural dynamics. The approach transforms biological sequences into the frequency domain, where disruption patterns become interpretable through spectral features.
 
