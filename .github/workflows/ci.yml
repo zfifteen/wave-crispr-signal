@@ -6,10 +6,10 @@ on:
     branches: [ main ]
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: '3.12' }
       - run: pip install -r requirements.txt
-      - run: python -m pytest -q
+      - run: PYTHONPATH=. python -m pytest -q

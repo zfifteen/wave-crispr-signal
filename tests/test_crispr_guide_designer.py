@@ -402,7 +402,8 @@ class TestCRISPRVisualization(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.visualizer.plot_guide_scores([])
 
-    @unittest.skip("Mocking issue with matplotlib colorbar")    def test_spectral_heatmap(self):
+    @unittest.skip("Mocking issue with matplotlib colorbar")
+    def test_spectral_heatmap(self):
         """Test spectral heatmap creation."""
         sequences = {
             "seq1": "ATCGATCGATCGATCGATCG",
