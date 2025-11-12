@@ -1,2 +1,31 @@
 .idea/
-.snapshots/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Project specific
+*.png
+*.html
+*.pdf
+test_results/
+temp/
+tmp/
+/wave-crispr-signal.iml
+
+# Validation results (generated files)
+proof_pack/validation_results/
+proof_pack/__pycache__/
+bin_resonance_results.csv
+results/
+/data/labs/
+/data/get_hg38/
+.snapshots

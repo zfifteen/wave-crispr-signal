@@ -8,18 +8,25 @@ proper integration with the Z Framework and validation of all key features.
 
 import sys
 import os
+import pytest
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from pain_management_application import (
+from experiments.pain_management_application import (
     PainManagementAnalyzer,
     PainManagementTarget,
     demo_pain_management_analysis,
     format_pain_analysis_results,
 )
-from z_framework import format_mpmath_for_display
+from scripts.z_framework import format_mpmath_for_display
 import mpmath as mp
 import numpy as np
+
+
+@pytest.fixture
+def analyzer():
+    """Pytest fixture to create a PainManagementAnalyzer for testing"""
+    return PainManagementAnalyzer(precision_dps=30)
 
 
 def test_pain_management_analyzer():
@@ -40,7 +47,6 @@ def test_pain_management_analyzer():
     assert len(analyzer.journavx_targets) > 0, "Should have JOURNAVX targets"
 
     print("✓ PainManagementAnalyzer initialization successful")
-    return analyzer
 
 
 def test_prime_curvature_analysis(analyzer):
@@ -96,7 +102,6 @@ def test_prime_curvature_analysis(analyzer):
     )
 
     print("✓ Prime curvature analysis successful")
-    return results
 
 
 def test_z5d_predictor(analyzer):
@@ -129,7 +134,6 @@ def test_z5d_predictor(analyzer):
     assert results["density_enhancement_success"], "Enhancement should be successful"
 
     print("✓ Z5D predictor test successful")
-    return results
 
 
 def test_bootstrap_validation(analyzer):
@@ -150,7 +154,7 @@ def test_bootstrap_validation(analyzer):
         )
 
         # Calculate density boost for resampled sequence
-        from pain_management_application import compute_density_boost
+        from experiments.pain_management_application import compute_density_boost
 
         boost = compute_density_boost(resampled_seq)
         boosts.append(boost)
@@ -182,13 +186,6 @@ def test_bootstrap_validation(analyzer):
     assert p_value < 0.05, f"p-value {p_value} should be <0.05 for significance"
 
     print("✓ Bootstrap validation successful")
-    return {
-        "mean_boost": mean_boost,
-        "ci_lower": ci_lower,
-        "ci_upper": ci_upper,
-        "p_value": p_value,
-        "significant": p_value < 0.05,
-    }
 
 
 def test_comprehensive_analysis(analyzer):
@@ -228,7 +225,6 @@ def test_comprehensive_analysis(analyzer):
         )
 
     print("✓ Comprehensive analysis test successful")
-    return results
 
 
 def test_target_creation():

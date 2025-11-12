@@ -13,7 +13,7 @@ import os
 repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, repo_root)
 
-from z_framework import (
+from scripts.z_framework import (
     ZFrameworkCalculator,
     format_mpmath_for_json,
     format_mpmath_for_display,
