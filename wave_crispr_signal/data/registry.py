@@ -25,6 +25,9 @@ from dataclasses import dataclass
 
 logger = logging.getLogger(__name__)
 
+# --- Constants ---
+DEFAULT_SPECIES = "Homo sapiens"
+
 
 @dataclass
 class DatasetMetadata:
@@ -78,7 +81,7 @@ class DatasetRegistry:
                 name="biogrid_orcs_v1.1.17",
                 path=str(self.base_dir / "biogrid_orcs_v1.1.17.csv"),
                 version="1.1.17",
-                species="Homo sapiens",
+                species=DEFAULT_SPECIES,
                 license="MIT",
                 n_guides=0,  # Will be determined on load
                 url="https://orcs.thebiogrid.org/",
@@ -93,9 +96,9 @@ class DatasetRegistry:
         Args:
             metadata: Dataset metadata
         """
-        if metadata.species != "Homo sapiens":
+        if metadata.species != DEFAULT_SPECIES:
             logger.warning(
-                f"Dataset {metadata.name} is not Homo sapiens: {metadata.species}"
+                f"Dataset {metadata.name} is not {DEFAULT_SPECIES}: {metadata.species}"
             )
 
         self.datasets[metadata.name] = metadata
@@ -190,12 +193,12 @@ class DatasetRegistry:
         # Validate species
         if "species" in df.columns:
             species_counts = df["species"].value_counts()
-            if "Homo sapiens" not in species_counts:
-                raise ValueError(f"Dataset {name} does not contain Homo sapiens data")
+            if DEFAULT_SPECIES not in species_counts:
+                raise ValueError(f"Dataset {name} does not contain {DEFAULT_SPECIES} data")
 
             # Filter to Homo sapiens only
-            df = df[df["species"] == "Homo sapiens"].copy()
-            logger.info(f"Filtered to {len(df)} Homo sapiens guides")
+            df = df[df["species"] == DEFAULT_SPECIES].copy()
+            logger.info(f"Filtered to {len(df)} {DEFAULT_SPECIES} guides")
 
         # Update metadata
         metadata.n_guides = len(df)
@@ -225,7 +228,8 @@ class DatasetRegistry:
             train_ratio: Training set ratio
             val_ratio: Validation set ratio
             test_ratio: Test set ratio
-            seed: Random seed
+            seed: Random seed for shuffling. Providing a consistent seed ensures
+                  deterministic and reproducible splits.
 
         Returns:
             Tuple of (train_df, val_df, test_df)

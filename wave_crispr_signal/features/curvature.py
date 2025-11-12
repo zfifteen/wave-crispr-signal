@@ -45,6 +45,15 @@ class KappaConfig(BaseModel):
     )
 
 
+def _to_mpf(n: Union[int, float, np.number]) -> mp.mpf:
+    """Convert a number to an mpmath float, handling numpy types."""
+    if isinstance(n, (np.integer, np.int_)):
+        return mp.mpf(int(n))
+    if isinstance(n, (np.floating, np.float_)):
+        return mp.mpf(float(n))
+    return mp.mpf(n)
+
+
 def kappa(
     n: Union[int, np.ndarray, mp.mpf],
     config: Optional[KappaConfig] = None,
@@ -104,13 +113,7 @@ def kappa(
 
     # Handle scalar input
     if np.isscalar(n):
-        # Convert numpy types to Python native types first
-        n_py = (
-            int(n)
-            if isinstance(n, (np.integer, np.int_))
-            else (float(n) if isinstance(n, (np.floating, np.float_)) else n)
-        )
-        n_val = mp.mpf(n_py)
+        n_val = _to_mpf(n)
         if n_val <= 0:
             raise ValueError(f"n must be positive, got {n}")
 
@@ -134,10 +137,7 @@ def kappa(
 
     # Use flat iterator to modify in place
     for idx, n_i in enumerate(n_arr.flat):
-        # Convert numpy types to Python native types first
-        n_val = mp.mpf(
-            int(n_i) if isinstance(n_i, (np.integer, np.int_)) else float(n_i)
-        )
+        n_val = _to_mpf(n_i)
 
         if config.mode == "discrete":
             n_mod_phi = mp.fmod(n_val, PHI)
@@ -186,49 +186,3 @@ def kappa_vectorized(
         return scale / (1.0 + n_arr / phi_float)
 
 
-def compute_coupled_features(
-    n: Union[int, np.ndarray],
-    k: float = 0.3,
-    coupling: Literal["additive", "multiplicative"] = "multiplicative",
-    kappa_config: Optional[KappaConfig] = None,
-) -> Union[mp.mpf, np.ndarray]:
-    """
-    Compute coupled κ(n) + θ′(n,k) features with specified coupling mode.
-
-    This function combines curvature and phase resolution using either
-    additive or multiplicative coupling as specified in the bridge derivation.
-
-    Additive coupling:
-        F(n) = κ(n) + θ′(n,k)
-
-    Multiplicative coupling:
-        F(n) = κ(n) · θ′(n,k)
-
-    Args:
-        n: Position index (must be positive).
-        k: Phase resolution parameter (default 0.3).
-        coupling: Coupling mode ('additive' or 'multiplicative').
-        kappa_config: Configuration for kappa calculation.
-
-    Returns:
-        Coupled feature value(s).
-
-    Examples:
-        >>> # Multiplicative coupling (default, consistent with derivation)
-        >>> result = compute_coupled_features(21, k=0.3, coupling='multiplicative')
-
-        >>> # Additive coupling for ablation study
-        >>> result = compute_coupled_features(21, k=0.3, coupling='additive')
-    """
-    from .phase_weighting import theta_prime, ThetaPrimeConfig
-
-    # Compute both features
-    kappa_val = kappa(n, config=kappa_config)
-    theta_config = ThetaPrimeConfig(k=k)
-    theta_val = theta_prime(n, config=theta_config)
-
-    # Apply coupling
-    if coupling == "additive":
-        return kappa_val + theta_val
-    else:  # multiplicative
-        return kappa_val * theta_val

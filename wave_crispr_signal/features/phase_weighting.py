@@ -57,6 +57,15 @@ class ThetaPrimeConfig(BaseModel):
         return v
 
 
+def _to_mpf(n: Union[int, float, np.number]) -> mp.mpf:
+    """Convert a number to an mpmath float, handling numpy types."""
+    if isinstance(n, (np.integer, np.int_)):
+        return mp.mpf(int(n))
+    if isinstance(n, (np.floating, np.float_)):
+        return mp.mpf(float(n))
+    return mp.mpf(n)
+
+
 def theta_prime(
     n: Union[int, np.ndarray, mp.mpf],
     config: Optional[ThetaPrimeConfig] = None,
@@ -113,13 +122,7 @@ def theta_prime(
 
     # Handle scalar input
     if np.isscalar(n):
-        # Convert numpy types to Python native types first
-        n_py = (
-            int(n)
-            if isinstance(n, (np.integer, np.int_))
-            else (float(n) if isinstance(n, (np.floating, np.float_)) else n)
-        )
-        n_val = mp.mpf(n_py)
+        n_val = _to_mpf(n)
         if n_val <= 0:
             raise ValueError(f"n must be positive, got {n}")
 
@@ -140,10 +143,7 @@ def theta_prime(
 
     # Use flat iterator to modify in place
     for idx, n_i in enumerate(n_arr.flat):
-        # Convert numpy types to Python native types first
-        n_val = mp.mpf(
-            int(n_i) if isinstance(n_i, (np.integer, np.int_)) else float(n_i)
-        )
+        n_val = _to_mpf(n_i)
         n_mod_phi = mp.fmod(n_val, phi_val)
         ratio = n_mod_phi / phi_val
         results.flat[idx] = phi_val * (ratio**k_val)

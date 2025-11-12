@@ -21,10 +21,10 @@ import mpmath as mp
 from wave_crispr_signal.features.curvature import (
     kappa,
     kappa_vectorized,
-    compute_coupled_features,
     KappaConfig,
     PHI,
 )
+from wave_crispr_signal.features.coupling import compute_coupled_features
 
 
 class TestKappaBounds:

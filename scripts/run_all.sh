@@ -41,7 +41,7 @@ if [[ ! -f "configs/bridge.yaml" ]]; then
 fi
 
 # Create run directory with timestamp
-RUN_ID=$(date +%Y%m%d_%H%M%S)
+RUN_ID=$(date +%Y%m%d_%H%M%S_%N)
 RUN_DIR="runs/${RUN_ID}"
 mkdir -p "$RUN_DIR"
 mkdir -p "$RUN_DIR/figures"

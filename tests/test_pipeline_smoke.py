@@ -18,7 +18,7 @@ import pytest
 import numpy as np
 import pandas as pd
 from wave_crispr_signal.features import theta_prime, kappa
-from wave_crispr_signal.features.curvature import compute_coupled_features
+from wave_crispr_signal.features.coupling import compute_coupled_features
 
 
 class TestPipelineSmoke:
