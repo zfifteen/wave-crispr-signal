@@ -1,0 +1,71 @@
+{
+  "description": "Expected output structure for spectral disruption profiler falsification experiment",
+  "version": "1.0",
+  "smoke_test": {
+    "expected_tests": 7,
+    "required_passes": 7,
+    "max_runtime_seconds": 5
+  },
+  "experiment_output_structure": {
+    "metadata": {
+      "timestamp": "string (YYYYMMDD-HHMMSS)",
+      "python_version": "string",
+      "experiment_id": "spectral_disruption_profiler_137",
+      "version": "string",
+      "git_commit": "string"
+    },
+    "parameters": {
+      "seed": "integer",
+      "n_bootstrap": "integer",
+      "n_permutation": "integer",
+      "k_parameter": "float",
+      "phi_period": "float",
+      "alpha": "float"
+    },
+    "primary_endpoints": {
+      "bootstrap_ci": {
+        "mean_delta_auc": "float",
+        "ci_lower": "float",
+        "ci_upper": "float",
+        "includes_zero": "boolean",
+        "std": "float"
+      }
+    },
+    "secondary_endpoints": {
+      "permutation_test": {
+        "observed_delta_auc": "float",
+        "p_value": "float",
+        "null_mean": "float",
+        "null_std": "float",
+        "significant": "boolean"
+      },
+      "performance": {
+        "total_time_100seq": "float",
+        "time_per_sequence_ms": "float",
+        "meets_target": "boolean"
+      }
+    },
+    "falsification_status": "HYPOTHESIS_FALSIFIED | HYPOTHESIS_SUPPORTED | INCONCLUSIVE",
+    "conclusion": "string",
+    "runtime_seconds": "float"
+  },
+  "falsification_criteria": {
+    "hypothesis_falsified": {
+      "bootstrap_ci_includes_zero": true,
+      "permutation_p_value_gt_alpha": true,
+      "description": "Phase weighting provides NO significant improvement"
+    },
+    "hypothesis_supported": {
+      "bootstrap_ci_excludes_zero": true,
+      "permutation_p_value_lt_alpha": true,
+      "description": "Phase weighting provides significant improvement (unexpected)"
+    }
+  },
+  "scientific_gates": {
+    "dna_validation": "Only A/C/G/T/N allowed (case-insensitive)",
+    "z_framework": "Z = A(B/e²) with documented parameters",
+    "geometric_resolution": "θ′(n,k) = φ·((n mod φ)/φ)^k with k ≈ 0.3",
+    "statistical_rigor": "Bootstrap CI (≥1,000), permutation tests (≥1,000), FDR correction",
+    "reproducibility": "Fixed seed, versioned code, metadata persistence"
+  }
+}

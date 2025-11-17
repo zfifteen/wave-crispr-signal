@@ -1,0 +1,86 @@
+# Golden Output Validation Checksums
+# Spectral Disruption Profiler Falsification Experiment
+# Version: 1.0
+# Date: 2025-11-17
+
+## Smoke Test Expected Results
+- All 7 tests must pass
+- Runtime must be < 5 seconds
+- Exit code: 0
+
+## DNA Validation Gate
+- Valid bases: A, C, G, T, N (case-insensitive)
+- Invalid: U (RNA), IUPAC codes (R, Y, etc.), numbers, special chars
+- Empty sequences must be rejected
+
+## Complex Encoding Verification
+- A → 1+0j
+- T → -1+0j
+- C → 0+1j
+- G → 0-1j
+- N → 0+0j
+
+## θ′(n,k) Geometric Resolution
+- θ′(0, k) ≈ 0 (zero position)
+- θ′(n, k) bounded: 0 ≤ θ′ ≤ 10 for reasonable n
+- Formula: φ·((n mod φ_period)/φ_period)^k
+- Default: φ_period = 21.0, k = 0.3
+
+## FFT Features Required Keys
+- dominant_freq (float)
+- spectral_entropy (float)
+- sidelobe_count (integer)
+- gc_content (float, 0-1)
+- sequence_length (integer)
+- phase_weighted (boolean)
+
+## Synthetic Sequence Generation
+- Generated count matches requested
+- All sequences have correct length
+- All bases are valid DNA (A/C/G/T)
+- GC content within requested range (±10% tolerance)
+
+## Z Framework Integration
+- ZFrameworkCalculator must be initialized
+- High precision: mp.dps = 50
+- Constants: φ ≈ 1.618, e² ≈ 7.389
+
+## Performance Targets
+- Smoke test: < 5 seconds for 10 sequences
+- Functional test: < 30 seconds for 100 sequences
+- Full experiment: < 5 minutes for 1000 sequences with 1000 bootstrap + 1000 permutation
+
+## Falsification Status Values
+- HYPOTHESIS_FALSIFIED: CI includes zero AND p > α (expected result)
+- HYPOTHESIS_SUPPORTED: CI excludes zero AND p < α (unexpected)
+- INCONCLUSIVE: Mixed results
+
+## Statistical Requirements
+- Bootstrap resamples: ≥1,000 (100 for smoke test)
+- Permutation resamples: ≥1,000 (100 for smoke test)
+- Significance level α: 0.05
+- Bootstrap CI level: 95% (2.5th and 97.5th percentiles)
+
+## Output File Structure
+- JSON format with proper indentation
+- All required fields present (see expected_structure.json)
+- Numeric values are valid floats/integers (not NaN/Inf)
+- Timestamps in YYYYMMDD-HHMMSS format
+- Git commit hash recorded
+
+## Metadata Requirements
+- timestamp: ISO-like format
+- python_version: Full version string
+- experiment_id: "spectral_disruption_profiler_137"
+- version: "1.0"
+- git_commit: Short hash or "unknown"
+
+## Expected Falsification Result
+For synthetic random data with no real signal:
+- Bootstrap CI should typically include zero
+- Permutation p-value should be > 0.05
+- Status: "HYPOTHESIS_FALSIFIED"
+- Conclusion: "Phase weighting provides NO significant improvement"
+
+This is the expected outcome as the experiment is designed to test
+conditions where phase weighting does NOT provide benefit.

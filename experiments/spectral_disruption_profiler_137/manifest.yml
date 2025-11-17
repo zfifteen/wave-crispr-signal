@@ -1,0 +1,264 @@
+# Experiment Manifest: Spectral Disruption Profiler Falsification
+# 
+# This manifest tracks the spectral disruption profiler falsification experiment
+# that tests conditions under which phase weighting θ′(n,k) with k* ≈ 0.300 
+# fails to enhance FFT-based disruption metrics or provide predictive lift 
+# in gRNA efficiency.
+
+experiment:
+  id: "spectral_disruption_profiler_137"
+  title: "Falsification Experiment for Spectral Disruption Profiler Hypothesis"
+  version: "1.1"
+  date_created: "2025-11-17"
+  date_updated: "2025-11-17"
+  status: "experimental"
+  data_requirement: "REAL HUMAN DNA REQUIRED - Synthetic data does NOT provide valid falsification"
+  
+hypothesis:
+  primary: "Phase weighting θ′(n,k) with k* ≈ 0.300 does NOT enhance FFT resolution or yield >0% lift in gRNA prediction over RuleSet3."
+  null: "θ′(n,k) phase weighting provides no significant improvement in CRISPR gRNA efficiency prediction compared to unweighted FFT analysis."
+  falsification_targets:
+    - "θ′(n,k) with k* ≈ 0.300 provides no enhancement"
+    - "Vectorized FFT fails performance targets (<30s/100 sequences)"
+    - "Geodesic bridges (kappa_geo=0.3) do not mitigate k over-reliance"
+    - "FDR-corrected entropy gradients do not reduce off-target false positives"
+
+scientific_domain:
+  primary: "CRISPR gRNA Design"
+  secondary: "Signal Processing, Spectral Analysis"
+  cross_domain: "DNA Sequence Analysis → Frequency Domain Analysis"
+
+mathematical_framework:
+  discrete_domain_form: "Z = A(B/e²)"
+  geodesic_resolution: "θ'(n,k) = φ·((n mod φ)/φ)^k"
+  parameters:
+    - name: "k"
+      default: 0.3
+      description: "Geodesic curvature exponent (optimal k*)"
+      test_range: [0.1, 0.5]
+    - name: "φ"
+      value: 1.618033988749895
+      description: "Golden ratio"
+    - name: "phi_period"
+      default: 21.0
+      description: "Geometric period for 21-nt CRISPR guides"
+    - name: "e_squared"
+      value: 7.3890560989306495
+      description: "Euler's constant squared"
+
+experimental_parameters:
+  encoding:
+    method: "complex_waveform"
+    mapping: "A→1+0i, T→-1+0i, C→0+i, G→0-i"
+    controls: "unweighted FFT baseline"
+  
+  fft_analysis:
+    features:
+      - "Δf₁ (dominant frequency shift)"
+      - "ΔEntropy (spectral entropy change)"
+      - "sidelobe_count (off-target periodicities)"
+    phase_weighting: true
+    golden_ratio_bias: true
+  
+  datasets:
+    real_human_dna:
+      - name: "Doench2016"
+        path: "data/doench2016.csv"
+        description: "582 human gRNA sequences with experimental efficiency labels"
+        format: "CSV"
+        available: true
+        recommended: true
+        sequence_column: "sequence"
+        label_column: "efficiency"
+      - name: "human_cdna"
+        path: "data/test_human_cdna.fasta"
+        description: "Human cDNA sequences (TOP2A, CDK6, TAF3 genes)"
+        format: "FASTA"
+        available: true
+        recommended: false
+        note: "No efficiency labels - limited utility for falsification"
+    
+    synthetic:
+      note: "NOT RECOMMENDED - Does not provide valid falsification"
+      warning: "Synthetic data with random labels cannot test against real biological signal"
+      use_case: "Testing/debugging only"
+  
+  sampling:
+    method: "qmc"
+    sampler: "sobol"
+    n_bootstrap: 1000
+    n_permutation: 1000
+    seed: 42
+
+statistical_validation:
+  methods:
+    - name: "Bootstrap Confidence Intervals"
+      samples: 1000
+      level: 0.95
+      resampling_unit: "sequence"
+    
+    - name: "Permutation Testing"
+      permutations: 1000
+      alpha: 0.05
+      tails: 2
+    
+    - name: "Effect Size"
+      metric: "Cohen's d"
+      ci_method: "bootstrap"
+      threshold: 0.2
+    
+    - name: "Partial Correlation"
+      control_variables:
+        - "GC_percentage"
+        - "guide_length"
+        - "guide_position"
+    
+    - name: "FDR Correction"
+      method: "benjamini_hochberg"
+      alpha: 0.05
+  
+  endpoints:
+    primary:
+      - name: "ΔROC-AUC"
+        description: "ROC-AUC difference vs RuleSet3 baseline"
+        null_value: 0.0
+        expected_ci_includes_zero: true
+        falsification_criterion: "CI includes zero"
+    
+    secondary:
+      - name: "Processing Time (s/100 sequences)"
+        expected: "<30"
+        falsification_criterion: ">30"
+      
+      - name: "k-parameter Sensitivity"
+        description: "Auto-optimization vs manual selection"
+        falsification_criterion: "Manual outperforms auto by >5%"
+      
+      - name: "FDR-corrected False Positive Rate"
+        expected: "<5%"
+        falsification_criterion: ">10%"
+
+performance_targets:
+  smoke_test:
+    runtime: "<5s"
+    sequences: 10
+    purpose: "CI validation"
+  
+  functional_test:
+    runtime: "<30s"
+    sequences: 100
+    purpose: "Performance validation"
+  
+  full_experiment:
+    runtime: "<5min"
+    sequences: 1000
+    bootstrap_samples: 1000
+    permutation_samples: 1000
+
+results:
+  # To be filled after experiment execution
+  run_id: null
+  status: "not_run"
+  primary_endpoints: {}
+  secondary_endpoints: {}
+  falsification_status: null
+  statistical_tests: {}
+  
+reproducibility:
+  python_version: "3.12+"
+  random_seed: 42
+  git_commit: null  # To be filled at runtime
+  dependencies:
+    - "mpmath==1.3.0"
+    - "numpy==1.26.4"
+    - "scipy==1.16.1"
+    - "matplotlib==3.10.5"
+    - "pandas==2.3.1"  # Required for CSV data loading
+    - "scikit-learn==1.5.1"
+
+files:
+  implementation: "experiments/spectral_disruption_profiler_137/spectral_disruption_profiler.py"
+  readme: "experiments/spectral_disruption_profiler_137/README.md"
+  manifest: "experiments/spectral_disruption_profiler_137/manifest.yml"
+  smoke_test: "experiments/spectral_disruption_profiler_137/smoke_test.py"
+  results_dir: "results/spectral_disruption_profiler_137/"
+  
+execution:
+  smoke_test: |
+    python experiments/spectral_disruption_profiler_137/smoke_test.py
+  
+  recommended_experiment: |
+    # RECOMMENDED: Use real human DNA data
+    python experiments/spectral_disruption_profiler_137/spectral_disruption_profiler.py \
+      --input data/doench2016.csv \
+      --seed 42 \
+      --bootstrap 1000 \
+      --permutation 1000 \
+      --splits split-by-gene \
+      --domain discrete \
+      --k-parameter 0.3 \
+      --output results/spectral_disruption_profiler_137/doench2016_results.json
+  
+  quick_test: |
+    # Quick test with real data (fewer resamples)
+    python experiments/spectral_disruption_profiler_137/spectral_disruption_profiler.py \
+      --input data/doench2016.csv \
+      --seed 42 \
+      --bootstrap 100 \
+      --permutation 100 \
+      --max-sequences 100 \
+      --output results/spectral_disruption_profiler_137/quick_test.json
+  
+  synthetic_test_not_recommended: |
+    # NOT RECOMMENDED: Synthetic data for testing only
+    python experiments/spectral_disruption_profiler_137/spectral_disruption_profiler.py \
+      --use-synthetic \
+      --n-sequences 100 \
+      --seed 42 \
+      --bootstrap 100 \
+      --permutation 100 \
+      --output results/spectral_disruption_profiler_137/synthetic_test.json
+
+validation:
+  status: "pending"
+  gates:
+    - name: "Human DNA Only"
+      description: "Validate A/C/G/T/N only for DNA sequences"
+      status: "pending"
+    
+    - name: "Z Framework Invariants"
+      description: "Z = A(B/e²) with proper documentation"
+      status: "pending"
+    
+    - name: "Statistical Rigor"
+      description: "Bootstrap CI, permutation tests, FDR correction"
+      status: "pending"
+    
+    - name: "Reproducibility"
+      description: "Fixed seed, versioned code, pinned dependencies"
+      status: "pending"
+    
+    - name: "Runtime Performance"
+      description: "Smoke test <5s, functional test <30s"
+      status: "pending"
+
+notes: |
+  This experiment is designed to FALSIFY the core hypotheses of the Spectral 
+  Disruption Profiler by testing conditions under which phase weighting θ′(n,k) 
+  with k* ≈ 0.300 fails to enhance FFT-based disruption metrics or provide 
+  predictive lift in gRNA efficiency.
+  
+  The experiment integrates elements from:
+  - unified-framework: Z = A(B/c) invariants, κ(n) curvature with kappa_geo=0.3
+  - z-sandbox: Geodesic Validation Assault for embedding, QMC sampling
+  - existing wave-crispr-signal modules: FFT analysis, phase weighting
+  
+  Success criterion: Demonstrating that phase-weighted analysis provides NO 
+  significant benefit over unweighted baseline, thus falsifying the hypothesis.
+
+future_work:
+  - "Extend to multi-guide screening datasets"
+  - "Test across broader k-parameter ranges"
+  - "Compare with RuleSet3 on real Kim 2025 data"
+  - "Integrate with conical_flow.py density corrections"
+  - "Test GVA embedding on non-prime-like disruptions"
