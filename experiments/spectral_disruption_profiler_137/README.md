@@ -242,7 +242,114 @@ python experiments/spectral_disruption_profiler_137/spectral_disruption_profiler
 
 ---
 
-## 7. References
+## 7. Example Output
+
+### Smoke Test Output
+```bash
+$ python experiments/spectral_disruption_profiler_137/smoke_test.py
+============================================================
+SPECTRAL DISRUPTION PROFILER - SMOKE TEST
+============================================================
+
+Testing DNA validation...
+  ✓ DNA validation passed
+
+Testing complex encoding...
+  ✓ Complex encoding passed
+
+Testing θ′(n,k) geometric resolution...
+  ✓ θ′(n,k) passed
+
+Testing FFT feature computation...
+  ✓ FFT features passed
+
+Testing synthetic sequence generation...
+  ✓ Synthetic generation passed
+
+Testing Z Framework integration...
+  ✓ Z Framework integration passed
+
+Testing performance...
+  ✓ Performance passed (0.01s < 5s)
+
+============================================================
+SMOKE TEST RESULTS: 7/7 passed
+============================================================
+✓ All tests passed
+```
+
+### Full Experiment Output
+```bash
+$ python experiments/spectral_disruption_profiler_137/spectral_disruption_profiler.py \
+    --seed 42 --bootstrap 100 --permutation 100 --n-sequences 20
+
+============================================================
+SPECTRAL DISRUPTION PROFILER FALSIFICATION EXPERIMENT
+============================================================
+
+Generating 20 synthetic sequences...
+Processing 20 sequences...
+Label distribution: 5 positive, 15 negative
+
+--- PRIMARY ENDPOINT: Bootstrap CI ---
+Computing bootstrap CI with 100 resamples...
+Bootstrap CI: [-0.3918, 0.0513]
+Mean ΔROC-AUC: -0.1363
+CI includes zero: True
+
+--- SECONDARY ENDPOINT: Permutation Test ---
+Performing permutation test with 100 permutations...
+Observed ΔROC-AUC: -0.1333
+Permutation p-value: 0.2300
+
+--- PERFORMANCE TEST ---
+Processing time: 0.01s for 100 sequences
+Per-sequence: 0.28ms
+
+============================================================
+FALSIFICATION STATUS: HYPOTHESIS_FALSIFIED
+CONCLUSION: Phase weighting provides NO significant improvement
+Total runtime: 2.64s
+============================================================
+```
+
+### Results JSON Structure
+```json
+{
+  "metadata": {
+    "timestamp": "20251117-075354",
+    "experiment_id": "spectral_disruption_profiler_137",
+    "version": "1.0",
+    "git_commit": "b0e342b"
+  },
+  "parameters": {
+    "seed": 42,
+    "n_bootstrap": 100,
+    "k_parameter": 0.3,
+    "phi_period": 21.0
+  },
+  "primary_endpoints": {
+    "bootstrap_ci": {
+      "mean_delta_auc": -0.1363,
+      "ci_lower": -0.3918,
+      "ci_upper": 0.0513,
+      "includes_zero": true
+    }
+  },
+  "secondary_endpoints": {
+    "permutation_test": {
+      "p_value": 0.23,
+      "significant": false
+    }
+  },
+  "falsification_status": "HYPOTHESIS_FALSIFIED",
+  "conclusion": "Phase weighting provides NO significant improvement"
+}
+```
+
+---
+
+## 8. References
 
 - Kim 2025: gRNA efficiency dataset
 - Doench 2016: RuleSet3 baseline
@@ -252,6 +359,6 @@ python experiments/spectral_disruption_profiler_137/spectral_disruption_profiler
 
 ---
 
-## 8. Version History
+## 9. Version History
 
 - **v1.0** (2025-11-17): Initial technical design document created
