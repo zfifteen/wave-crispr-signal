@@ -71,35 +71,53 @@ Add to `scripts/run_tests.py`:
 python experiments/spectral_disruption_profiler_137/smoke_test.py
 ```
 
-### Standard Experiment (Research)
+### ⭐ Standard Experiment with Real Human DNA (RECOMMENDED)
 ```bash
-# Default parameters (100 sequences, 1000 bootstrap, 1000 permutation)
+# Use Doench 2016 dataset (real human gRNA sequences with efficiency labels)
 python experiments/spectral_disruption_profiler_137/spectral_disruption_profiler.py \
+  --input data/doench2016.csv \
   --seed 42 \
-  --output results/spectral_disruption_profiler_137/run1.json
+  --bootstrap 1000 \
+  --permutation 1000 \
+  --output results/spectral_disruption_profiler_137/doench2016_run.json
+```
+
+### Quick Test with Real Data (100 resamples)
+```bash
+# Faster testing with real data
+python experiments/spectral_disruption_profiler_137/spectral_disruption_profiler.py \
+  --input data/doench2016.csv \
+  --seed 42 \
+  --bootstrap 100 \
+  --permutation 100 \
+  --max-sequences 50 \
+  --output results/spectral_disruption_profiler_137/quick_test.json
 ```
 
 ### High-Confidence Experiment (Publication)
 ```bash
-# Increased resamples for publication-quality results
+# Increased resamples for publication-quality results with real data
 python experiments/spectral_disruption_profiler_137/spectral_disruption_profiler.py \
+  --input data/doench2016.csv \
   --seed 42 \
   --bootstrap 10000 \
   --permutation 10000 \
-  --n-sequences 1000 \
   --output results/spectral_disruption_profiler_137/publication_run.json
 ```
 
-### Adversarial Testing
+### ⚠️ Synthetic Data Mode (NOT RECOMMENDED)
 ```bash
-# High GC content (80-90%) to test failure modes
+# For testing only - does NOT provide valid falsification!
 python experiments/spectral_disruption_profiler_137/spectral_disruption_profiler.py \
+  --use-synthetic \
   --seed 42 \
-  --gc-min 0.8 \
-  --gc-max 0.9 \
   --n-sequences 100 \
-  --output results/spectral_disruption_profiler_137/adversarial_gc.json
+  --bootstrap 100 \
+  --permutation 100 \
+  --output results/spectral_disruption_profiler_137/synthetic_test.json
 ```
+
+**⚠️ WARNING**: Synthetic mode uses random DNA with random labels and does NOT test against real biological signal.
 
 ## Dependencies
 
@@ -108,10 +126,10 @@ python experiments/spectral_disruption_profiler_137/spectral_disruption_profiler
 - `numpy==1.26.4` - Numerical computing
 - `scipy==1.16.1` - Scientific computing (FFT, stats)
 - `scikit-learn==1.5.1` - ROC-AUC metrics
+- `pandas==2.3.1` - CSV data loading (now required)
 
 ### Optional
 - `matplotlib==3.10.5` - Visualization (for plotting results)
-- `pandas==2.3.1` - Data manipulation (for batch processing)
 
 ## Scientific Gates Compliance
 

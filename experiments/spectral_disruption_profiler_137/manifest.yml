@@ -8,9 +8,11 @@
 experiment:
   id: "spectral_disruption_profiler_137"
   title: "Falsification Experiment for Spectral Disruption Profiler Hypothesis"
-  version: "1.0"
+  version: "1.1"
   date_created: "2025-11-17"
+  date_updated: "2025-11-17"
   status: "experimental"
+  data_requirement: "REAL HUMAN DNA REQUIRED - Synthetic data does NOT provide valid falsification"
   
 hypothesis:
   primary: "Phase weighting θ′(n,k) with k* ≈ 0.300 does NOT enhance FFT resolution or yield >0% lift in gRNA prediction over RuleSet3."
@@ -59,26 +61,27 @@ experimental_parameters:
     golden_ratio_bias: true
   
   datasets:
-    synthetic:
-      - name: "adversarial_high_gc"
-        gc_range: [0.8, 0.9]
-        noise_level: "high"
-        n_sequences: 100
-      - name: "balanced_gc"
-        gc_range: [0.4, 0.6]
-        noise_level: "low"
-        n_sequences: 100
+    real_human_dna:
+      - name: "Doench2016"
+        path: "data/doench2016.csv"
+        description: "582 human gRNA sequences with experimental efficiency labels"
+        format: "CSV"
+        available: true
+        recommended: true
+        sequence_column: "sequence"
+        label_column: "efficiency"
+      - name: "human_cdna"
+        path: "data/test_human_cdna.fasta"
+        description: "Human cDNA sequences (TOP2A, CDK6, TAF3 genes)"
+        format: "FASTA"
+        available: true
+        recommended: false
+        note: "No efficiency labels - limited utility for falsification"
     
-    benchmark:
-      - name: "Kim2025_holdout"
-        description: "Kim 2025 gRNA efficiency holdout set"
-        available: false
-      - name: "Doench2016_RuleSet3"
-        description: "RuleSet3 baseline comparison"
-        available: false
-      - name: "Patch2024_offtarget"
-        description: "Off-target threshold benchmarks"
-        available: false
+    synthetic:
+      note: "NOT RECOMMENDED - Does not provide valid falsification"
+      warning: "Synthetic data with random labels cannot test against real biological signal"
+      use_case: "Testing/debugging only"
   
   sampling:
     method: "qmc"
@@ -170,7 +173,7 @@ reproducibility:
     - "numpy==1.26.4"
     - "scipy==1.16.1"
     - "matplotlib==3.10.5"
-    - "pandas==2.3.1"
+    - "pandas==2.3.1"  # Required for CSV data loading
     - "scikit-learn==1.5.1"
 
 files:
@@ -184,24 +187,37 @@ execution:
   smoke_test: |
     python experiments/spectral_disruption_profiler_137/smoke_test.py
   
-  full_experiment: |
+  recommended_experiment: |
+    # RECOMMENDED: Use real human DNA data
     python experiments/spectral_disruption_profiler_137/spectral_disruption_profiler.py \
+      --input data/doench2016.csv \
       --seed 42 \
       --bootstrap 1000 \
       --permutation 1000 \
       --splits split-by-gene \
       --domain discrete \
       --k-parameter 0.3 \
-      --output results/spectral_disruption_profiler_137/
+      --output results/spectral_disruption_profiler_137/doench2016_results.json
   
-  adversarial_test: |
+  quick_test: |
+    # Quick test with real data (fewer resamples)
     python experiments/spectral_disruption_profiler_137/spectral_disruption_profiler.py \
-      --input data/adversarial_high_gc.csv \
+      --input data/doench2016.csv \
       --seed 42 \
-      --bootstrap 10000 \
-      --permutation 10000 \
-      --k-parameter auto \
-      --output results/spectral_disruption_profiler_137/adversarial/
+      --bootstrap 100 \
+      --permutation 100 \
+      --max-sequences 100 \
+      --output results/spectral_disruption_profiler_137/quick_test.json
+  
+  synthetic_test_not_recommended: |
+    # NOT RECOMMENDED: Synthetic data for testing only
+    python experiments/spectral_disruption_profiler_137/spectral_disruption_profiler.py \
+      --use-synthetic \
+      --n-sequences 100 \
+      --seed 42 \
+      --bootstrap 100 \
+      --permutation 100 \
+      --output results/spectral_disruption_profiler_137/synthetic_test.json
 
 validation:
   status: "pending"
