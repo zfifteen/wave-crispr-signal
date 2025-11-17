@@ -25,6 +25,7 @@ import time
 from pathlib import Path
 from typing import Dict, List, Tuple, Optional
 import numpy as np
+import pandas as pd
 from scipy import stats
 from scipy.fft import fft, fftfreq
 from scipy.stats import entropy
@@ -343,6 +344,132 @@ class SpectralDisruptionFalsifier:
         
         return sequences
     
+    def load_human_dna_from_csv(
+        self,
+        csv_path: str,
+        sequence_column: str = 'sequence',
+        label_column: Optional[str] = 'efficiency',
+        max_sequences: Optional[int] = None
+    ) -> Tuple[List[str], Optional[np.ndarray]]:
+        """
+        Load real human DNA sequences from CSV file.
+        
+        Args:
+            csv_path: Path to CSV file with DNA sequences
+            sequence_column: Column name containing DNA sequences
+            label_column: Column name containing labels/efficiency scores (optional)
+            max_sequences: Maximum number of sequences to load
+            
+        Returns:
+            Tuple of (sequences, labels) where labels may be None
+        """
+        logger.info(f"Loading human DNA data from {csv_path}...")
+        
+        # Load CSV
+        df = pd.read_csv(csv_path)
+        
+        if sequence_column not in df.columns:
+            raise ValueError(f"Column '{sequence_column}' not found in CSV")
+        
+        # Get sequences
+        sequences = df[sequence_column].tolist()
+        
+        # Validate all sequences are human DNA
+        validated_sequences = []
+        for i, seq in enumerate(sequences):
+            try:
+                validated_seq = self.validate_dna_sequence(seq)
+                validated_sequences.append(validated_seq)
+            except ValueError as e:
+                logger.warning(f"Skipping sequence {i}: {e}")
+        
+        # Get labels if available
+        labels = None
+        if label_column and label_column in df.columns:
+            # Get labels for validated sequences only
+            valid_indices = [i for i, seq in enumerate(sequences) 
+                           if i < len(validated_sequences)]
+            labels = df[label_column].iloc[:len(validated_sequences)].values
+            
+            # Convert to binary if continuous (median split)
+            if labels.dtype in [np.float32, np.float64]:
+                median = np.median(labels)
+                labels = (labels >= median).astype(int)
+                logger.info(f"Converted continuous labels to binary using median split")
+        
+        # Limit number of sequences if requested
+        if max_sequences and len(validated_sequences) > max_sequences:
+            indices = np.random.choice(len(validated_sequences), max_sequences, replace=False)
+            validated_sequences = [validated_sequences[i] for i in indices]
+            if labels is not None:
+                labels = labels[indices]
+        
+        logger.info(f"Loaded {len(validated_sequences)} human DNA sequences from {csv_path}")
+        if labels is not None:
+            logger.info(f"Label distribution: {np.sum(labels)} positive, {len(labels) - np.sum(labels)} negative")
+        
+        return validated_sequences, labels
+    
+    def load_human_dna_from_fasta(
+        self,
+        fasta_path: str,
+        max_sequences: Optional[int] = None,
+        sequence_length: int = 21
+    ) -> List[str]:
+        """
+        Load real human DNA sequences from FASTA file.
+        
+        Args:
+            fasta_path: Path to FASTA file with human DNA
+            max_sequences: Maximum number of sequences to extract
+            sequence_length: Length of sequences to extract (default 21 for guides)
+            
+        Returns:
+            List of validated DNA sequences
+        """
+        logger.info(f"Loading human DNA sequences from {fasta_path}...")
+        
+        sequences = []
+        current_seq = ""
+        
+        with open(fasta_path, 'r') as f:
+            for line in f:
+                line = line.strip()
+                if line.startswith('>'):
+                    # Header line, process previous sequence if exists
+                    if current_seq:
+                        # Extract subsequences of specified length
+                        for i in range(0, len(current_seq) - sequence_length + 1, sequence_length):
+                            subseq = current_seq[i:i+sequence_length]
+                            try:
+                                validated = self.validate_dna_sequence(subseq)
+                                sequences.append(validated)
+                                if max_sequences and len(sequences) >= max_sequences:
+                                    break
+                            except ValueError:
+                                continue
+                        current_seq = ""
+                    if max_sequences and len(sequences) >= max_sequences:
+                        break
+                else:
+                    current_seq += line.upper()
+        
+        # Process last sequence
+        if current_seq and (not max_sequences or len(sequences) < max_sequences):
+            for i in range(0, len(current_seq) - sequence_length + 1, sequence_length):
+                subseq = current_seq[i:i+sequence_length]
+                try:
+                    validated = self.validate_dna_sequence(subseq)
+                    sequences.append(validated)
+                    if max_sequences and len(sequences) >= max_sequences:
+                        break
+                except ValueError:
+                    continue
+        
+        logger.info(f"Extracted {len(sequences)} valid DNA sequences from {fasta_path}")
+        
+        return sequences
+    
     def compute_roc_auc_difference(
         self,
         sequences: List[str],
@@ -500,16 +627,20 @@ class SpectralDisruptionFalsifier:
     def run_falsification_experiment(
         self,
         sequences: Optional[List[str]] = None,
+        labels: Optional[np.ndarray] = None,
         n_sequences: int = 100,
-        gc_range: Tuple[float, float] = (0.4, 0.6)
+        gc_range: Tuple[float, float] = (0.4, 0.6),
+        use_synthetic: bool = False
     ) -> Dict:
         """
         Run complete falsification experiment.
         
         Args:
-            sequences: Optional list of sequences; if None, generates synthetic
-            n_sequences: Number of synthetic sequences to generate
-            gc_range: GC content range for synthetic sequences
+            sequences: Optional list of sequences; if None and use_synthetic=True, generates synthetic
+            labels: Optional labels for sequences (required for real data)
+            n_sequences: Number of synthetic sequences to generate (only if use_synthetic=True)
+            gc_range: GC content range for synthetic sequences (only if use_synthetic=True)
+            use_synthetic: If True, use synthetic data; if False, requires real sequences and labels
             
         Returns:
             Complete results dictionary
@@ -520,17 +651,33 @@ class SpectralDisruptionFalsifier:
         
         start_time = time.time()
         
-        # Generate or use provided sequences
-        if sequences is None:
-            logger.info(f"Generating {n_sequences} synthetic sequences...")
-            sequences = self.generate_synthetic_sequences(
-                n_sequences=n_sequences,
-                gc_range=gc_range
+        # Validate inputs
+        if not use_synthetic and (sequences is None or labels is None):
+            raise ValueError(
+                "Real data mode requires both 'sequences' and 'labels' to be provided. "
+                "Use use_synthetic=True for synthetic data, or provide real human DNA data."
             )
+        
+        # Generate synthetic or use provided sequences
+        if use_synthetic:
+            if sequences is None:
+                logger.info(f"⚠️  WARNING: Using synthetic random DNA sequences")
+                logger.info(f"⚠️  This does not test against real human DNA data!")
+                logger.info(f"Generating {n_sequences} synthetic sequences...")
+                sequences = self.generate_synthetic_sequences(
+                    n_sequences=n_sequences,
+                    gc_range=gc_range
+                )
+            # Generate synthetic labels (random for null hypothesis testing)
+            n = len(sequences)
+            true_labels = np.random.randint(0, 2, n)
+            logger.info(f"⚠️  Using random synthetic labels (null hypothesis)")
+        else:
+            logger.info(f"✓ Using real human DNA data")
+            true_labels = labels
         
         # Generate synthetic labels (random for null hypothesis testing)
         n = len(sequences)
-        true_labels = np.random.randint(0, 2, n)
         
         logger.info(f"Processing {n} sequences...")
         logger.info(f"Label distribution: {np.sum(true_labels)} positive, {n - np.sum(true_labels)} negative")
@@ -606,9 +753,47 @@ def main():
     """Main entry point for falsification experiment."""
     parser = argparse.ArgumentParser(
         description="Spectral Disruption Profiler Falsification Experiment",
-        formatter_class=argparse.RawDescriptionHelpFormatter
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  # Use real human DNA data from CSV (RECOMMENDED)
+  python spectral_disruption_profiler.py --input data/doench2016.csv
+  
+  # Use real human DNA data from FASTA
+  python spectral_disruption_profiler.py --input-fasta data/test_human_cdna.fasta --max-sequences 100
+  
+  # Use synthetic data (for testing only, NOT recommended for falsification)
+  python spectral_disruption_profiler.py --use-synthetic --n-sequences 100
+"""
     )
     
+    # Input data arguments
+    parser.add_argument(
+        '--input', type=str,
+        help='Path to CSV file with human DNA sequences and labels (e.g., data/doench2016.csv)'
+    )
+    parser.add_argument(
+        '--input-fasta', type=str,
+        help='Path to FASTA file with human DNA sequences'
+    )
+    parser.add_argument(
+        '--sequence-column', type=str, default='sequence',
+        help='Column name for sequences in CSV (default: sequence)'
+    )
+    parser.add_argument(
+        '--label-column', type=str, default='efficiency',
+        help='Column name for labels in CSV (default: efficiency)'
+    )
+    parser.add_argument(
+        '--max-sequences', type=int,
+        help='Maximum number of sequences to load from input file'
+    )
+    parser.add_argument(
+        '--use-synthetic', action='store_true',
+        help='Use synthetic random DNA data instead of real human DNA (NOT RECOMMENDED)'
+    )
+    
+    # Experiment parameters
     parser.add_argument(
         '--seed', type=int, default=42,
         help='Random seed for reproducibility (default: 42)'
@@ -625,18 +810,22 @@ def main():
         '--k-parameter', type=float, default=0.3,
         help='Geodesic curvature exponent k (default: 0.3)'
     )
+    
+    # Synthetic data parameters (only used with --use-synthetic)
     parser.add_argument(
         '--n-sequences', type=int, default=100,
-        help='Number of synthetic sequences to generate (default: 100)'
+        help='Number of synthetic sequences to generate (only with --use-synthetic)'
     )
     parser.add_argument(
         '--gc-min', type=float, default=0.4,
-        help='Minimum GC content (default: 0.4)'
+        help='Minimum GC content for synthetic sequences (default: 0.4)'
     )
     parser.add_argument(
         '--gc-max', type=float, default=0.6,
-        help='Maximum GC content (default: 0.6)'
+        help='Maximum GC content for synthetic sequences (default: 0.6)'
     )
+    
+    # Output and metadata
     parser.add_argument(
         '--output', type=str, 
         default='results/spectral_disruption_profiler_137/falsification_results.json',
@@ -657,6 +846,18 @@ def main():
     
     args = parser.parse_args()
     
+    # Validate arguments
+    if not args.use_synthetic and not args.input and not args.input_fasta:
+        print("ERROR: Must provide either --input or --input-fasta for real human DNA data,")
+        print("       or use --use-synthetic flag (not recommended for falsification).")
+        print("\nRecommended usage:")
+        print("  python spectral_disruption_profiler.py --input data/doench2016.csv")
+        return 1
+    
+    if args.use_synthetic and (args.input or args.input_fasta):
+        print("WARNING: --use-synthetic flag ignores --input and --input-fasta.")
+        print("         Using synthetic data instead of real human DNA.")
+    
     # Create falsifier
     falsifier = SpectralDisruptionFalsifier(
         seed=args.seed,
@@ -665,10 +866,37 @@ def main():
         k_parameter=args.k_parameter
     )
     
+    # Load data
+    sequences = None
+    labels = None
+    
+    if not args.use_synthetic:
+        if args.input:
+            # Load from CSV
+            sequences, labels = falsifier.load_human_dna_from_csv(
+                args.input,
+                sequence_column=args.sequence_column,
+                label_column=args.label_column,
+                max_sequences=args.max_sequences
+            )
+        elif args.input_fasta:
+            # Load from FASTA
+            sequences = falsifier.load_human_dna_from_fasta(
+                args.input_fasta,
+                max_sequences=args.max_sequences
+            )
+            # For FASTA without labels, we cannot perform meaningful falsification
+            print("WARNING: FASTA file has no labels. Cannot compute meaningful ROC-AUC.")
+            print("         Consider using a CSV file with efficiency labels instead.")
+            return 1
+    
     # Run experiment
     results = falsifier.run_falsification_experiment(
+        sequences=sequences,
+        labels=labels,
         n_sequences=args.n_sequences,
-        gc_range=(args.gc_min, args.gc_max)
+        gc_range=(args.gc_min, args.gc_max),
+        use_synthetic=args.use_synthetic
     )
     
     # Save results

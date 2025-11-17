@@ -1,9 +1,23 @@
 # Technical Design Document: Falsification Experiment for Spectral Disruption Profiler Hypothesis
 
 **Experiment ID**: `spectral_disruption_profiler_137`  
-**Version**: 1.0  
+**Version**: 1.1  
 **Date Created**: 2025-11-17  
+**Date Updated**: 2025-11-17  
 **Status**: Experimental  
+
+---
+
+## ⚠️ CRITICAL UPDATE: Real Human DNA Data Required
+
+This falsification experiment **MUST** use actual human DNA sequences with real efficiency labels to be valid. Synthetic random DNA sequences do not provide a meaningful test of the hypothesis.
+
+**Required:**
+- Real human DNA sequences (e.g., from Doench 2016, Kim 2025, or other validated CRISPR datasets)
+- Actual efficiency labels from experimental data
+- Minimum 50+ sequences for statistical power
+
+**Default dataset:** `data/doench2016.csv` (582 human gRNA sequences with efficiency labels)
 
 ---
 
@@ -64,20 +78,24 @@ experiments/spectral_disruption_profiler_137/
 
 **Dependencies**:
 - NumPy/SciPy for FFT
+- Pandas for CSV loading
 - Bootstrap CI (≥1,000 resamples)
-- z-sandbox QMC (Sobol/Owen) for sampling (if available)
-- unified-framework conical_flow.py for density tests (if available)
 - mpmath (dps=50) for high-precision calculations
 
-**Datasets**:
+**Datasets** (REAL HUMAN DNA REQUIRED):
+- **Doench 2016** (`data/doench2016.csv`): 582 human gRNA sequences with efficiency labels ✅ **RECOMMENDED**
 - Kim 2025 holdouts (if available)
-- Adversarial synthetics (GC 80-90%, noise-added via generate_synthetic_data.py)
-- Doench 2016/Patch 2024 benchmarks (if available)
+- Patch 2024 benchmarks (if available)
+- Human cDNA FASTA files (`data/test_human_cdna.fasta`)
+
+**⚠️ NOT ACCEPTABLE**:
+- Synthetic random DNA sequences (invalid for falsification)
+- Sequences without real efficiency labels
+- Non-human DNA sequences
 
 **Null Baselines**:
-- RuleSet3 without weighting (baseline)
+- Unweighted FFT controls (same sequences, no phase weighting)
 - Random k variations
-- Unweighted FFT controls
 
 ### 2.2 Core Modules
 
@@ -201,28 +219,56 @@ experiments/spectral_disruption_profiler_137/
 python experiments/spectral_disruption_profiler_137/smoke_test.py
 ```
 
-### Run Full Falsification Experiment
+### ⭐ Run with Real Human DNA Data (RECOMMENDED)
 ```bash
+# Using Doench 2016 dataset (582 human gRNA sequences)
 python experiments/spectral_disruption_profiler_137/spectral_disruption_profiler.py \
+  --input data/doench2016.csv \
   --seed 42 \
   --bootstrap 1000 \
   --permutation 1000 \
   --splits split-by-gene \
   --domain discrete \
   --k-parameter 0.3 \
-  --output results/spectral_disruption_profiler_137/
+  --output results/spectral_disruption_profiler_137/doench2016_results.json
 ```
 
-### Batch Processing with Adversarial Data
+### Quick Test with Real Data (100 bootstrap/permutation)
 ```bash
 python experiments/spectral_disruption_profiler_137/spectral_disruption_profiler.py \
-  --input data/adversarial_high_gc.csv \
+  --input data/doench2016.csv \
   --seed 42 \
-  --bootstrap 10000 \
-  --permutation 10000 \
-  --k-parameter auto \
-  --output results/spectral_disruption_profiler_137/adversarial/
+  --bootstrap 100 \
+  --permutation 100 \
+  --max-sequences 100 \
+  --output results/spectral_disruption_profiler_137/quick_test.json
 ```
+
+### Using Custom CSV File
+```bash
+python experiments/spectral_disruption_profiler_137/spectral_disruption_profiler.py \
+  --input path/to/your/data.csv \
+  --sequence-column "guide_sequence" \
+  --label-column "knockout_efficiency" \
+  --seed 42 \
+  --bootstrap 1000 \
+  --permutation 1000 \
+  --output results/spectral_disruption_profiler_137/custom_results.json
+```
+
+### ⚠️ Synthetic Data (NOT RECOMMENDED - For Testing Only)
+```bash
+# This does NOT provide valid falsification results!
+python experiments/spectral_disruption_profiler_137/spectral_disruption_profiler.py \
+  --use-synthetic \
+  --n-sequences 100 \
+  --seed 42 \
+  --bootstrap 100 \
+  --permutation 100 \
+  --output results/spectral_disruption_profiler_137/synthetic_test.json
+```
+
+**⚠️ WARNING**: Synthetic data mode uses random DNA sequences with random labels, which does NOT test against real biological signal and CANNOT provide meaningful falsification of the hypothesis.
 
 ---
 
@@ -278,38 +324,43 @@ SMOKE TEST RESULTS: 7/7 passed
 ✓ All tests passed
 ```
 
-### Full Experiment Output
+### Full Experiment Output (with Real Human DNA Data)
 ```bash
 $ python experiments/spectral_disruption_profiler_137/spectral_disruption_profiler.py \
-    --seed 42 --bootstrap 100 --permutation 100 --n-sequences 20
+    --input data/doench2016.csv --seed 42 --bootstrap 100 --permutation 100 --max-sequences 50
+
+INFO:__main__:Loading human DNA data from data/doench2016.csv...
+INFO:__main__:Converted continuous labels to binary using median split
+INFO:__main__:Loaded 50 human DNA sequences from data/doench2016.csv
+INFO:__main__:Label distribution: 26 positive, 24 negative
 
 ============================================================
 SPECTRAL DISRUPTION PROFILER FALSIFICATION EXPERIMENT
 ============================================================
 
-Generating 20 synthetic sequences...
-Processing 20 sequences...
-Label distribution: 5 positive, 15 negative
+✓ Using real human DNA data
+Processing 50 sequences...
+Label distribution: 26 positive, 24 negative
 
 --- PRIMARY ENDPOINT: Bootstrap CI ---
 Computing bootstrap CI with 100 resamples...
-Bootstrap CI: [-0.3918, 0.0513]
-Mean ΔROC-AUC: -0.1363
+Bootstrap CI: [-0.1488, 0.0033]
+Mean ΔROC-AUC: -0.0646
 CI includes zero: True
 
 --- SECONDARY ENDPOINT: Permutation Test ---
 Performing permutation test with 100 permutations...
-Observed ΔROC-AUC: -0.1333
-Permutation p-value: 0.2300
+Observed ΔROC-AUC: -0.0641
+Permutation p-value: 0.0500
 
 --- PERFORMANCE TEST ---
 Processing time: 0.01s for 100 sequences
-Per-sequence: 0.28ms
+Per-sequence: 0.26ms
 
 ============================================================
-FALSIFICATION STATUS: HYPOTHESIS_FALSIFIED
-CONCLUSION: Phase weighting provides NO significant improvement
-Total runtime: 2.64s
+FALSIFICATION STATUS: INCONCLUSIVE
+CONCLUSION: Mixed results, further investigation needed
+Total runtime: 5.69s
 ============================================================
 ```
 
