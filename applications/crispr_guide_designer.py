@@ -32,6 +32,7 @@ def make_json_serializable(obj):
 # Add parent directory for invariant features import
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from scripts.invariant_features import InvariantFeatureSet
+from applications.phase_weighted_scorecard import PhaseWeightedScorecard
 
 
 class CRISPRGuideDesigner:
@@ -53,6 +54,8 @@ class CRISPRGuideDesigner:
 
         # Initialize invariant feature calculator
         self.invariant_features = InvariantFeatureSet(pam_pattern)
+        # Initialize phase-weighted scorecard
+        self.scorecard = PhaseWeightedScorecard()
 
     def build_waveform(
         self, seq: str, d: float = 0.34, zn_map: Optional[Dict[int, float]] = None
@@ -129,6 +132,38 @@ class CRISPRGuideDesigner:
         return np.clip(
             (entropy_score * 0.4 + sidelobe_score * 0.4 + gc_score * 0.2), 0, 1
         )
+
+    def calculate_phase_weighted_score(self, guide_seq: str) -> Dict[str, float]:
+        """
+        Calculate on-target efficiency score using the phase-weighted scorecard.
+
+        Args:
+            guide_seq: Guide RNA sequence
+
+        Returns:
+            Dictionary with phase-weighted scoring metrics.
+        """
+        features = self.scorecard.compute_spectral_features(guide_seq)
+        
+        # Lower entropy and fewer sidelobes are better
+        entropy_score = 1.0 - (features["entropy"] / 10.0)
+        sidelobe_score = 1.0 - (features["sidelobe_count"] / len(guide_seq))
+
+        # GC content factor
+        gc_content = (guide_seq.count("G") + guide_seq.count("C")) / len(guide_seq)
+        gc_score = 1.0 - abs(gc_content - 0.5) * 2
+
+        # Combine scores (similar weighting to original on-target score)
+        combined_score = np.clip(
+            (entropy_score * 0.4 + sidelobe_score * 0.4 + gc_score * 0.2), 0, 1
+        )
+
+        return {
+            "phase_weighted_score": combined_score,
+            "phase_weighted_entropy": features["entropy"],
+            "phase_weighted_sidelobes": features["sidelobe_count"],
+            "phase_weighted_diversity": features["diversity"],
+        }
 
     def calculate_comprehensive_score(
         self, sequence: str, include_invariants: bool = True
@@ -340,7 +375,11 @@ class CRISPRGuideDesigner:
         return pam_sites
 
     def design_guides(
-        self, sequence: str, num_guides: int = 5, use_invariants: bool = True
+        self,
+        sequence: str,
+        num_guides: int = 5,
+        use_invariants: bool = True,
+        use_phase_weighted_scorecard: bool = False,
     ) -> List[Dict]:
         """
         Design CRISPR guides for a target sequence using comprehensive scoring.
@@ -349,6 +388,7 @@ class CRISPRGuideDesigner:
             sequence: Target DNA sequence
             num_guides: Number of top guides to return
             use_invariants: Whether to use invariant features for scoring
+            use_phase_weighted_scorecard: Whether to use the phase-weighted scorecard
 
         Returns:
             List of guide dictionaries with scores and positions
@@ -364,45 +404,42 @@ class CRISPRGuideDesigner:
             if guide_end - guide_start >= self.guide_length:
                 guide_seq = sequence[guide_start:guide_end].upper()
 
-                # Calculate comprehensive scores
-                if use_invariants:
-                    score_data = self.calculate_comprehensive_score(
-                        guide_seq, include_invariants=True
-                    )
-                    primary_score = score_data["comprehensive_score"]
+                score_data = self.calculate_comprehensive_score(
+                    guide_seq, include_invariants=use_invariants
+                )
+                
+                guide_data = {
+                    "sequence": guide_seq,
+                    "position": int(guide_start),
+                    "pam_position": int(pam_pos),
+                    "pam_sequence": pam_seq,
+                    "length": int(len(guide_seq)),
+                    "on_target_score": score_data["base_score"],
+                    **make_json_serializable(score_data),
+                }
+
+                if use_phase_weighted_scorecard:
+                    phase_weighted_data = self.calculate_phase_weighted_score(guide_seq)
+                    guide_data.update(make_json_serializable(phase_weighted_data))
+                    primary_score = guide_data["phase_weighted_score"]
                 else:
-                    score_data = self.calculate_comprehensive_score(
-                        guide_seq, include_invariants=False
-                    )
-                    primary_score = score_data["base_score"]
+                    primary_score = score_data.get("comprehensive_score", score_data["base_score"])
+
+                guide_data["primary_score"] = primary_score
 
                 # G→C transition analysis
                 gc_analysis = self.analyze_gc_transition_effects(guide_seq)
+                guide_data.update(make_json_serializable(gc_analysis))
 
                 # Basic quality filters
                 gc_content = score_data["gc_content"]
                 has_poly_t = "TTTT" in guide_seq  # Avoid poly-T stretches
 
                 if 0.2 <= gc_content <= 0.8 and not has_poly_t:
-                    guide_data = {
-                        "sequence": guide_seq,
-                        "position": int(guide_start),
-                        "pam_position": int(pam_pos),
-                        "pam_sequence": pam_seq,
-                        "comprehensive_score": float(primary_score),
-                        "on_target_score": float(score_data[
-                            "base_score"
-                        ]),  # Keep traditional score for comparison
-                        "gc_content": float(gc_content),
-                        "length": int(len(guide_seq)),
-                        **make_json_serializable(score_data),  # Include all scoring metrics
-                        **make_json_serializable(gc_analysis),  # Include G→C analysis
-                    }
                     guides.append(guide_data)
 
-        # Sort by comprehensive score and return top guides
-        sort_key = "comprehensive_score" if use_invariants else "on_target_score"
-        guides.sort(key=lambda x: x[sort_key], reverse=True)
+        # Sort by the primary score and return top guides
+        guides.sort(key=lambda x: x["primary_score"], reverse=True)
         return guides[:num_guides]
 
     def predict_repair_outcomes(self, guide_seq: str, target_seq: str) -> Dict:

@@ -192,6 +192,31 @@ class TestCRISPRGuideDesigner(unittest.TestCase):
             valid_bases = set("ATCG")
             self.assertTrue(all(base in valid_bases for base in guide["sequence"]))
 
+    def test_design_guides_with_phase_weighted_scorecard(self):
+        """Test guide design with the phase-weighted scorecard."""
+        guides = self.designer.design_guides(
+            self.test_sequence, num_guides=3, use_phase_weighted_scorecard=True
+        )
+
+        # Check return format
+        self.assertIsInstance(guides, list)
+        self.assertLessEqual(len(guides), 3)
+
+        # Check guide properties
+        for guide in guides:
+            self.assertIn("sequence", guide)
+            self.assertIn("primary_score", guide)
+            self.assertIn("phase_weighted_score", guide)
+            self.assertIn("phase_weighted_entropy", guide)
+            self.assertIn("phase_weighted_sidelobes", guide)
+
+            # Verify that the primary score is the phase-weighted score
+            self.assertEqual(guide["primary_score"], guide["phase_weighted_score"])
+
+        # Check that guides are sorted by primary_score
+        scores = [g["primary_score"] for g in guides]
+        self.assertEqual(scores, sorted(scores, reverse=True))
+
     def test_predict_repair_outcomes(self):
         """Test repair outcome predictions."""
         repair = self.designer.predict_repair_outcomes(
