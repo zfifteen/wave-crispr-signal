@@ -107,8 +107,12 @@ def format_csv(results: List[Dict]) -> str:
         "guide_sequence",
         "position",
         "pam_sequence",
+        "primary_score",
         "on_target_score",
         "gc_content",
+        "phase_weighted_score",
+        "phase_weighted_entropy",
+        "phase_weighted_sidelobes",
         "nhej_prob",
         "mmej_prob",
         "hdr_eff",
@@ -145,14 +149,18 @@ def format_csv(results: List[Dict]) -> str:
                 guide["sequence"],
                 str(guide["position"]),
                 guide["pam_sequence"],
-                f"{guide['on_target_score']:.3f}",
-                f"{guide['gc_content']:.3f}",
+                f"{guide.get('primary_score', 0.0):.3f}" if 'primary_score' in guide else "",
+                f"{guide.get('on_target_score', 0.0):.3f}" if 'on_target_score' in guide else "",
+                f"{guide.get('gc_content', 0.0):.3f}" if 'gc_content' in guide else "",
+                f"{guide.get('phase_weighted_score', 0.0):.3f}" if 'phase_weighted_score' in guide else "",
+                f"{guide.get('phase_weighted_entropy', 0.0):.3f}" if 'phase_weighted_entropy' in guide else "",
+                f"{guide.get('phase_weighted_sidelobes', 0.0):.3f}" if 'phase_weighted_sidelobes' in guide else "",
                 f"{repair.get('nhej_probability', 0):.3f}",
                 f"{repair.get('mmej_probability', 0):.3f}",
                 f"{repair.get('hdr_efficiency', 0):.3f}",
                 z_opening,
                 z_stacking,
-                z_twist, 
+                z_twist,
                 z_melting,
                 z_mean
             ]
@@ -193,7 +201,11 @@ def design_guides_command(args):
         )
 
         # Design guides
-        guides = designer.design_guides(sequence, num_guides=args.num_guides)
+        guides = designer.design_guides(
+            sequence,
+            num_guides=args.num_guides,
+            use_phase_weighted_scorecard=args.use_phase_weighted_scorecard,
+        )
 
         # Add repair outcome predictions if requested
         if args.predict_repair:
@@ -365,6 +377,10 @@ Examples:
     design_parser.add_argument(
         "--skip-validation", action="store_true",
         help="Skip human DNA validation (use with caution)"
+    )
+    design_parser.add_argument(
+        "--use-phase-weighted-scorecard", action="store_true",
+        help="Use the phase-weighted scorecard for ranking guides"
     )
     design_parser.add_argument(
         "--format", "-f", choices=["json", "csv", "tsv"], default="json",

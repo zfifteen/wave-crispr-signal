@@ -30,12 +30,10 @@ from experiments.spectral_disruption_profiler.scoring import (
     compute_composite_score,
     score_with_confidence,
     auto_optimize_k,
-,
 )
 from experiments.spectral_disruption_profiler.detection import (
     detect_off_targets,
     compute_gc_resonance,
-,
 )
 
 # Configure logging
