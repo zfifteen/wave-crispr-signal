@@ -35,3 +35,9 @@ results/
 /data/labs/
 /data/get_hg38/
 .snapshots
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so

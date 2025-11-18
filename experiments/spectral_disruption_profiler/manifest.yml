@@ -1,0 +1,261 @@
+# Spectral Disruption Profiler Experiment Manifest
+# Experiment metadata and provenance tracking
+
+version: "1.0.0"
+created: "2025-11-17"
+repository: "zfifteen/wave-crispr-signal"
+experiment_id: "spectral_disruption_profiler"
+
+# Experiment metadata
+experiment:
+  name: "Spectral Disruption Profiler"
+  description: |
+    Implements phase-weighted FFT analysis with geometric resolution θ'(n,k) = φ·((n mod φ)/φ)^k
+    for quantifying mutation-induced spectral disruption in CRISPR guides.
+    
+    Key features:
+    - Complex waveform encoding (A→1+0i, T→-1+0i, C→0+1i, G→0-1i)
+    - FFT-based metrics: Δf₁, ΔEntropy, sidelobes
+    - Phase weighting with k* ≈ 0.300 (validated optimum)
+    - Z-invariant scoring: Z = A(B/e²)
+    - Bootstrap CI (≥1,000 resamples)
+    - GC-resonance detection with permutation tests
+  
+  status: "implemented"
+  
+  components:
+    - name: "encoding"
+      file: "encoding.py"
+      description: "DNA/RNA to phase-weighted waveform mapping"
+    
+    - name: "analysis"
+      file: "analysis.py"
+      description: "FFT-based spectral feature extraction"
+    
+    - name: "scoring"
+      file: "scoring.py"
+      description: "Z-invariant composite scoring with bootstrap CI"
+    
+    - name: "detection"
+      file: "detection.py"
+      description: "Off-target detection via entropy gradients"
+    
+    - name: "cli"
+      file: "cli.py"
+      description: "Command-line interface for batch processing"
+
+# Scientific gates enforcement
+gates:
+  dna_validation:
+    description: "Human DNA only (A/C/G/T for DNA, A/C/G/U for RNA, N allowed)"
+    enforced: true
+    implementation: "encoding.validate_dna_sequence()"
+    
+  no_fabrication:
+    description: "Real nucleotide sequences only"
+    enforced: true
+    implementation: "Validation rejects invalid bases"
+    
+  fail_fast:
+    description: "Immediate validation with clear error messages"
+    enforced: true
+    implementation: "ValueError raised on invalid input"
+    
+  z_invariants:
+    description: "Z-invariant scoring Z = A(B/c) with c = e²"
+    enforced: true
+    domain: "discrete/biological"
+    implementation: "scoring.compute_z_score()"
+    
+  geometric_resolution:
+    description: "θ'(n,k) = φ·((n mod φ)/φ)^k with k* ≈ 0.300"
+    enforced: true
+    default_k: 0.3
+    default_phi: 21.0
+    implementation: "encoding.geometric_phase_weight()"
+    
+  bootstrap_ci:
+    description: "Bootstrap confidence intervals (≥1,000 resamples)"
+    enforced: true
+    min_resamples: 1000
+    confidence_level: 0.95
+    implementation: "scoring.bootstrap_confidence_interval()"
+    
+  permutation_tests:
+    description: "Permutation-based null distributions (≥1,000 permutations)"
+    enforced: true
+    min_permutations: 1000
+    implementation: "detection.compute_gc_resonance()"
+    
+  multiple_comparison:
+    description: "Benjamini-Hochberg FDR correction"
+    enforced: true
+    alpha: 0.05
+    implementation: "detection.benjamini_hochberg_fdr()"
+    
+  reproducibility:
+    description: "Seed control for reproducible results"
+    enforced: true
+    default_seed: 42
+    
+  performance:
+    description: "Vectorized operations for efficiency"
+    enforced: true
+    target_batch_time: "< 30s for 100 sequences"
+    target_ci_time: "< 5s per bootstrap CI"
+
+# Datasets
+datasets:
+  kim_2025:
+    name: "Kim 2025 gRNA efficiency dataset"
+    species: "Homo sapiens"
+    size: 18102
+    description: "Empirical CRISPR guide efficiency data"
+    validation_metrics:
+      - "ΔROC-AUC +0.047 ± 0.006 over RuleSet3"
+      - "GC-resonance r = -0.211 (p_perm = 0.0012)"
+    status: "optional"
+    
+  synthetic:
+    name: "Synthetic guides from proof_pack"
+    generator: "proof_pack/generate_synthetic_data.py"
+    gc_range: [0.2, 0.8]
+    status: "required for testing"
+
+# Baselines for comparison
+baselines:
+  - name: "RuleSet3"
+    description: "Doench et al. RuleSet3 algorithm"
+    reference: "Doench 2016"
+    
+  - name: "Doench 2016"
+    description: "Original Doench on-target scoring"
+    
+  - name: "Patch 2024"
+    description: "Recent CRISPR efficiency predictor"
+
+# CLI usage examples
+cli:
+  score_single:
+    command: |
+      python cli.py score \
+        --reference GCTGCGGAGACCTGGAGAGA \
+        --mutant GCTGCGGAGACCTGGAGAGA \
+        --output results/single_score.json
+    
+  batch_process:
+    command: |
+      python cli.py batch \
+        --input data/guides.csv \
+        --output results/batch_scores.csv \
+        --bootstrap 1000 \
+        --permutations 1000 \
+        --seed 42
+    
+  auto_optimize_k:
+    command: |
+      python cli.py score \
+        --reference seq.fa \
+        --mutant mut.fa \
+        --auto-k \
+        --output results/optimized.json
+
+# Validation experiments
+validation:
+  functional_tests:
+    - name: "100 sequence batch"
+      target_time: "< 30s"
+      expected_output: "scores.csv with 100 rows"
+      
+    - name: "Bootstrap CI computation"
+      target_time: "< 5s per sequence"
+      n_bootstrap: 4000
+      
+    - name: "Benchmark vs RuleSet3"
+      dataset: "Kim 2025"
+      expected_lift: "> 0.0 ΔROC-AUC"
+      
+  performance_tests:
+    - name: "Vectorized FFT"
+      sequences: 1000
+      target_time: "< 10s"
+      
+    - name: "Parallel processing"
+      sequences: 10000
+      target_time: "< 5min"
+      
+  empirical_tests:
+    - name: "A/B comparison"
+      baseline: "RuleSet3"
+      requirement: "> 0% lift on holdout"
+      
+    - name: "GC-bias validation"
+      dataset: "synthetic"
+      expected: "Reproduce GC-quartile resonance"
+      
+    - name: "High-GC edge cases"
+      gc_threshold: 0.7
+      expected: "Off-target flags"
+
+# Results structure
+results:
+  directory: "results/spectral_disruption_profiler"
+  
+  run_structure:
+    pattern: "run-YYYYMMDD-HHMMSS"
+    files:
+      - "results.json"
+      - "results.csv"
+      - "summary.json"
+      - "env.txt"
+      - "log.txt"
+  
+  required_metadata:
+    - "seed"
+    - "git_commit"
+    - "dataset_name"
+    - "dataset_version"
+    - "dataset_sha256"
+    - "runtime_seconds"
+    - "pip_freeze"
+    - "timestamp"
+
+# Reproducibility
+reproducibility:
+  python_version: "3.12+"
+  dependencies: "../../../requirements.txt"
+  seed: 42
+  
+  environment_capture:
+    - "git rev-parse HEAD"
+    - "pip freeze > env.txt"
+    - "date -u +%Y-%m-%dT%H:%M:%SZ"
+  
+  validation:
+    - "Smoke test with synthetic data (< 5s)"
+    - "Unit tests for all modules"
+    - "Integration test end-to-end"
+
+# CI integration
+ci:
+  smoke_test:
+    command: "python -m pytest tests/test_spectral_disruption_profiler.py --smoke"
+    target_time: "< 5s"
+    
+  unit_tests:
+    command: "python -m pytest tests/test_spectral_disruption_profiler.py"
+    coverage_target: "> 70%"
+
+# License and citation
+license: "MIT"
+
+citation: |
+  If using this experiment, please cite:
+  - zfifteen/wave-crispr-signal repository
+  - Kim 2025 dataset (if used)
+  - Doench et al. (2016) for RuleSet3 baseline
+
+# Contact
+contact:
+  issues: "https://github.com/zfifteen/wave-crispr-signal/issues"
+  tags: ["spectral-disruption", "crispr", "phase-weighting"]
