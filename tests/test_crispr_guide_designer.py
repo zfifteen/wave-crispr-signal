@@ -217,6 +217,123 @@ class TestCRISPRGuideDesigner(unittest.TestCase):
         scores = [g["primary_score"] for g in guides]
         self.assertEqual(scores, sorted(scores, reverse=True))
 
+    def test_calculate_phase_weighted_score(self):
+        """Test phase-weighted score calculation."""
+        score_data = self.designer.calculate_phase_weighted_score(self.test_guide)
+
+        # Check return format
+        self.assertIsInstance(score_data, dict)
+        required_keys = [
+            "phase_weighted_score",
+            "phase_weighted_entropy",
+            "phase_weighted_sidelobes",
+            "phase_weighted_diversity",
+        ]
+        for key in required_keys:
+            self.assertIn(key, score_data)
+
+        # Check score ranges
+        self.assertGreaterEqual(score_data["phase_weighted_score"], 0.0)
+        self.assertLessEqual(score_data["phase_weighted_score"], 1.0)
+        self.assertGreaterEqual(score_data["phase_weighted_entropy"], 0.0)
+        self.assertGreaterEqual(score_data["phase_weighted_sidelobes"], 0)
+
+    def test_calculate_phase_weighted_score_edge_cases(self):
+        """Test phase-weighted score calculation with edge cases."""
+        # Test empty sequence
+        with self.assertRaises(ValueError):
+            self.designer.calculate_phase_weighted_score("")
+
+        # Test invalid characters
+        with self.assertRaises(ValueError):
+            self.designer.calculate_phase_weighted_score("ATCGXYZ")
+
+        # Test very short sequence (below minimum of 5 bases)
+        # The phase-weighted scorecard requires at least 5 bases
+        with self.assertRaises(RuntimeError):
+            self.designer.calculate_phase_weighted_score("ATCG")
+
+        # Test minimum valid length (5 bases)
+        try:
+            score_data = self.designer.calculate_phase_weighted_score("ATCGG")
+            self.assertIsInstance(score_data, dict)
+        except Exception as e:
+            self.fail(f"5-base sequence should not raise exception: {e}")
+
+    def test_csv_export_with_phase_weighted_scores(self):
+        """Test CSV export includes phase-weighted scores correctly."""
+        from applications.crispr_cli import format_csv
+
+        # Design guides with phase-weighted scoring
+        guides = self.designer.design_guides(
+            self.test_sequence, num_guides=2, use_phase_weighted_scorecard=True
+        )
+
+        results = [
+            {
+                "sequence_name": "test_sequence",
+                "sequence_length": len(self.test_sequence),
+                "guides": guides,
+            }
+        ]
+
+        # Format as CSV
+        try:
+            csv_output = format_csv(results)
+            self.assertIsInstance(csv_output, str)
+            self.assertIn("phase_weighted_score", csv_output)
+            self.assertIn("phase_weighted_entropy", csv_output)
+            self.assertIn("phase_weighted_sidelobes", csv_output)
+
+            # Verify no empty float formatting errors
+            lines = csv_output.split("\n")
+            self.assertGreater(len(lines), 1)  # At least header + 1 guide
+        except Exception as e:
+            self.fail(f"CSV formatting should not fail: {e}")
+
+    def test_csv_export_without_phase_weighted_scores(self):
+        """Test CSV export handles missing phase-weighted scores gracefully."""
+        from applications.crispr_cli import format_csv
+
+        # Design guides WITHOUT phase-weighted scoring
+        guides = self.designer.design_guides(
+            self.test_sequence, num_guides=2, use_phase_weighted_scorecard=False
+        )
+
+        results = [
+            {
+                "sequence_name": "test_sequence",
+                "sequence_length": len(self.test_sequence),
+                "guides": guides,
+            }
+        ]
+
+        # Format as CSV (should handle missing phase-weighted fields)
+        try:
+            csv_output = format_csv(results)
+            self.assertIsInstance(csv_output, str)
+
+            # Verify no errors with missing fields
+            lines = csv_output.split("\n")
+            self.assertGreater(len(lines), 1)
+        except Exception as e:
+            self.fail(f"CSV formatting should handle missing fields gracefully: {e}")
+
+    def test_performance_optimization_filters(self):
+        """Test that quality filters are applied before expensive calculations."""
+        # Create a sequence with guides that will fail quality filters
+        # (high GC content and poly-T stretches)
+        bad_sequence = "GGCCGGCCGGCCGGCCGGCCGGCCGGCCGGCCGGCCGGCCGGCCGGCCGGCCGGCCGGCCGGCCGGCCGG"
+
+        # Design guides - should return empty or very few guides due to filters
+        guides = self.designer.design_guides(
+            bad_sequence, num_guides=5, use_phase_weighted_scorecard=True
+        )
+
+        # Should have filtered out most/all guides before expensive calculations
+        # This test mainly ensures no errors occur during filtering
+        self.assertIsInstance(guides, list)
+
     def test_predict_repair_outcomes(self):
         """Test repair outcome predictions."""
         repair = self.designer.predict_repair_outcomes(

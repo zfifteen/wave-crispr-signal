@@ -142,28 +142,50 @@ class CRISPRGuideDesigner:
 
         Returns:
             Dictionary with phase-weighted scoring metrics.
+
+        Raises:
+            ValueError: If guide_seq is empty or contains invalid characters
         """
-        features = self.scorecard.compute_spectral_features(guide_seq)
-        
-        # Lower entropy and fewer sidelobes are better
-        entropy_score = 1.0 - (features["entropy"] / 10.0)
-        sidelobe_score = 1.0 - (features["sidelobe_count"] / len(guide_seq))
+        # Input validation
+        if not guide_seq:
+            raise ValueError("Guide sequence cannot be empty")
 
-        # GC content factor
-        gc_content = (guide_seq.count("G") + guide_seq.count("C")) / len(guide_seq)
-        gc_score = 1.0 - abs(gc_content - 0.5) * 2
+        # Validate sequence contains only valid bases
+        valid_bases = set("ATCG")
+        if not all(base.upper() in valid_bases for base in guide_seq):
+            raise ValueError(f"Guide sequence contains invalid characters. Only A, T, C, G are allowed.")
 
-        # Combine scores (similar weighting to original on-target score)
-        combined_score = np.clip(
-            (entropy_score * 0.4 + sidelobe_score * 0.4 + gc_score * 0.2), 0, 1
-        )
+        try:
+            features = self.scorecard.compute_spectral_features(guide_seq)
 
-        return {
-            "phase_weighted_score": combined_score,
-            "phase_weighted_entropy": features["entropy"],
-            "phase_weighted_sidelobes": features["sidelobe_count"],
-            "phase_weighted_diversity": features["diversity"],
-        }
+            # Validate required features are present
+            required_keys = ["entropy", "sidelobe_count", "diversity"]
+            for key in required_keys:
+                if key not in features:
+                    raise KeyError(f"Phase-weighted scorecard missing required feature: {key}")
+
+            # Lower entropy and fewer sidelobes are better
+            entropy_score = 1.0 - (features["entropy"] / 10.0)
+            sidelobe_score = 1.0 - (features["sidelobe_count"] / len(guide_seq))
+
+            # GC content factor
+            gc_content = (guide_seq.count("G") + guide_seq.count("C")) / len(guide_seq)
+            gc_score = 1.0 - abs(gc_content - 0.5) * 2
+
+            # Combine scores (similar weighting to original on-target score)
+            combined_score = np.clip(
+                (entropy_score * 0.4 + sidelobe_score * 0.4 + gc_score * 0.2), 0, 1
+            )
+
+            return {
+                "phase_weighted_score": combined_score,
+                "phase_weighted_entropy": features["entropy"],
+                "phase_weighted_sidelobes": features["sidelobe_count"],
+                "phase_weighted_diversity": features["diversity"],
+            }
+        except Exception as e:
+            # Re-raise with more context
+            raise RuntimeError(f"Failed to calculate phase-weighted score for sequence '{guide_seq}': {e}") from e
 
     def calculate_comprehensive_score(
         self, sequence: str, include_invariants: bool = True
@@ -404,10 +426,19 @@ class CRISPRGuideDesigner:
             if guide_end - guide_start >= self.guide_length:
                 guide_seq = sequence[guide_start:guide_end].upper()
 
+                # Apply basic quality filters EARLY to avoid unnecessary computation
+                gc_content = (guide_seq.count("G") + guide_seq.count("C")) / len(guide_seq)
+                has_poly_t = "TTTT" in guide_seq  # Avoid poly-T stretches
+
+                # Skip this guide if it doesn't pass basic filters
+                if not (0.2 <= gc_content <= 0.8 and not has_poly_t):
+                    continue
+
+                # Now calculate comprehensive scores (only for guides that pass filters)
                 score_data = self.calculate_comprehensive_score(
                     guide_seq, include_invariants=use_invariants
                 )
-                
+
                 guide_data = {
                     "sequence": guide_seq,
                     "position": int(guide_start),
@@ -418,10 +449,17 @@ class CRISPRGuideDesigner:
                     **make_json_serializable(score_data),
                 }
 
+                # Calculate phase-weighted scores if requested
                 if use_phase_weighted_scorecard:
-                    phase_weighted_data = self.calculate_phase_weighted_score(guide_seq)
-                    guide_data.update(make_json_serializable(phase_weighted_data))
-                    primary_score = guide_data["phase_weighted_score"]
+                    try:
+                        phase_weighted_data = self.calculate_phase_weighted_score(guide_seq)
+                        guide_data.update(make_json_serializable(phase_weighted_data))
+                        primary_score = guide_data["phase_weighted_score"]
+                    except Exception as e:
+                        # Log error and fall back to comprehensive score
+                        import sys
+                        print(f"Warning: Phase-weighted scoring failed for guide at position {guide_start}: {e}", file=sys.stderr)
+                        primary_score = score_data.get("comprehensive_score", score_data["base_score"])
                 else:
                     primary_score = score_data.get("comprehensive_score", score_data["base_score"])
 
@@ -431,12 +469,7 @@ class CRISPRGuideDesigner:
                 gc_analysis = self.analyze_gc_transition_effects(guide_seq)
                 guide_data.update(make_json_serializable(gc_analysis))
 
-                # Basic quality filters
-                gc_content = score_data["gc_content"]
-                has_poly_t = "TTTT" in guide_seq  # Avoid poly-T stretches
-
-                if 0.2 <= gc_content <= 0.8 and not has_poly_t:
-                    guides.append(guide_data)
+                guides.append(guide_data)
 
         # Sort by the primary score and return top guides
         guides.sort(key=lambda x: x["primary_score"], reverse=True)
