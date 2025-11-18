@@ -141,10 +141,15 @@ class CRISPRGuideDesigner:
             guide_seq: Guide RNA sequence
 
         Returns:
-            Dictionary with phase-weighted scoring metrics.
+            Dictionary with phase-weighted scoring metrics containing:
+                - phase_weighted_score (float): Combined efficiency score [0, 1]
+                - phase_weighted_entropy (float): Spectral entropy metric (≥0)
+                - phase_weighted_sidelobes (int): Number of spectral sidelobes (≥0)
+                - phase_weighted_diversity (float): Sequence diversity metric
 
         Raises:
             ValueError: If guide_seq is empty or contains invalid characters
+            RuntimeError: If phase-weighted scorecard computation fails
         """
         # Input validation
         if not guide_seq:
@@ -165,14 +170,20 @@ class CRISPRGuideDesigner:
                     raise KeyError(f"Phase-weighted scorecard missing required feature: {key}")
 
             # Lower entropy and fewer sidelobes are better
-            entropy_score = 1.0 - (features["entropy"] / 10.0)
-            sidelobe_score = 1.0 - (features["sidelobe_count"] / len(guide_seq))
+            # Entropy normalization: divide by 10.0 based on empirical max entropy ~10 bits
+            # for typical guide sequences. Clip to ensure score stays in [0, 1].
+            entropy_score = np.clip(1.0 - (features["entropy"] / 10.0), 0.0, 1.0)
 
-            # GC content factor
+            # Sidelobe normalization: divide by sequence length as theoretical maximum
+            # Clip to prevent negative scores if sidelobe_count > len(guide_seq)
+            sidelobe_score = np.clip(1.0 - (features["sidelobe_count"] / len(guide_seq)), 0.0, 1.0)
+
+            # GC content factor (optimal ~40-60%)
             gc_content = (guide_seq.count("G") + guide_seq.count("C")) / len(guide_seq)
-            gc_score = 1.0 - abs(gc_content - 0.5) * 2
+            gc_score = np.clip(1.0 - abs(gc_content - 0.5) * 2, 0.0, 1.0)
 
             # Combine scores (similar weighting to original on-target score)
+            # All component scores are now guaranteed to be in [0, 1]
             combined_score = np.clip(
                 (entropy_score * 0.4 + sidelobe_score * 0.4 + gc_score * 0.2), 0, 1
             )
@@ -456,12 +467,12 @@ class CRISPRGuideDesigner:
                         guide_data.update(make_json_serializable(phase_weighted_data))
                         primary_score = guide_data["phase_weighted_score"]
                     except Exception as e:
-                        # Log error and fall back to comprehensive score
+                        # Log error and fall back to comprehensive score, then base score
                         import sys
                         print(f"Warning: Phase-weighted scoring failed for guide at position {guide_start}: {e}", file=sys.stderr)
-                        primary_score = score_data.get("comprehensive_score", score_data["base_score"])
+                        primary_score = score_data.get("comprehensive_score", score_data.get("base_score", 0.0))
                 else:
-                    primary_score = score_data.get("comprehensive_score", score_data["base_score"])
+                    primary_score = score_data.get("comprehensive_score", score_data.get("base_score", 0.0))
 
                 guide_data["primary_score"] = primary_score
 
