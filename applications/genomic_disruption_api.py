@@ -315,7 +315,17 @@ class DisruptionAnalyzer:
         
         Returns:
             List of designed guides with scores and positions
+        
+        Raises:
+            ValueError: If guide_length is out of valid range (17-24)
         """
+        # Validate guide length (typical CRISPR guide range)
+        if not (17 <= guide_length <= 24):
+            raise ValueError(
+                f"Invalid guide_length {guide_length}. "
+                f"Must be between 17 and 24 nucleotides."
+            )
+        
         # Validate target
         validate_dna_sequence(target_sequence, allow_rna=False)
         target_upper = target_sequence.upper()
@@ -408,6 +418,14 @@ class DisruptionAnalyzer:
                 spectral_distance = float(np.linalg.norm(guide_features - offtarget_features))
                 
                 # Compute Hamming distance (mismatches)
+                # Ensure sequences are same length for accurate comparison
+                if len(guide) != len(offtarget):
+                    logger.warning(
+                        f"Guide and off-target have different lengths: "
+                        f"{len(guide)} vs {len(offtarget)}, skipping"
+                    )
+                    continue
+                
                 mismatches = sum(g != o for g, o in zip(guide.upper(), offtarget.upper()))
                 
                 if mismatches <= mismatch_threshold:
@@ -462,8 +480,8 @@ class GenomicDisruptionAPI:
         """
         try:
             guide = request.get('guide')
-            if not guide:
-                return {'error': 'Missing required field: guide'}
+            if not guide or not isinstance(guide, str):
+                return {'error': 'Missing or invalid required field: guide (must be string)'}
             
             result = self.analyzer.score_guide(
                 guide=guide,
@@ -494,8 +512,8 @@ class GenomicDisruptionAPI:
         """
         try:
             guides = request.get('guides')
-            if not guides:
-                return {'error': 'Missing required field: guides'}
+            if not guides or not isinstance(guides, list):
+                return {'error': 'Missing or invalid required field: guides (must be list)'}
             
             results = self.analyzer.batch_score(
                 guides=guides,

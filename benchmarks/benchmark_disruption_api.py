@@ -96,20 +96,27 @@ def benchmark_single_guide(
     }
 
 
+# Default batch sizes for benchmarking
+DEFAULT_BATCH_SIZES = [10, 50, 100, 500, 1000]
+
+
 def benchmark_batch_processing(
     analyzer: DisruptionAnalyzer,
-    batch_sizes: List[int] = [10, 50, 100, 500, 1000],
+    batch_sizes: List[int] = None,
 ) -> Dict[str, Any]:
     """
     Benchmark batch processing throughput.
     
     Args:
         analyzer: DisruptionAnalyzer instance
-        batch_sizes: List of batch sizes to test
+        batch_sizes: List of batch sizes to test (default: DEFAULT_BATCH_SIZES)
     
     Returns:
         Dictionary with throughput statistics
     """
+    if batch_sizes is None:
+        batch_sizes = DEFAULT_BATCH_SIZES
+    
     results = {}
     
     for batch_size in batch_sizes:
@@ -286,7 +293,7 @@ def run_full_benchmark(
         print(f"    Avg latency: {result['avg_latency_ms']:.2f} ms/guide")
     
     # Check if largest batch meets target (1,000 guides/min)
-    largest_batch = batch_results[f'batch_{max([10, 50, 100, 500, 1000])}']
+    largest_batch = batch_results[f'batch_{max(DEFAULT_BATCH_SIZES)}']
     if largest_batch['throughput_guides_per_min'] >= 1000:
         print(f"  ✓ PASSED: Throughput ≥ 1,000 guides/min target")
     else:
