@@ -81,8 +81,6 @@ def test_density_calculation_smoke():
         print(f"  ✓ Actual boost ({results['actual_boost_pct']:.1f}%) << claimed (210%)")
     
     print("✓ Density calculation smoke test passed")
-    
-    return elapsed
 
 
 def main():
@@ -97,7 +95,7 @@ def main():
         test_moebius_function()
         test_prime_counting()
         test_riemann_R()
-        elapsed = test_density_calculation_smoke()
+        test_density_calculation_smoke()
         
         total_elapsed = time.time() - start_total
         
