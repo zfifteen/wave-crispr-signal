@@ -69,8 +69,6 @@ def mu(k: int) -> int:
             m //= p
             if m % p == 0:  # Squared factor detected
                 return 0
-        while m % p == 0:
-            m //= p
         p += 1 if p == 2 else 2
     
     if m > 1:
