@@ -35,6 +35,7 @@ results/
 /data/labs/
 /data/get_hg38/
 .snapshots
+experiments/*/results.json
 
 # Python cache
 __pycache__/
