@@ -305,7 +305,7 @@ class TestBaselineFunctions:
     
     def test_gc_content_mixed(self):
         """Mixed sequence should have correct GC content."""
-        # 10 GC, 10 AT = 50%
+        # 10 GC, 12 AT = 22 total, GC fraction = 10/22 ≈ 0.4545
         score = simple_gc_content("GCGCGCGCGCATATATATATAT")
         expected = 10 / 22
         assert abs(score - expected) < 0.01

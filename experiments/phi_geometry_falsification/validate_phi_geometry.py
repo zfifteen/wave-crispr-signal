@@ -209,14 +209,13 @@ def permutation_test(x: np.ndarray, y: np.ndarray,
     observed_r, _ = stats.pearsonr(x, y)
     
     rng = np.random.default_rng(seed)
-    perm_rs = []
+    perm_rs = np.zeros(n_permutations)
     
-    for _ in range(n_permutations):
+    for i in range(n_permutations):
         perm_y = rng.permutation(y)
         perm_r, _ = stats.pearsonr(x, perm_y)
-        perm_rs.append(perm_r)
+        perm_rs[i] = perm_r
     
-    perm_rs = np.array(perm_rs)
     # Two-sided p-value
     p_value = np.mean(np.abs(perm_rs) >= np.abs(observed_r))
     
