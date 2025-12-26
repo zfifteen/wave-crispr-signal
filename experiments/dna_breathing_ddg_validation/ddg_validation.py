@@ -29,6 +29,11 @@ from scipy import stats
 from scipy.fft import fft
 import warnings
 
+try:
+    from Bio import SeqIO
+except ImportError:
+    SeqIO = None
+
 # Add parent directories to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
@@ -397,7 +402,8 @@ def load_sequences(input_path: str, logger: logging.Logger) -> pd.DataFrame:
     if input_path.endswith('.csv'):
         df = pd.read_csv(input_path)
     elif input_path.endswith('.fasta'):
-        from Bio import SeqIO
+        if SeqIO is None:
+            raise ImportError("BioPython is required to read FASTA files. Install with: pip install biopython")
         records = []
         with open(input_path) as f:
             for record in SeqIO.parse(f, 'fasta'):
@@ -887,10 +893,12 @@ def generate_findings_report(output_dir: Path, config: Dict[str, Any],
         report += "| Bin | Center (bp/turn) | Width (%) | Feature | |d| | q-value | 95% CI |\n"
         report += "|-----|------------------|-----------|---------|-----|---------|--------|\n"
         
-        top_results = stats_df.nlargest(10, 'cohens_d', keep='all')
+        # Sort by absolute value of Cohen's d
+        stats_df['abs_cohens_d'] = stats_df['cohens_d'].abs()
+        top_results = stats_df.nlargest(10, 'abs_cohens_d', keep='all')
         for _, row in top_results.iterrows():
             ci_str = f"[{row['ci_lower']:.3f}, {row['ci_upper']:.3f}]"
-            report += f"| {row['bin']} | {row['center_bp']:.1f} | {int(row['width_pct']*100)} | {row['feature']} | {abs(row['cohens_d']):.3f} | {row['q_value']:.3f} | {ci_str} |\n"
+            report += f"| {row['bin']} | {row['center_bp']:.1f} | {int(row['width_pct']*100)} | {row['feature']} | {row['abs_cohens_d']:.3f} | {row['q_value']:.3f} | {ci_str} |\n"
         
         report += "\n"
     
