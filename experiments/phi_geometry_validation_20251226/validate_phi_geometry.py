@@ -85,9 +85,20 @@ def load_crispr_data(filepath: Path) -> Tuple[List[str], np.ndarray]:
         
     Returns:
         Tuple of (sequences, efficiencies)
+        
+    Raises:
+        FileNotFoundError: If the data file does not exist
     """
+    if not filepath.exists():
+        raise FileNotFoundError(
+            f"Dataset file not found: {filepath}\n"
+            f"Please ensure the data file exists at the specified path."
+        )
+    
     sequences = []
     efficiencies = []
+    total_rows = 0
+    skipped_rows = 0
     
     with open(filepath, 'r') as f:
         header = f.readline().strip().split(',')
@@ -95,6 +106,7 @@ def load_crispr_data(filepath: Path) -> Tuple[List[str], np.ndarray]:
         eff_idx = header.index('efficiency')
         
         for line in f:
+            total_rows += 1
             parts = line.strip().split(',')
             if len(parts) >= max(seq_idx, eff_idx) + 1:
                 seq = parts[seq_idx].strip().upper()
@@ -103,6 +115,16 @@ def load_crispr_data(filepath: Path) -> Tuple[List[str], np.ndarray]:
                 if all(c in 'ACGTN' for c in seq):
                     sequences.append(seq)
                     efficiencies.append(eff)
+                else:
+                    skipped_rows += 1
+            else:
+                skipped_rows += 1
+    
+    if skipped_rows > 0:
+        print(f"Warning: Skipped {skipped_rows}/{total_rows} rows due to invalid sequences or malformed data")
+    
+    if len(sequences) == 0:
+        raise ValueError("No valid sequences loaded from dataset")
     
     return sequences, np.array(efficiencies)
 
