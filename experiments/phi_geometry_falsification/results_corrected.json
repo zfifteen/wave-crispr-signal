@@ -1,0 +1,181 @@
+{
+  "metadata": {
+    "experiment": "phi_geometry_falsification",
+    "date": "2025-12-27T11:58:05.022695",
+    "seed": 42,
+    "n_bootstrap": 1000,
+    "n_permutations": 1000,
+    "data_file": "/home/runner/work/wave-crispr-signal/wave-crispr-signal/data/doench2016.csv",
+    "data_sha256": "6c2c38934aa771e74ecb42a7b477e0541694aba805ab5de529e87448416ec892",
+    "phi_constants": {
+      "phi": 1.618033988749895,
+      "dna_length_diameter_ratio": 1.6088,
+      "dna_major_minor_sep_ratio": 1.6407,
+      "dna_helical_period": 10
+    },
+    "n_sequences": 583,
+    "efficiency_range": [
+      0.38,
+      0.99
+    ]
+  },
+  "feature_results": {
+    "phi_phase": {
+      "pearson_r": -0.042868288917886126,
+      "pearson_p": 0.3014517078430649,
+      "ci_lower": -0.11387421646547799,
+      "ci_upper": 0.038011188730190645,
+      "permutation_p": 0.283,
+      "null_mean": -0.0014383688445827863,
+      "null_std": 0.040044962283497444,
+      "partial_r_gc": -0.05755766628580331
+    },
+    "phi_curvature": {
+      "pearson_r": 0.14675243340027241,
+      "pearson_p": 0.0003778994624115236,
+      "ci_lower": 0.04998628479715031,
+      "ci_upper": 0.2435809932676637,
+      "permutation_p": 0.001,
+      "null_mean": 0.0008660398453648026,
+      "null_std": 0.041978617530915176,
+      "partial_r_gc": 0.24518736904378058
+    },
+    "phi_combined": {
+      "pearson_r": 0.10358178303431938,
+      "pearson_p": 0.012335816252228958,
+      "ci_lower": -0.002319857324621472,
+      "ci_upper": 0.20361637324804632,
+      "permutation_p": 0.012,
+      "null_mean": 0.0008578012668153776,
+      "null_std": 0.04190387739238585,
+      "partial_r_gc": 0.200373933314136
+    },
+    "uniform_phase": {
+      "pearson_r": 0.0,
+      "pearson_p": 1.0,
+      "ci_lower": 0.0,
+      "ci_upper": 0.0,
+      "permutation_p": 1.0,
+      "null_mean": 0.0,
+      "null_std": 0.0,
+      "partial_r_gc": 0.0,
+      "skipped": true,
+      "reason": "constant value (no variance)"
+    },
+    "random_phase": {
+      "pearson_r": -0.011184506162461881,
+      "pearson_p": 0.7875579190579398,
+      "ci_lower": -0.09555351175169947,
+      "ci_upper": 0.07101883664860943,
+      "permutation_p": 0.794,
+      "null_mean": -0.002320305409794679,
+      "null_std": 0.042738042813401315,
+      "partial_r_gc": -0.06253927287615932
+    },
+    "gc_content": {
+      "pearson_r": 0.7093947192667315,
+      "pearson_p": 2.5027483335082555e-90,
+      "ci_lower": 0.6646060361019928,
+      "ci_upper": 0.7488643395267268,
+      "permutation_p": 0.0,
+      "null_mean": 0.00213245405887812,
+      "null_std": 0.04113639260919303,
+      "partial_r_gc": 0.7093947192667315
+    },
+    "pairwise_comparisons": {
+      "phi_phase_vs_uniform_phase": {
+        "phi_r": -0.042868288917886126,
+        "baseline_r": 0.0,
+        "phi_abs_r": 0.042868288917886126,
+        "baseline_abs_r": 0.0,
+        "phi_advantage": 0.042868288917886126,
+        "phi_better": true
+      },
+      "phi_phase_vs_random_phase": {
+        "phi_r": -0.042868288917886126,
+        "baseline_r": -0.011184506162461881,
+        "phi_abs_r": 0.042868288917886126,
+        "baseline_abs_r": 0.011184506162461881,
+        "phi_advantage": 0.031683782755424245,
+        "phi_better": true
+      },
+      "phi_phase_vs_gc_content": {
+        "phi_r": -0.042868288917886126,
+        "baseline_r": 0.7093947192667315,
+        "phi_abs_r": 0.042868288917886126,
+        "baseline_abs_r": 0.7093947192667315,
+        "phi_advantage": -0.6665264303488454,
+        "phi_better": false
+      },
+      "phi_curvature_vs_uniform_phase": {
+        "phi_r": 0.14675243340027241,
+        "baseline_r": 0.0,
+        "phi_abs_r": 0.14675243340027241,
+        "baseline_abs_r": 0.0,
+        "phi_advantage": 0.14675243340027241,
+        "phi_better": true
+      },
+      "phi_curvature_vs_random_phase": {
+        "phi_r": 0.14675243340027241,
+        "baseline_r": -0.011184506162461881,
+        "phi_abs_r": 0.14675243340027241,
+        "baseline_abs_r": 0.011184506162461881,
+        "phi_advantage": 0.13556792723781053,
+        "phi_better": true
+      },
+      "phi_curvature_vs_gc_content": {
+        "phi_r": 0.14675243340027241,
+        "baseline_r": 0.7093947192667315,
+        "phi_abs_r": 0.14675243340027241,
+        "baseline_abs_r": 0.7093947192667315,
+        "phi_advantage": -0.562642285866459,
+        "phi_better": false
+      },
+      "phi_combined_vs_uniform_phase": {
+        "phi_r": 0.10358178303431938,
+        "baseline_r": 0.0,
+        "phi_abs_r": 0.10358178303431938,
+        "baseline_abs_r": 0.0,
+        "phi_advantage": 0.10358178303431938,
+        "phi_better": true
+      },
+      "phi_combined_vs_random_phase": {
+        "phi_r": 0.10358178303431938,
+        "baseline_r": -0.011184506162461881,
+        "phi_abs_r": 0.10358178303431938,
+        "baseline_abs_r": 0.011184506162461881,
+        "phi_advantage": 0.0923972768718575,
+        "phi_better": true
+      },
+      "phi_combined_vs_gc_content": {
+        "phi_r": 0.10358178303431938,
+        "baseline_r": 0.7093947192667315,
+        "phi_abs_r": 0.10358178303431938,
+        "baseline_abs_r": 0.7093947192667315,
+        "phi_advantage": -0.6058129362324121,
+        "phi_better": false
+      }
+    }
+  },
+  "falsification": {
+    "hypothesis_falsified": false,
+    "criterion_1": {
+      "description": "\u03c6-features show weak correlation (|r| < 0.1)",
+      "met": false,
+      "max_phi_r": 0.14675243340027241
+    },
+    "criterion_2": {
+      "description": "\u03c6-features do NOT outperform baselines",
+      "met": false,
+      "phi_wins": 6,
+      "total_comparisons": 9
+    },
+    "criterion_3": {
+      "description": "\u03c6-correlations are NOT significant (p > 0.05)",
+      "met": false,
+      "min_phi_p": 0.001
+    },
+    "conclusion": "HYPOTHESIS NOT FALSIFIED: \u03c6-geometry features show some predictive signal."
+  },
+  "runtime_seconds": 2.395777
+}
