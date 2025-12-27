@@ -274,8 +274,12 @@ def phi_phase_score(seq: str,
     Compute φ-phase alignment score for a DNA sequence.
     
     Measures how well the sequence's positional φ-phases align with a 
-    target phase, indicating structural compatibility with canonical
-    B-DNA φ-geometry.
+    target phase, weighted by sequence-specific structural properties.
+    
+    SEQUENCE-DEPENDENT: This function now incorporates nucleotide properties
+    (purine/pyrimidine status) to ensure it varies with sequence content,
+    not just length. Purines (A/G) and pyrimidines (C/T) have different
+    stacking energies and structural properties in B-DNA.
     
     Args:
         seq: DNA sequence string
@@ -283,7 +287,7 @@ def phi_phase_score(seq: str,
         period: Helical period (default: 10)
         
     Returns:
-        Score in [0, 1], higher = better phase alignment
+        Score in [0, 1], higher = better weighted phase alignment
     """
     seq = validate_dna_sequence(seq)
     n = len(seq)
@@ -295,13 +299,26 @@ def phi_phase_score(seq: str,
     indices = np.arange(n)
     phases = dna_phi_phase_vectorized(indices, period)
     
+    # CRITICAL FIX: Weight by sequence-specific properties
+    # Purines (A/G) vs Pyrimidines (C/T) have different structural impacts
+    # Purines: larger, stronger stacking → weight = 1.2
+    # Pyrimidines: smaller, weaker stacking → weight = 0.8
+    # N (ambiguous): neutral weight = 1.0
+    weights = np.array([
+        1.2 if base in 'AG' else (0.8 if base in 'CT' else 1.0)
+        for base in seq
+    ], dtype=np.float64)
+    
+    # Normalize weights to preserve scale
+    weights = weights / np.mean(weights)
+    
     # Compute circular distance from target phase
-    # Using cosine similarity on unit circle
+    # Using weighted cosine similarity on unit circle
     phase_diffs = 2 * np.pi * (phases - target_phase)
-    alignment = np.mean(np.cos(phase_diffs))
+    weighted_alignment = np.sum(weights * np.cos(phase_diffs)) / np.sum(weights)
     
     # Normalize to [0, 1]
-    score = (alignment + 1.0) / 2.0
+    score = (weighted_alignment + 1.0) / 2.0
     
     return float(score)
 
