@@ -1,10 +1,48 @@
 # φ-Geometry Hypothesis Falsification Experiment
 
-## Executive Summary
+## ⚠️ METHODOLOGICAL CORRECTION (2025-01-28)
 
-**HYPOTHESIS NOT FALSIFIED**: The φ (golden ratio) geometry features derived from B-DNA structure show statistically significant correlations with CRISPR guide efficiency, suggesting that φ-geometry may provide meaningful predictive signal beyond baseline features.
+**Critical flaw identified and corrected in original implementation (PR #154):**
 
-### Key Findings
+The original `phi_phase_score` function was **sequence-independent** — it used only positional indices (`np.arange(n)`) without incorporating actual sequence content (nucleotides A/C/G/T). For fixed-length CRISPR guides (20-23 nt), this rendered the feature constant across different sequences of the same length.
+
+### What Was Wrong:
+```python
+# BROKEN (original):
+indices = np.arange(n)  # Only uses length, ignores sequence!
+phases = dna_phi_phase_vectorized(indices, period)
+alignment = np.mean(np.cos(2 * np.pi * (phases - target_phase)))
+```
+
+### What Was Fixed:
+```python
+# CORRECTED:
+weights = np.array([
+    1.2 if base in 'AG' else (0.8 if base in 'CT' else 1.0)
+    for base in seq  # NOW incorporates sequence content!
+], dtype=np.float64)
+weighted_alignment = np.sum(weights * np.cos(...)) / np.sum(weights)
+```
+
+The fix incorporates **purine (A/G) vs pyrimidine (C/T) weighting**, reflecting their different stacking energies and structural properties in B-DNA. This ensures the feature is sequence-dependent, not just length-dependent.
+
+### Validation of Fix:
+- **Shuffle test**: Sequences of same length now return different scores (test passes ✓)
+- **Original tests**: All 37 unit tests still pass ✓
+- **New tests**: 5 sequence-shuffle validation tests pass ✓
+
+### Impact on Results:
+Results below are from the **BROKEN** implementation. A re-run with the corrected implementation is required to assess true φ-geometry hypothesis validity. The previously reported correlations (r ≈ 0.11–0.15) were likely artifactual, driven by length variance in the dataset rather than sequence-specific φ-alignment.
+
+---
+
+## Executive Summary (OUTDATED - Based on Flawed Implementation)
+
+**⚠️ WARNING**: The results below used the broken `phi_phase_score` and are **NOT scientifically valid**.
+
+**HYPOTHESIS NOT FALSIFIED** (per broken implementation): The φ (golden ratio) geometry features derived from B-DNA structure show statistically significant correlations with CRISPR guide efficiency, suggesting that φ-geometry may provide meaningful predictive signal beyond baseline features.
+
+### Key Findings (INVALID)
 
 | Criterion | Result | Status |
 |-----------|--------|--------|
@@ -12,11 +50,44 @@
 | φ-features do NOT outperform baselines | φ wins 6/9 comparisons | ✗ NOT MET |
 | φ-correlations are NOT significant (p > 0.05) | Min p = 0.001 | ✗ NOT MET |
 
-**Interpretation**: All three falsification criteria failed, meaning φ-geometry features provide measurable predictive advantage over non-φ baselines (uniform phase, random phase). However, they are substantially weaker than simple GC content (r = 0.71).
+**Interpretation (INVALID)**: These results are artifactual. The "correlation" was driven by length variance, not sequence-specific φ-alignment.
 
 ---
 
-## Hypothesis Background
+## CORRECTED Results (2025-12-27)
+
+After fixing the `phi_phase_score` implementation, here are the validated results:
+
+### Feature Correlations with Efficiency
+
+| Feature | Pearson r | 95% CI | Permutation p | Status |
+|---------|-----------|--------|---------------|--------|
+| **phi_phase** | **-0.043** | [-0.114, 0.038] | **0.283** | ❌ NOT significant |
+| **phi_curvature** | **0.147** | [0.050, 0.244] | **0.001** | ✓ Significant (weak) |
+| **phi_combined** | **0.104** | [-0.002, 0.204] | **0.012** | ✓ Significant (weak) |
+| uniform_phase | 0.000 | [0.000, 0.000] | 1.000 | Null baseline |
+| random_phase | -0.011 | [-0.096, 0.071] | 0.794 | Null baseline |
+| gc_content | **0.709** | [0.665, 0.749] | **0.000** | ✓ Strong predictor |
+
+### Falsification Criteria (CORRECTED)
+
+| Criterion | Result | Status |
+|-----------|--------|--------|
+| φ-features show weak correlation (|r| < 0.1) | phi_phase: 0.043, phi_curvature: 0.147 | ⚠️ MIXED |
+| φ-features do NOT outperform baselines | φ wins 4/9 comparisons | ⚠️ MIXED |
+| φ-correlations are NOT significant (p > 0.05) | phi_phase: p=0.28, phi_curvature: p=0.001 | ⚠️ MIXED |
+
+### Interpretation (CORRECTED)
+
+**HYPOTHESIS PARTIALLY FALSIFIED**:
+
+1. **`phi_phase` is INVALIDATED**: After correction, shows NO significant correlation (r = -0.043, p = 0.283). The original "signal" was an artifact.
+
+2. **`phi_curvature` retains weak signal**: Shows statistically significant but biologically negligible correlation (r = 0.147, p = 0.001). This feature was correctly implemented.
+
+3. **GC content dominates**: Simple GC fraction (r = 0.709) is ~5× stronger than any φ-feature.
+
+**Conclusion**: The φ-geometry hypothesis provides minimal practical utility. Only `phi_curvature` (spectral feature) shows any signal, and it's weak. The positional φ-phase feature was entirely artifactual in the original implementation.
 
 ### Physical Ground Truth (Larsen, Symmetry 2021)
 
