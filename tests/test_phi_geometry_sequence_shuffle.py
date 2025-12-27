@@ -14,6 +14,7 @@ import pytest
 import numpy as np
 import sys
 from pathlib import Path
+from scipy.stats import pearsonr
 
 # Add repo root to path
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -24,6 +25,11 @@ from wave_crispr_signal.features.phi_geometry import (
     phi_curvature_score,
     compute_phi_features,
 )
+
+# Test constants
+SEED_ORIGINAL = 42
+SEED_SHUFFLE = 99
+MIN_SCORE_CHANGE_THRESHOLD = 0.001  # Minimum mean score change to confirm sequence-dependence
 
 
 class TestSequenceShuffleValidation:
@@ -100,7 +106,7 @@ class TestSequenceShuffleValidation:
         may be modest since purine/pyrimidine weighting is a subtle effect.
         """
         # Synthetic data: sequences with efficiency labels
-        np.random.seed(42)
+        np.random.seed(SEED_ORIGINAL)
         
         sequences_original = [
             "ATCGATCGATCGATCGATCG",
@@ -114,11 +120,10 @@ class TestSequenceShuffleValidation:
         
         # Compute original correlation
         scores_original = np.array([phi_phase_score(s) for s in sequences_original])
-        from scipy.stats import pearsonr
         r_original, _ = pearsonr(scores_original, efficiencies)
         
         # Shuffle sequences (preserving length distribution)
-        np.random.seed(99)  # Different seed for shuffle
+        np.random.seed(SEED_SHUFFLE)  # Different seed for shuffle to avoid correlation
         sequences_shuffled = [
             ''.join(np.random.permutation(list(seq))) 
             for seq in sequences_original
@@ -128,16 +133,13 @@ class TestSequenceShuffleValidation:
         scores_shuffled = np.array([phi_phase_score(s) for s in sequences_shuffled])
         r_shuffled, _ = pearsonr(scores_shuffled, efficiencies)
         
-        # If feature is sequence-dependent, correlation should change
-        # We use a lower threshold (0.01) because purine/pyrimidine weighting
+        # If feature is sequence-dependent, scores should change after shuffle
+        # We use a conservative threshold since purine/pyrimidine weighting
         # is a subtle effect, but it should still cause SOME change
-        delta_r = abs(r_original - r_shuffled)
-        
-        # More importantly, verify that scores themselves changed
         score_changes = np.abs(scores_original - scores_shuffled)
         mean_score_change = np.mean(score_changes)
         
-        assert mean_score_change > 0.001, (
+        assert mean_score_change > MIN_SCORE_CHANGE_THRESHOLD, (
             f"Scores did not change after shuffle (mean change = {mean_score_change:.6f}). "
             f"This indicates phi_phase is still sequence-independent."
         )
