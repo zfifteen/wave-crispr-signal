@@ -1,0 +1,338 @@
+# Spectral Signal Routing Hypothesis 1 Falsification Experiment Manifest
+# Experiment metadata and provenance tracking
+
+version: "1.0.0"
+created: "2026-01-14"
+repository: "zfifteen/wave-crispr-signal"
+experiment_id: "spectral_signal_routing_fft_cluster_pr_174_2026_01_14"
+
+# Experiment metadata
+experiment:
+  name: "Spectral Signal Routing via FFT-Compatible Clustering"
+  description: |
+    Falsification experiment for Hypothesis 1 (H1-strong): spectral channels in 
+    Emergent Doom Engine substrate are (a) task-linked, (b) routing-like, and 
+    (c) causally necessary for high performance.
+    
+    Key features:
+    - FFT-based spectral analysis of EDE cell-state trajectories
+    - Three condition families: A (performance), B (controls), C (interventions)
+    - Operational channel definition (elevated magnitude + reproducibility)
+    - Phase-scrambled and IID controls for specificity testing
+    - Spectral knock-out interventions for causal necessity testing
+  
+  status: "design_complete"
+  pr_number: 174
+  associated_branch: "feat-sat-clustering"
+  
+  components:
+    - name: "TECH_SPEC"
+      file: "TECH_SPEC.md"
+      description: "Authoritative technical design specification"
+    
+    - name: "TODO_IMPLEMENTATION"
+      file: "TODO_IMPLEMENTATION.md"
+      description: "Implementation checklist and status tracking"
+    
+    - name: "experiment_specification"
+      file: "experiment_specification.json"
+      description: "Machine-readable configuration (to be populated)"
+    
+    - name: "notes"
+      directory: "notes/"
+      description: "Optional design notes and scratchpad"
+
+# Hypothesis articulation
+hypothesis:
+  statement: >
+    Local update rules on the Emergent Doom Engine substrate produce cell-state 
+    trajectories that, when viewed in the frequency domain, exhibit structured 
+    spectral channels that can be interpreted as routing pathways for 
+    task-relevant information.
+  
+  strong_form: >
+    H1-strong: For appropriately chosen tasks and substrates in the Emergent Doom 
+    Engine, successful problem-solving runs will reliably exhibit non-trivial, 
+    stable spectral channels (distinct peaks or bands) that (a) are absent or 
+    strongly attenuated in matched non-solving controls, and (b) are causally 
+    necessary for maintaining high task performance.
+  
+  key_properties:
+    - property: "Task-linked"
+      description: "Meaningfully associated with successful problem solving"
+    - property: "Routing-like"
+      description: "Information flows along identifiable spectral channels"
+    - property: "Causally necessary"
+      description: "Channels required for maintaining high performance"
+
+# Falsification criteria
+falsification_criteria:
+  criterion_1:
+    name: "Existence/Distinctiveness"
+    description: "A1 vs A2: successful runs exhibit spectral structure systematically different from unsuccessful runs"
+    null_hypothesis: "No robust differences in spectral features between A1 and A2"
+    evidence_against_h1: "No consistent differences beyond negligible effect thresholds"
+    
+  criterion_2:
+    name: "Stability/Consistency"
+    description: "Channels are stable over time and reproducible across runs"
+    null_hypothesis: "Apparent channels are transient artifacts"
+    evidence_against_h1: "Channels lack reproducibility or temporal stability"
+    
+  criterion_3:
+    name: "Specificity"
+    description: "B1 vs B2/B3: channels specific to structured dynamics vs controls"
+    null_hypothesis: "Channels indistinguishable from phase-scrambled or IID controls"
+    evidence_against_h1: "B1 features do not differ from B2/B3 under same detection rules"
+    
+  criterion_4:
+    name: "Causal Necessity"
+    description: "C1 vs C2 vs C3: spectral knock-out degrades performance"
+    null_hypothesis: "C2 does not degrade performance more than C3"
+    evidence_against_h1: "Performance unchanged or C3 degrades more than C2"
+
+# Experimental design
+design:
+  substrate: "Emergent Doom Engine (Java)"
+  task_class: "EDE-integrated with binary success/failure criterion"
+  
+  condition_families:
+    family_a:
+      name: "High-Performance vs Low-Performance"
+      conditions:
+        - id: "A1"
+          name: "High-Performance"
+          description: "Runs meeting success criterion within T_max"
+        - id: "A2"
+          name: "Low-Performance"
+          description: "Runs failing success criterion (same macro-parameters)"
+      
+    family_b:
+      name: "Structured vs Randomized Controls"
+      conditions:
+        - id: "B1"
+          name: "Structured Dynamics"
+          description: "Same as A1/A2, analyzed under same FFT pipeline"
+        - id: "B2"
+          name: "Phase-Scrambled"
+          description: "Phase randomization preserving power spectrum"
+        - id: "B3"
+          name: "IID Random"
+          description: "IID sampling from empirical marginals"
+      
+    family_c:
+      name: "Spectral Disruption Interventions"
+      conditions:
+        - id: "C1"
+          name: "Baseline Replay"
+          description: "Deterministic replay without perturbation"
+        - id: "C2"
+          name: "Spectral Knock-Out"
+          description: "Targeted spectral band attenuation/removal"
+        - id: "C3"
+          name: "Non-Spectral Perturbation"
+          description: "Broad-spectrum noise matching C2 variance"
+
+# Time series and observables
+observables:
+  cell_level:
+    - "Strategy/behavior ID (integer-encoded)"
+    - "Local fitness or error proxy"
+    - "Energy or other task-relevant scalars"
+  
+  global_level:
+    - "Task-level metrics (best score, constraint satisfaction)"
+    - "Aggregations (mean, variance across cells)"
+    - "Front band aggregations"
+  
+  time_series_types:
+    - name: "x_task(t)"
+      description: "Task progress per step"
+    - name: "x_global(t)"
+      description: "Global field aggregations"
+    - name: "x_cell_region(k,t)"
+      description: "Spatially localized series (front band, clusters, random)"
+
+# Spectral analysis pipeline
+spectral_analysis:
+  preprocessing:
+    - step: "Window segmentation"
+      parameters: ["T_window", "T_stride"]
+    - step: "Detrending (optional)"
+      methods: ["mean subtraction", "linear fit"]
+    - step: "Tapering"
+      window_functions: ["Hann", "Hamming", "Blackman"]
+    - step: "Normalization"
+      methods: ["z-score", "unit variance"]
+  
+  fft_computation:
+    outputs:
+      - "Magnitude spectrum |X(f)|"
+      - "Phase spectrum arg(X(f))"
+  
+  channel_definition:
+    description: "Operational definition to avoid post-hoc re-interpretation"
+    criteria:
+      - name: "Elevated magnitude"
+        description: "Band average exceeds baseline by pre-specified margin"
+      - name: "Reproducibility"
+        description: "Same band detected across multiple windows/runs"
+    thresholds:
+      note: "To be specified during implementation and fixed before labeling"
+  
+  run_level_features:
+    channel_counts:
+      - "Number of channels detected"
+      - "Distribution across frequency ranges (low/mid/high)"
+    channel_strength:
+      - "Mean channel magnitude or energy"
+      - "Maximum channel magnitude"
+    stability:
+      - "Fraction of windows containing channels"
+      - "Run-level continuity measures"
+    control_metrics:
+      - "Total spectral energy"
+      - "Low-vs-high frequency energy ratios"
+      - "Spectral centroid and shape descriptors"
+
+# Scientific gates enforcement
+gates:
+  no_fabrication:
+    description: "No fabricated metrics, p-values, or effect sizes"
+    enforced: true
+    implementation: "All parameters justified from data or fixed a priori"
+    
+  pre_registration:
+    description: "Analysis parameters fixed before success/failure labeling"
+    enforced: true
+    implementation: "Channel thresholds, windowing, etc. in config before analysis"
+    
+  fail_fast:
+    description: "Immediate validation with clear error messages"
+    enforced: true
+    implementation: "ValueError on invalid input or configuration"
+    
+  reproducibility:
+    description: "Fixed seeds, SHA256 checksums, environment capture"
+    enforced: true
+    required_flags: ["--seed", "--task", "--output"]
+    metadata_capture:
+      - "git_commit_hash"
+      - "timestamp"
+      - "pip_freeze"
+      - "dataset_checksums_sha256"
+      - "configuration_hash"
+    
+  scope_control:
+    description: "Work traceable to H1-strong or reusable FFT infrastructure"
+    enforced: true
+    implementation: "New ideas flagged if not mappable to spec or EDE_PM_INSTRUCTIONS"
+
+# Emergent Doom Engine context
+emergent_doom_engine:
+  interpretation:
+    doom: "Inevitable convergence toward target state"
+    spectral_channels: "Emergent 'doom pathways' in frequency space"
+    
+  alignment:
+    purpose: "Test whether spectral doom pathways are present and necessary"
+    infrastructure: "Reusable FFT-compatible analysis harness for EDE tasks"
+    
+  scope:
+    - "Evaluate H1-strong for spectral signal routing"
+    - "No changes to core substrate semantics at design level"
+    - "Applicable to factorization, SAT, and future EDE tasks"
+
+# Datasets (to be determined)
+datasets:
+  ede_task_data:
+    name: "TO_BE_DETERMINED"
+    description: "Runs from selected EDE task"
+    species: "N/A (computational substrate)"
+    validation_metrics: []
+    status: "pending_task_selection"
+
+# CLI usage (to be implemented)
+cli:
+  note: "Commands to be defined during implementation"
+  expected_pattern: |
+    python run_spectral_experiment.py \
+      --task <task_name> \
+      --condition <A1|A2|B1|B2|B3|C1|C2|C3> \
+      --seed <seed> \
+      --output results/<exp_id>/run-<timestamp>/
+
+# Results structure
+results:
+  directory: "results/spectral_signal_routing_fft_cluster_pr_174_2026_01_14"
+  
+  run_structure:
+    pattern: "run-YYYYMMDD-HHMMSS"
+    files:
+      - "results.json"
+      - "results.csv"
+      - "summary.json"
+      - "env.txt"
+      - "log.txt"
+  
+  required_metadata:
+    - "seed"
+    - "git_commit"
+    - "task_name"
+    - "condition_id"
+    - "dataset_sha256"
+    - "runtime_seconds"
+    - "pip_freeze"
+    - "timestamp"
+
+# Reproducibility
+reproducibility:
+  python_version: "3.12+"
+  java_version: "TO_BE_DETERMINED (for EDE substrate)"
+  dependencies: "../../../requirements.txt"
+  
+  environment_capture:
+    - "git rev-parse HEAD"
+    - "pip freeze > env.txt"
+    - "date -u +%Y-%m-%dT%H:%M:%SZ"
+  
+  validation:
+    - "Smoke test with synthetic/minimal data (< 5s)"
+    - "Unit tests for spectral analysis components"
+    - "Integration test end-to-end"
+
+# CI integration (future)
+ci:
+  smoke_test:
+    command: "TO_BE_IMPLEMENTED"
+    target_time: "< 5s"
+    
+  unit_tests:
+    command: "TO_BE_IMPLEMENTED"
+    coverage_target: "> 70%"
+
+# License and citation
+license: "MIT"
+
+citation: |
+  If using this experiment, please cite:
+  - zfifteen/wave-crispr-signal repository
+  - Emergent Doom Engine framework
+  - PR #174 (SAT clustering experiment)
+
+# Contact
+contact:
+  owner: "Dionisio Alberto Lopez III (zfifteen)"
+  issues: "https://github.com/zfifteen/wave-crispr-signal/issues"
+  tags: ["spectral-routing", "fft-analysis", "emergent-doom-engine", "falsification"]
+
+# Project management snapshot
+pm_snapshot:
+  high_level_goal: "Evaluate and falsify spectral signal routing claims on EDE substrates"
+  current_sub_goal: "Establish repository-integrated experiment spec and folder structure"
+  you_are_here: "Design and skeleton complete; implementation pending"
+  next_steps:
+    - "Select EDE task (TODO_IMPLEMENTATION Section 1)"
+    - "Implement trace recorder (TODO_IMPLEMENTATION Section 2)"
+    - "Define and extract time series (TODO_IMPLEMENTATION Section 3)"
+    - "Build spectral analysis harness (TODO_IMPLEMENTATION Section 4)"
