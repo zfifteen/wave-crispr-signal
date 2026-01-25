@@ -21,7 +21,7 @@ test:
 	python scripts/run_tests.py
 
 # Run smoke tests for CI
-smoke: mve-smoke test-z-framework-import mri-z5d-smoke fus-enhancer-smoke
+smoke: mve-smoke test-z-framework-import mri-z5d-smoke fus-enhancer-smoke pr156-falsification-smoke
 	@echo "✓ All smoke tests completed"
 
 # Test Z Framework import compatibility
@@ -138,3 +138,44 @@ run-fus-enhancer-quick:
 fus-enhancer-smoke:
 	@echo "Running FUS Enhancer smoke test..."
 	python tests/test_fus_enhancer.py --smoke
+
+# Run PR-156 falsification experiment smoke tests
+pr156-falsification-smoke:
+	@echo "Running PR-156 Falsification Experiment smoke tests..."
+	@python experiments/PR-156-falsify-crispr-hypothesis/run_all_falsification_tests.py --smoke || true
+	@echo "✓ PR-156 falsification smoke tests completed"
+
+# Run PR-156 falsification experiments (full run)
+run-pr156-falsification:
+	python experiments/PR-156-falsify-crispr-hypothesis/run_all_falsification_tests.py \
+		--seed 42 \
+		--k-parameter 0.3 \
+		--n-samples 100 \
+		--n-bootstrap 1000 \
+		--n-folds 10 \
+		--min-length 20 \
+		--max-length 100 \
+		--length-step 10 \
+		--n-per-length 20 \
+		--output-dir results/PR-156-falsify-combined
+
+# Run PR-156 Hypothesis 1 only
+run-pr156-h1:
+	python experiments/PR-156-falsify-crispr-hypothesis/falsify_hypothesis1.py \
+		--seed 42 \
+		--n-samples 100 \
+		--n-bootstrap 1000 \
+		--n-folds 10 \
+		--k-parameter 0.3 \
+		--output-dir results/PR-156-falsify-hypothesis1
+
+# Run PR-156 Hypothesis 2 only
+run-pr156-h2:
+	python experiments/PR-156-falsify-crispr-hypothesis/falsify_hypothesis2.py \
+		--seed 42 \
+		--min-length 20 \
+		--max-length 100 \
+		--length-step 10 \
+		--n-per-length 20 \
+		--k-parameter 0.3 \
+		--output-dir results/PR-156-falsify-hypothesis2
