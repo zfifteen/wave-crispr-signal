@@ -52,6 +52,49 @@ python bin/bin_resonance_test.py \
 
 ---
 
+## 🔬 Falsification Experiments
+
+**PR-156: Falsification Testing for θ′(n,k) and κ(n) Hypotheses**
+
+This experiment rigorously tests two key claims about the Z Framework:
+
+1. **Hypothesis 1**: θ′(n,k) with k≈0.3 improves CRISPR guide efficiency prediction by ΔROC-AUC +0.047 over baselines
+2. **Hypothesis 2**: κ(n) = d(n)·ln(n+1)/e² creates a Z-invariant scoring abstraction for variable-length sequences
+
+**Quick smoke test** (<5 seconds):
+
+```bash
+make pr156-falsification-smoke
+```
+
+**Full falsification run** (~5 minutes):
+
+```bash
+make run-pr156-falsification
+```
+
+**Run individual hypotheses**:
+
+```bash
+# Hypothesis 1: ROC-AUC comparison
+make run-pr156-h1
+
+# Hypothesis 2: Z-invariance testing
+make run-pr156-h2
+```
+
+**What gets tested**:
+- Spectral features vs baseline features (GC content, length)
+- 10-fold cross-validation with bootstrap CI
+- ANOVA for length invariance
+- Autocorrelation for emergent periodicity
+
+**Results**: JSON reports saved to `results/PR-156-falsify-*/`
+
+See [`experiments/PR-156-falsify-crispr-hypothesis/README.md`](experiments/PR-156-falsify-crispr-hypothesis/README.md) for detailed documentation.
+
+---
+
 ## 🧬 Overview
 
 This framework encodes DNA as a **complex waveform** and interrogates it with FFT-based metrics plus geodesic curvature weighting. Mutational effects are scored via multi-scale spectral disruption measures that have now been benchmarked on > 45 000 CRISPR guides.
