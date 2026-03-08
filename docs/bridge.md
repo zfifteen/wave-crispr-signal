@@ -1,5 +1,11 @@
 # Bridge API Documentation
 
+> [!NOTE]
+> **Archival Reference (Non-Blocking)**
+> This document is retained for historical context and may reference deprecated policy, testing, or CI workflows.
+> It is non-authoritative for current development decisions.
+> Use `docs/INDEX.md` and `docs/CONTRIBUTING.md` for current workflow.
+
 ## Overview
 
 The bridge module provides implementations of geometric resolution (θ′) and curvature (κ) features for CRISPR guide scoring. These features emerge from the geodesic-topological bridge connecting discrete sequence space to topological structures.

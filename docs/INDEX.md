@@ -2,11 +2,9 @@
 
 This is the canonical documentation index for the active CRISPR scope.
 
-## Core
+## Active Guidance
 
 - `WAVE_CRISPR_SIGNAL_TLDR.md` - project overview and intent.
-- `PHASE_WEIGHTED_SCORECARD.md` - phase-weighted scoring method.
-- `FFT_GOLDEN_RATIO_CRISPR.md` - FFT and phase-weighting details.
 - `TOPOLOGICAL_ANALYSIS.md` - topology bridge and analysis notes.
 - `REPRODUCIBILITY_VALIDATION.md` - reproducibility guidance.
 - `INVARIANT_FEATURES.md` - invariant feature definitions.
@@ -22,3 +20,7 @@ This is the canonical documentation index for the active CRISPR scope.
 
 - Validation is change-scoped: add tests or manual validation steps only for the behavior you change.
 - CI is intentionally absent during reset and will be reintroduced later as a minimal gate.
+
+## Historical Reference
+
+- `ARCHIVE_INDEX.md` - archival document map (non-authoritative, non-blocking).

@@ -7,9 +7,10 @@ This repository uses a reset workflow: testing and validation are introduced per
 1. Install dependencies: `pip install -r requirements.txt`
 2. Create a branch for your change.
 3. Implement the change.
-4. Add change-coupled validation:
-   - unit/integration test when behavior is stable and testable, or
-   - explicit manual validation steps for exploratory work.
+4. Add change-coupled validation (default):
+   - one targeted unit/integration test for the behavior changed, and
+   - one manual verification command with observed outcome.
+   - if automated testing is not appropriate, state that explicitly in the PR.
 
 ## Contribution Rules
 
@@ -21,6 +22,7 @@ This repository uses a reset workflow: testing and validation are introduced per
 ## Validation Contract
 
 For each PR, include the exact validation you ran for that change.
+Default expectation for behavior changes: targeted automated test + manual check.
 
 Examples:
 

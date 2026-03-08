@@ -13,6 +13,7 @@ Describe what changed and why.
 ## Validation Performed
 
 List exactly what you ran for this change.
+Default for behavior changes: one targeted automated test and one manual verification check.
 
 - [ ] Targeted automated test(s)
 - [ ] Manual validation

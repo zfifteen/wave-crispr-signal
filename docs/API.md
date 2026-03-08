@@ -1,5 +1,11 @@
 # Genomic Disruption Analyzer API Documentation
 
+> [!NOTE]
+> **Archival Reference (Non-Blocking)**
+> This document is retained for historical context and may reference deprecated policy, testing, or CI workflows.
+> It is non-authoritative for current development decisions.
+> Use `docs/INDEX.md` and `docs/CONTRIBUTING.md` for current workflow.
+
 ## Overview
 
 The Genomic Disruption Analyzer provides a REST API for CRISPR guide RNA design, scoring, and off-target profiling using FFT-encoded DNA waveforms with θ′(n,k) phase weighting (k≈0.3).
