@@ -1,0 +1,105 @@
+experiment:
+  id: phi_geometry_falsification
+  name: "φ-Geometry Hypothesis Falsification"
+  version: "1.0.0"
+  date_created: "2025-01-28"
+  status: active
+
+hypothesis:
+  statement: >
+    φ (golden ratio) geometry in B-DNA structure, as documented in Larsen
+    (Symmetry 2021), improves CRISPR guide prediction metrics compared to
+    non-φ baselines.
+  
+  physical_ground_truth:
+    - "B-DNA helix length:diameter ≈ 1.6088 (close to φ ≈ 1.618)"
+    - "Major/minor backbone spacing ≈ 1.64"
+    - "Axial 10-fold symmetry with golden diamond tiling"
+  
+  reference: "Larsen, M. D. (2021). DNA Structure and the Golden Ratio Revisited. Symmetry."
+
+falsification_criteria:
+  criterion_1:
+    description: "φ-features show weak correlation with efficiency (|r| < 0.1)"
+    threshold: 0.1
+  criterion_2:
+    description: "φ-features do NOT outperform baselines in majority of comparisons"
+    threshold: 0.5
+  criterion_3:
+    description: "φ-correlations are NOT statistically significant (p > 0.05)"
+    threshold: 0.05
+
+features:
+  phi_features:
+    - name: phi_phase_score
+      description: "Alignment with canonical 10-bp + φ geometry"
+    - name: phi_curvature_score
+      description: "Spectral energy at φ-related modes"
+    - name: phi_combined_score
+      description: "Geometric mean of phase and curvature"
+  
+  baseline_features:
+    - name: uniform_phase_score
+      description: "Uniform phase baseline (null model)"
+    - name: random_phase_score
+      description: "Random phase assignment baseline"
+    - name: gc_content
+      description: "Simple GC fraction (sequence-only)"
+
+data:
+  primary_dataset:
+    name: "doench2016.csv"
+    path: "data/doench2016.csv"
+    description: "CRISPR guide sequences with efficiency scores"
+    license: "Research use"
+  
+  validation_method: "SHA256 checksum recorded in results"
+
+reproducibility:
+  required_flags:
+    - "--seed"
+    - "--bootstrap"
+    - "--permutation"
+  
+  environment:
+    python_version: "3.12+"
+    dependencies: "requirements.txt"
+
+execution:
+  quick_validation:
+    command: >
+      python experiments/phi_geometry_falsification/validate_phi_geometry.py
+        --seed 42 --bootstrap 100 --permutation 100
+    expected_runtime: "<30 seconds"
+  
+  full_analysis:
+    command: >
+      python experiments/phi_geometry_falsification/validate_phi_geometry.py
+        --seed 42 --bootstrap 1000 --permutation 1000
+        --output results/phi_geometry/validation.json
+    expected_runtime: "<2 minutes"
+
+outputs:
+  primary:
+    path: "results/phi_geometry/validation.json"
+    format: "JSON"
+    contents:
+      - "Feature correlations with 95% CI"
+      - "Permutation test p-values"
+      - "Partial correlations controlling for GC"
+      - "Falsification verdict"
+  
+  report:
+    format: "Human-readable terminal output"
+    contents:
+      - "Executive summary"
+      - "Criterion-by-criterion evaluation"
+      - "Feature correlation table"
+
+scientific_gates:
+  dna_validation: "A/C/G/T/N only (human DNA)"
+  statistical_validation:
+    - "Pearson r with 95% bootstrap CI (1000+ resamples)"
+    - "Permutation p-values (1000+ permutations)"
+    - "Partial correlation controlling for GC%"
+  reproducibility: "Fixed seeds, SHA256 checksums"

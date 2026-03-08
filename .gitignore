@@ -25,23 +25,24 @@ temp/
 tmp/
 test_results/
 
-# Generated outputs
-results/
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Validation results (generated files)
 proof_pack/validation_results/
+proof_pack/__pycache__/
+bin_resonance_results.csv
+results/
+/data/labs/
+/data/get_hg38/
+.snapshots
+experiments/*/results.json
 
-# Local datasets not tracked
-data/labs/
-data/get_hg38/
-
-# App snapshots
-.snapshots/
-.benchmarks/
-
-# Root-level generated artifact guardrails
-/acf_scale_*.png
-/null_dist_output.txt
-/falsification_results.json
-/FALSIFICATION_REPORT.md
-
-# Project metadata
-/wave-crispr-signal.iml
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
