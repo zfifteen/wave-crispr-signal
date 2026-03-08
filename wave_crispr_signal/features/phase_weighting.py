@@ -61,7 +61,7 @@ def _to_mpf(n: Union[int, float, np.number]) -> mp.mpf:
     """Convert a number to an mpmath float, handling numpy types."""
     if isinstance(n, (np.integer, np.int_)):
         return mp.mpf(int(n))
-    if isinstance(n, (np.floating, np.float_)):
+    if isinstance(n, np.floating):
         return mp.mpf(float(n))
     return mp.mpf(n)
 
