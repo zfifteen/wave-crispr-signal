@@ -1,137 +1,76 @@
-# 📊 Signal-Theoretic Analysis of DNA Mutations  
-*A complex-valued spectral framework for quantifying mutational disruption.*
+# wave-crispr-signal
 
----
+Signal-theoretic CRISPR analytics toolkit for guide scoring, disruption analysis, and reproducible validation.
 
-## 🆕 September 2025 Update – Key Findings
+## Project Charter (Scope Contract)
 
-| Area | Finding | Evidence |
-|------|---------|----------|
-| Phase-Weighted CRISPR Scorecard | **NEW**: Phase-weighted spectral analysis with θ′(n,k) geometric resolution. Enables mutation disruption quantification via Z-invariant scoring. Bootstrap CI validation shows multiple mutations yield higher disruption scores (p < 0.05). | `docs/PHASE_WEIGHTED_SCORECARD.md`, `applications/phase_weighted_scorecard.py` |
-| Geodesic–Topological Bridge | Verified analytical link between θ′(n,k)=φ·((n mod φ)/φ)^k and f(x)=arcsin((x–1)/(2x+3)); optimum k\* ≈ 0.300 holds across **6 public datasets** (Doench 2016, Kim 2025, Patch 2024 …). | `docs/TOPOLOGICAL_ANALYSIS.md`, `tests/test_geodesic_bridge.py` |
-| GC-Quartile Resonance | Re-run on Kim 2025 gRNA efficiencies (N = 18 102). Quartile Q4 shows **r = –0.211, p_perm = 0.0012**, FDR-corrected. | `results/gc_resonance_kim2025.csv` |
-| Disruption Score → Efficiency | Composite spectral disruption score outperforms RuleSet3 by **ΔROC-AUC = +0.047 ± 0.006** (bootstrap 10 000 ×). | `notebooks/compare_ruleset3_wave.ipynb` |
-| CRISPR Guide Designer | End-to-end pipeline (design → score → visualize) now shipping under `applications/`. | `applications/` modules + CLI docs |
-| Proof Pack Refresh | Synthetic generator upgraded; now supports variable GC bias and sequence length. | `proof_pack/generate_synthetic_data.py` |
+### Mission
+Build and maintain a focused CRISPR signal-analysis toolkit that turns sequence-level signals into reproducible guide-quality and disruption metrics.
 
----
+### Intended Users
+- Computational biologists evaluating gRNA candidates.
+- Research engineers building CRISPR scoring/validation pipelines.
+- Reproducibility reviewers validating published CRISPR signal claims.
 
-## 🔬 Validation & Proof Pack
+### Primary Outputs
+- CRISPR scoring APIs and CLIs (`applications/`, `wave_crispr_signal/`).
+- Reproducible validation/proof scripts (`proof_pack/`, `tests/`).
+- Core methodology documentation (`docs/`).
 
-Reproducible validation scripts live in `proof_pack/`.  
+### Non-Goals
+- This repo is **not** a general cross-domain Z-framework lab.
+- Non-CRISPR exploratory work (MRI/FUS/pain and related side projects) is retained under `legacy/` for archival reproducibility.
 
-**Phase-Weighted CRISPR Scorecard** (NEW):
+## Keep/Archive Rules
 
-```bash
-# Quick validation demo with bootstrap CI
-python proof_pack/phase_weighted_quick_demo.py
+- `core`: CRISPR scoring/design/validation code and tests stay in mainline.
+- `support`: build/test/tooling/data helpers stay in mainline.
+- `research-legacy`: non-CRISPR exploratory work is kept under `legacy/` (read-only by default).
+- `delete/regenerate`: generated artifacts and machine-specific files are removed from root and ignored.
 
-# Score a single guide
-python applications/phase_weighted_scorecard_cli.py score --guide GCTGCGGAGACCTGGAGAGA
+## Entrypoint Contract
 
-# Batch process guides
-python applications/phase_weighted_scorecard_cli.py batch \
-  --input test_data/sample_guides.csv \
-  --output results/scores.csv
-```
+- Primary package and CRISPR-facing CLI behaviors remain stable.
+- Existing imports from moved non-CRISPR modules continue to work through compatibility wrappers in `experiments/`.
+- New contributions must map to CRISPR outcomes or be added under `legacy/`.
 
-Full suite (bootstraps + permutation tests):
+## Repository Layout
 
-```bash
-python proof_pack/run_validation.py
-```
+- `wave_crispr_signal/`: core CRISPR feature and scoring package.
+- `applications/`: user-facing CRISPR applications and CLIs.
+- `experiments/`: active CRISPR experiments plus compatibility wrappers.
+- `proof_pack/`: reproducible validation and proof scripts.
+- `data/` and `test_data/`: datasets and fixtures.
+- `docs/`: canonical docs for current scope.
+- `legacy/`: archived non-CRISPR research and side projects.
+- `tools/`: repo maintenance and policy tooling.
+- `tests/`: regression and policy tests.
 
-Need the latest GC-Quartile resonance numbers?
+## Contributor Decision Tree
 
-```bash
-python bin/bin_resonance_test.py \
-  --input data/kim2025.csv \
-  --output results/gc_resonance_kim2025.csv \
-  --n_boot 4000 --n_perm 20000 --tail two
-```
+1. Does this change advance CRISPR scoring/design/validation?
+   - Yes: implement in mainline (`wave_crispr_signal/`, `applications/`, `experiments/`, `proof_pack/`, `tests/`).
+   - No: place under `legacy/`.
+2. Is the output generated or environment-specific?
+   - Yes: keep out of versioned root; add ignore rule if needed.
+3. Does the change alter public CRISPR interfaces?
+   - Yes: include migration note and compatibility test updates.
 
----
-
-## 🧬 Overview
-
-This framework encodes DNA as a **complex waveform** and interrogates it with FFT-based metrics plus geodesic curvature weighting. Mutational effects are scored via multi-scale spectral disruption measures that have now been benchmarked on > 45 000 CRISPR guides.
-
----
-
-## 📁 Repository Map (v2025-09)
-
-• Core algorithms …… `z_framework.py`, `spectral_features.py`  
-• Topology extension … `topological_analysis.py`  
-• CRISPR apps        … `applications/` (designer, metrics, viz, **fft_crispr_disruption**)  
-• Validation         … `proof_pack/`, `tests/`  
-• Docs               … `docs/` (see [`WAVE_CRISPR_SIGNAL_TLDR.md`](docs/WAVE_CRISPR_SIGNAL_TLDR.md) for project overview)
-
-Run all tests:
+## Quick Start
 
 ```bash
+python -m pip install -r requirements.txt
 python -m pytest -q
-```
 
----
-
-## ⚙️ Method Snapshot
-
-1. Complex encoding (A,T,C,G → 1, –1, +i, –i)  
-2. Position-dependent phase shift: θ′(n,k) with k≈0.3  
-3. FFT → extract ΔEntropy, Δf₁, sidelobe count  
-4. Golden-ratio phase weighting for off-target detection  
-5. Composite disruption score = Σ weighted spectral deltas  
-6. Bootstrap CI + permutation-based p-values  
-
-Detailed derivations in `docs/METHOD_DETAILS.md` and `docs/FFT_GOLDEN_RATIO_CRISPR.md`.
-
----
-
-## 🎯 Use Cases
-
-• **gRNA on-target prediction** (AUC↑)  
-• **Off-target profiling** via spectral signature distance and FFT-based periodicity detection  
-• **Variant effect ranking** in non-coding regions  
-• **Repair pathway bias** estimation from entropy gradients  
-• **Mutation disruption quantification** with phase-weighted Z-invariant scoring (NEW)
-
----
-
-## 🚀 Quick Start
-
-```bash
-pip install -r requirements.txt
-
-# Phase-weighted scorecard (NEW)
+# Example: phase-weighted scorecard
 python applications/phase_weighted_scorecard_cli.py score --guide GCTGCGGAGACCTGGAGAGA
-
-# design 5 candidate guides
-python applications/crispr_cli.py design "ATGCTGCGGA..." -n 5 -o guides.json
-
-# score an existing guide
-python applications/crispr_cli.py score "GACGATCGATCGATCGATCG"
-
-# FFT-based off-target analysis with golden-ratio phase weighting
-python applications/example_fft_crispr_usage.py
-
-# validate FFT disruption metrics
-python proof_pack/validate_fft_golden_ratio.py
 ```
 
-For phase-weighted scorecard details, see [`docs/PHASE_WEIGHTED_SCORECARD.md`](docs/PHASE_WEIGHTED_SCORECARD.md).
+## Canonical Docs
 
----
-
-## 🤖 AI Assistant Configuration
-
-This repository includes configuration files for AI research assistants:
-
-- **Claude Sonnet 4** (`.claude/`) - Deep research and scientific analysis
-- **Grok** (`.grok/`) - Code analysis and validation
-
-Both are configured with complete project context and mandatory scientific gates.
-
----
+- `docs/INDEX.md`: documentation index and navigation.
+- `docs/INVENTORY_CLASSIFICATION.md`: current structure classification (`core/support/research-legacy/delete-regenerate`).
+- `legacy/README.md`: archived scope and retention policy.
 
 ## License
 
