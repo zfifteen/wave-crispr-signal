@@ -1,7 +1,15 @@
+# IDE/editor
 .idea/
 *.swp
 *.swo
 *~
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.venv*/
 
 # OS
 .DS_Store
@@ -12,14 +20,10 @@
 ehthumbs.db
 Thumbs.db
 
-# Project specific
-*.png
-*.html
-*.pdf
-test_results/
+# Build/test temp
 temp/
 tmp/
-/wave-crispr-signal.iml
+test_results/
 
 # Python
 __pycache__/

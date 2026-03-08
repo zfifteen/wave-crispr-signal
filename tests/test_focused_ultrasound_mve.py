@@ -144,7 +144,7 @@ class TestFocusedUltrasoundMVE(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp_dir:
             # Test that CLI can be called without errors
             cmd = [
-                'python', 'experiments/focused_ultrasound_mve.py',
+                sys.executable, 'experiments/focused_ultrasound_mve.py',
                 '--seed', '42',
                 '--bootstrap', '1000', 
                 '--permutation', '1000',

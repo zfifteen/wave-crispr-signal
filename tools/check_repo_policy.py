@@ -1,223 +1,171 @@
 #!/usr/bin/env python3
-"""
-Repository Policy Self-Checker
+"""Repository policy checker for CRISPR-focused layout and hygiene."""
 
-Validates repository structure against .github/REPOSITORY_POLICY.md
-ensuring compliance with established standards.
-"""
+from __future__ import annotations
 
+import fnmatch
 import sys
 from pathlib import Path
-from typing import List
 
 
-class PolicyChecker:
-    """Checks repository compliance with REPOSITORY_POLICY.md standards."""
+ALLOWED_TOP_LEVEL_DIRS = {
+    ".git",
+    ".github",
+    ".idea",
+    ".pytest_cache",
+    ".venv314",
+    "applications",
+    "bin",
+    "configs",
+    "data",
+    "docs",
+    "experiments",
+    "legacy",
+    "modules",
+    "notebooks",
+    "proof_pack",
+    "scripts",
+    "static",
+    "templates",
+    "test_data",
+    "tests",
+    "tools",
+    "wave_crispr_signal",
+    "web_apps",
+}
 
-    def __init__(self, repo_root: str = "."):
-        self.repo_root = Path(repo_root)
-        self.issues: List[str] = []
-        self.warnings: List[str] = []
+ALLOWED_TOP_LEVEL_FILES = {
+    ".gitignore",
+    ".pre-commit-config.yaml",
+    "LICENSE",
+    "Makefile",
+    "README.md",
+    "pyproject.toml",
+    "repo_metadata.yaml",
+    "requirements.txt",
+    "targets.yaml",
+}
 
-    def check_required_directories(self) -> bool:
-        """Check that required directories exist."""
-        required_dirs = [
-            ".github",
-            ".grok",
-            "applications",
-            "data",
-            "docs",
-            "notebooks",
-            "proof_pack",
-            "static",
-            "templates",
-            "tests",
-            "wave-ribonn",
-        ]
+FORBIDDEN_ROOT_PATTERNS = [
+    "acf_scale_*.png",
+    "null_dist_output.txt",
+    "falsification_results.json",
+    "FALSIFICATION_REPORT.md",
+]
 
-        success = True
-        for dirname in required_dirs:
-            dir_path = self.repo_root / dirname
-            if not dir_path.exists():
-                self.issues.append(f"Missing required directory: {dirname}")
-                success = False
-            elif not dir_path.is_dir():
-                self.issues.append(f"Required path is not a directory: {dirname}")
-                success = False
+NON_CRISPR_KEYWORDS = [
+    "ultrasound",
+    "mri",
+    "pain",
+    "orcs",
+    "z5d",
+]
 
-        return success
+CORE_PATHS = [
+    "wave_crispr_signal",
+    "applications",
+]
 
-    def check_required_files(self) -> bool:
-        """Check that policy-required files exist."""
-        required_files = [
-            ".github/REPOSITORY_POLICY.md",
-            ".github/copilot-instructions.yml",
-            "requirements.txt",
-            "README.md",
-            "run_tests.py",
-        ]
 
-        success = True
-        for filepath in required_files:
-            file_path = self.repo_root / filepath
-            if not file_path.exists():
-                self.issues.append(f"Missing required file: {filepath}")
-                success = False
-            elif not file_path.is_file():
-                self.issues.append(f"Required path is not a file: {filepath}")
-                success = False
+class PolicyError(Exception):
+    pass
 
-        return success
 
-    def check_naming_conventions(self) -> bool:
-        """Check file naming conventions."""
-        success = True
-
-        # Check Python files are snake_case
-        for py_file in self.repo_root.glob("*.py"):
-            if not self._is_snake_case(py_file.stem):
-                self.warnings.append(f"Python file not snake_case: {py_file.name}")
-
-        # Check major docs are UPPERCASE
-        for doc in self.repo_root.glob("*.md"):
-            if doc.name.startswith("README") or doc.name.startswith("LICENSE"):
+def check_root_layout(repo_root: Path) -> list[str]:
+    issues: list[str] = []
+    for p in repo_root.iterdir():
+        name = p.name
+        if p.is_dir():
+            if name.startswith(".") and name in {".git", ".github", ".idea", ".pytest_cache", ".venv314"}:
                 continue
-            if "_" in doc.stem and not doc.stem.isupper():
-                # Allow mixed case for issue resolution docs
-                if "ISSUE_" not in doc.name and "SUMMARY" not in doc.name:
-                    self.warnings.append(f"Major doc not UPPERCASE: {doc.name}")
-
-        return success
-
-    def check_core_modules(self) -> bool:
-        """Check that core scientific modules exist at root level."""
-        expected_modules = [
-            "z_framework.py",
-            "topological_analysis.py",
-            "invariant_features.py",
-        ]
-
-        success = True
-        for module in expected_modules:
-            module_path = self.repo_root / module
-            if not module_path.exists():
-                self.issues.append(f"Missing core module: {module}")
-                success = False
-
-        return success
-
-    def check_test_structure(self) -> bool:
-        """Check test organization (dual location allowance)."""
-        success = True
-
-        # Check for root-level test files
-        root_tests = list(self.repo_root.glob("test_*.py"))
-        tests_dir_tests = list((self.repo_root / "tests").glob("test_*.py"))
-
-        if not root_tests and not tests_dir_tests:
-            self.issues.append("No test files found in root or tests/ directory")
-            success = False
-
-        # Check run_tests.py orchestrator exists
-        if not (self.repo_root / "run_tests.py").exists():
-            self.issues.append("Missing test orchestrator: run_tests.py")
-            success = False
-
-        return success
-
-    def check_dependencies(self) -> bool:
-        """Check requirements.txt has exact version pinning."""
-        success = True
-        req_file = self.repo_root / "requirements.txt"
-
-        if not req_file.exists():
-            return False
-
-        try:
-            with open(req_file, "r") as f:
-                lines = f.readlines()
-
-            for line in lines:
-                line = line.strip()
-                if line and not line.startswith("#"):
-                    if "==" not in line:
-                        self.warnings.append(f"Dependency not pinned: {line}")
-
-        except Exception as e:
-            self.issues.append(f"Could not read requirements.txt: {e}")
-            success = False
-
-        return success
-
-    def _is_snake_case(self, name: str) -> bool:
-        """Check if string is snake_case."""
-        if not name:
-            return False
-        return name.lower() == name and "_" in name and " " not in name
-
-    def run_all_checks(self) -> bool:
-        """Run all policy checks."""
-        print("🔍 Running repository policy checks...")
-        print("=" * 50)
-
-        checks = [
-            ("Required directories", self.check_required_directories),
-            ("Required files", self.check_required_files),
-            ("Naming conventions", self.check_naming_conventions),
-            ("Core modules", self.check_core_modules),
-            ("Test structure", self.check_test_structure),
-            ("Dependencies", self.check_dependencies),
-        ]
-
-        all_passed = True
-        for check_name, check_func in checks:
-            try:
-                result = check_func()
-                status = "✓ PASS" if result else "❌ FAIL"
-                print(f"{check_name}: {status}")
-                if not result:
-                    all_passed = False
-            except Exception as e:
-                print(f"{check_name}: ❌ ERROR - {e}")
-                all_passed = False
-
-        # Report issues and warnings
-        if self.issues:
-            print(f"\n❌ ISSUES FOUND ({len(self.issues)}):")
-            for issue in self.issues:
-                print(f"  • {issue}")
-
-        if self.warnings:
-            print(f"\n⚠️  WARNINGS ({len(self.warnings)}):")
-            for warning in self.warnings:
-                print(f"  • {warning}")
-
-        print("=" * 50)
-        if all_passed and not self.issues:
-            print("🎉 All policy checks PASSED!")
-            return True
+            if name.startswith(".") and name not in ALLOWED_TOP_LEVEL_DIRS:
+                issues.append(f"Unexpected top-level hidden directory: {name}")
+            elif not name.startswith(".") and name not in ALLOWED_TOP_LEVEL_DIRS:
+                issues.append(f"Unexpected top-level directory: {name}")
         else:
-            print("💥 Some policy checks FAILED!")
-            return False
+            if name.startswith("."):
+                if name not in {".gitignore", ".pre-commit-config.yaml"}:
+                    issues.append(f"Unexpected top-level hidden file: {name}")
+            elif name not in ALLOWED_TOP_LEVEL_FILES:
+                issues.append(f"Unexpected top-level file: {name}")
+    return issues
 
 
-def main():
-    """Main entry point."""
-    import argparse
+def check_root_artifacts(repo_root: Path) -> list[str]:
+    issues: list[str] = []
+    for pattern in FORBIDDEN_ROOT_PATTERNS:
+        for match in repo_root.glob(pattern):
+            if match.is_file():
+                issues.append(f"Forbidden generated artifact at root: {match.name}")
+    return issues
 
-    parser = argparse.ArgumentParser(description="Check repository policy compliance")
-    parser.add_argument(
-        "--repo-root",
-        default=".",
-        help="Repository root directory (default: current directory)",
-    )
 
-    args = parser.parse_args()
+def check_core_scope(repo_root: Path) -> list[str]:
+    issues: list[str] = []
+    for core in CORE_PATHS:
+        root = repo_root / core
+        if not root.exists():
+            issues.append(f"Missing core path: {core}")
+            continue
+        for path in root.rglob("*.py"):
+            rel = str(path.relative_to(repo_root)).lower()
+            for keyword in NON_CRISPR_KEYWORDS:
+                if keyword in rel:
+                    issues.append(
+                        f"Non-CRISPR keyword '{keyword}' found in core path: {path.relative_to(repo_root)}"
+                    )
+                    break
+    return issues
 
-    checker = PolicyChecker(args.repo_root)
-    success = checker.run_all_checks()
 
-    sys.exit(0 if success else 1)
+def check_docs_index(repo_root: Path) -> list[str]:
+    issues: list[str] = []
+    docs_index = repo_root / "docs" / "INDEX.md"
+    inventory = repo_root / "docs" / "INVENTORY_CLASSIFICATION.md"
+    legacy_readme = repo_root / "legacy" / "README.md"
+    readme = repo_root / "README.md"
+
+    for required in [docs_index, inventory, legacy_readme, readme]:
+        if not required.exists():
+            issues.append(f"Missing required documentation file: {required.relative_to(repo_root)}")
+
+    if docs_index.exists():
+        text = docs_index.read_text(encoding="utf-8")
+        if "INVENTORY_CLASSIFICATION.md" not in text:
+            issues.append("docs/INDEX.md missing link/reference to INVENTORY_CLASSIFICATION.md")
+        if "../legacy/README.md" not in text:
+            issues.append("docs/INDEX.md missing link/reference to legacy/README.md")
+
+    if readme.exists():
+        text = readme.read_text(encoding="utf-8")
+        if "docs/INDEX.md" not in text:
+            issues.append("README.md missing link/reference to docs/INDEX.md")
+        if "legacy/" not in text:
+            issues.append("README.md missing legacy scope reference")
+
+    return issues
+
+
+def run(repo_root: Path) -> int:
+    issues: list[str] = []
+    issues.extend(check_root_layout(repo_root))
+    issues.extend(check_root_artifacts(repo_root))
+    issues.extend(check_core_scope(repo_root))
+    issues.extend(check_docs_index(repo_root))
+
+    if issues:
+        print("Repository policy violations detected:")
+        for item in issues:
+            print(f"- {item}")
+        return 1
+
+    print("Repository policy checks passed.")
+    return 0
+
+
+def main() -> None:
+    repo_root = Path(".").resolve()
+    raise SystemExit(run(repo_root))
 
 
 if __name__ == "__main__":
