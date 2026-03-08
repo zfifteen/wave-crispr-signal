@@ -28,6 +28,11 @@ from scipy.stats import entropy as shannon_entropy
 from scipy.signal import find_peaks
 from typing import Dict, List, Tuple, Optional, Union
 import warnings
+from wave_crispr_signal.sequence_utils import (
+    validate_dna_sequence as _core_validate_dna_sequence,
+    encode_complex_phase_weighted as _core_encode_complex_phase_weighted,
+)
+from wave_crispr_signal.features.phase_weighting import theta_prime_zero_based
 
 # Configure high precision
 mp.dps = 50
@@ -48,121 +53,18 @@ DEFAULT_WEIGHTS = {
 
 
 def validate_dna_sequence(seq: str, allow_rna: bool = False) -> None:
-    """
-    Validate DNA/RNA sequence contains only valid nucleotides.
-    
-    Args:
-        seq: DNA or RNA sequence
-        allow_rna: If True, allow U for RNA; if False, only allow DNA (A/C/G/T/N)
-    
-    Raises:
-        ValueError: If sequence contains invalid characters
-    """
-    seq_upper = seq.upper()
-    
-    if allow_rna:
-        # For RNA: allow A/C/G/U/N only
-        valid_chars = set('ACGUN')
-        invalid_chars = set(seq_upper) - valid_chars
-        if invalid_chars:
-            raise ValueError(
-                f"Invalid RNA sequence: contains {invalid_chars}. "
-                f"Only A, C, G, U, N allowed for RNA sequences."
-            )
-        if 'T' in seq_upper:
-            raise ValueError(
-                f"Invalid RNA sequence: contains 'T'. "
-                f"RNA sequences should use 'U' instead of 'T'."
-            )
-    else:
-        # For DNA: allow A/C/G/T/N only
-        valid_chars = set('ACGTN')
-        invalid_chars = set(seq_upper) - valid_chars
-        if invalid_chars:
-            raise ValueError(
-                f"Invalid DNA sequence: contains {invalid_chars}. "
-                f"Only A, C, G, T, N allowed for DNA sequences."
-            )
-        if 'U' in seq_upper:
-            raise ValueError(
-                f"Invalid DNA sequence: contains 'U'. "
-                f"DNA sequences should use 'T' instead of 'U'."
-            )
+    """Compatibility wrapper around core sequence validation."""
+    _core_validate_dna_sequence(seq, allow_rna=allow_rna)
 
 
 def encode_complex(seq: str, is_rna: bool = False) -> np.ndarray:
-    """
-    Map DNA/RNA string to complex vector.
-    
-    Complex encoding preserves complementarity:
-    - A → 1 (real positive)
-    - T → -1 (real negative) [DNA only]
-    - U → -1 (real negative) [RNA only]
-    - C → +i (imaginary positive)
-    - G → -i (imaginary negative)
-    - N → 0 (ambiguous base)
-    
-    Args:
-        seq: DNA or RNA sequence
-        is_rna: If True, treat as RNA (U instead of T)
-    
-    Returns:
-        Complex numpy array
-        
-    Raises:
-        ValueError: If sequence contains invalid nucleotides
-    """
-    # Validate sequence first
-    validate_dna_sequence(seq, allow_rna=is_rna)
-    
-    seq = seq.upper()
-    
-    if is_rna:
-        # RNA encoding
-        mapping = {
-            'A': 1.0 + 0.0j,
-            'U': -1.0 + 0.0j,
-            'C': 0.0 + 1.0j,
-            'G': 0.0 - 1.0j,
-            'N': 0.0 + 0.0j,
-        }
-    else:
-        # DNA encoding
-        mapping = {
-            'A': 1.0 + 0.0j,
-            'T': -1.0 + 0.0j,
-            'C': 0.0 + 1.0j,
-            'G': 0.0 - 1.0j,
-            'N': 0.0 + 0.0j,
-        }
-    
-    return np.array([mapping[base] for base in seq], dtype=np.complex128)
+    """Compatibility wrapper around core phase-weighted complex encoding."""
+    return _core_encode_complex_phase_weighted(seq, is_rna=is_rna)
 
 
 def theta_prime(n: Union[int, float, np.ndarray], k: float = K_STAR) -> Union[float, np.ndarray]:
-    """
-    Geodesic resolution function θ′(n,k) with golden-angle phasing.
-    
-    θ′(n,k) = φ · ((n mod φ)/φ)^k
-    
-    This function normalizes position n in sequences for phase-weighted encoding,
-    embedding golden-angle spirals to minimize discrepancy in spectral sampling.
-    
-    Args:
-        n: Position index or array of positions
-        k: Scaling parameter (default: K_STAR = 0.3)
-    
-    Returns:
-        Phase-weighted position value(s)
-    """
-    if isinstance(n, np.ndarray):
-        n_mod_phi = n % PHI
-        ratio = n_mod_phi / PHI
-        return PHI * (ratio ** k)
-    else:
-        n_mod_phi = float(n) % PHI
-        ratio = n_mod_phi / PHI
-        return PHI * (ratio ** k)
+    """Compatibility wrapper around core phase-weighting helper."""
+    return theta_prime_zero_based(n, k=k, phi=PHI)
 
 
 def apply_phase_weighting(

@@ -1,8 +1,9 @@
 """
 Experiments Package
 
-This package contains experiment-specific scripts that import from modules/
-and demonstrate various applications of the wave-crispr-signal framework.
+Active experiment implementations were archived to `archive/code/experiments/`
+in the LOC-reduction pass. This package remains as a compatibility anchor for
+future focused additions.
 """
 
 __version__ = "1.0.0"

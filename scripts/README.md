@@ -1,17 +1,17 @@
 # Scripts
 
-Operational scripts for maintenance and one-off workflows.
-
-## Available Scripts
+## Active Scripts
 
 - `run_tests.py` - change-scoped validation helper
+- `invariant_features.py` - invariant feature implementation used by active guide-designer flow
+
+## Archive
+
+Non-primary scripts were moved to `archive/code/scripts/`.
 
 ## Usage
 
 ```bash
-# No args: prints reset guidance and exits 0
 python scripts/run_tests.py
-
-# Run specific targeted checks
-python scripts/run_tests.py "python -m pytest -q path/to/test_file.py" "python applications/phase_weighted_scorecard_cli.py score --guide GCTGCGGAGACCTGGAGAGA"
+python scripts/run_tests.py "python -m pytest -q path/to/test_file.py"
 ```

@@ -62,7 +62,7 @@ from pathlib import Path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import numpy as np
-from scipy.stats import bootstrap
+from wave_crispr_signal.stats_utils import bootstrap_ci
 
 # Import core modules
 from applications.phase_weighted_scorecard import (
@@ -239,12 +239,27 @@ class DisruptionAnalyzer:
                 # Skip invalid resamples
                 continue
         
-        scores = np.array(scores)
+        if not scores:
+            return {
+                'median': 0.0,
+                'lower_95': 0.0,
+                'upper_95': 0.0,
+                'n_samples': 0,
+            }
+
+        scores_arr = np.array(scores, dtype=float)
+        lower_95, upper_95 = bootstrap_ci(
+            scores_arr,
+            func=np.mean,
+            n_boot=n_bootstrap,
+            ci=95.0,
+            seed=self.seed,
+        )
         return {
-            'median': float(np.median(scores)),
-            'lower_95': float(np.percentile(scores, 2.5)),
-            'upper_95': float(np.percentile(scores, 97.5)),
-            'n_samples': len(scores),
+            'median': float(np.median(scores_arr)),
+            'lower_95': float(lower_95),
+            'upper_95': float(upper_95),
+            'n_samples': int(len(scores_arr)),
         }
     
     def batch_score(

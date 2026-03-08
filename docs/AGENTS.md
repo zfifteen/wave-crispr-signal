@@ -2,7 +2,8 @@
 
 ## Project Structure
 - Core CRISPR logic lives in `wave_crispr_signal/` and `applications/`.
-- Experimental and reproducibility scripts live in `experiments/` and `proof_pack/`.
+- Preserved demo surface lives in `web_apps/demo_mvp/`.
+- Non-primary code is retained under `archive/code/`.
 - Canonical documentation lives in `docs/`.
 
 ## Development Commands

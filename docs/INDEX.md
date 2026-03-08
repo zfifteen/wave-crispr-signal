@@ -10,11 +10,13 @@ This is the canonical documentation index for the active CRISPR scope.
 - `INVARIANT_FEATURES.md` - invariant feature definitions.
 - `CONTRIBUTING.md` - contribution workflow.
 - `INVENTORY_CLASSIFICATION.md` - current top-level classification.
+- `PRIMARY_CLI_VALIDATION.md` - manual verification commands for preserved CLIs.
 
 ## Running Key Workflows
 
-- Primary score workflow: `python applications/phase_weighted_scorecard_cli.py score --guide <GUIDE>`
-- Validation proof run: `python proof_pack/run_validation.py`
+- Phase-weighted CLI: `python applications/phase_weighted_scorecard_cli.py score --guide <GUIDE>`
+- CRISPR CLI: `python applications/crispr_cli.py --help`
+- Genomic disruption API CLI: `python applications/genomic_disruption_api.py --help`
 
 ## Testing and CI
 

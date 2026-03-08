@@ -184,3 +184,18 @@ def theta_prime_vectorized(
     n_mod_phi = np.fmod(n_arr, phi)
     ratio = n_mod_phi / phi
     return phi * (ratio**k)
+
+
+def theta_prime_zero_based(
+    n: Union[int, float, np.ndarray], k: float = 0.3, phi: Optional[float] = None
+) -> Union[float, np.ndarray]:
+    """Compatibility helper for zero-based index arrays used in app codepaths."""
+    if phi is None:
+        phi = float(PHI)
+    n_arr = np.asarray(n, dtype=np.float64)
+    n_mod_phi = np.fmod(n_arr, phi)
+    ratio = n_mod_phi / phi
+    out = phi * (ratio**k)
+    if np.isscalar(n):
+        return float(out)
+    return out

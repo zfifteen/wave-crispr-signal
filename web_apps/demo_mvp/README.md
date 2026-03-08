@@ -216,9 +216,9 @@ Testing Demo MVP API...
 ## References
 
 ### Repository
-- **Spectral utilities**: `experiments/trinity/spectral.py`
-- **Repository policy**: `.github/REPOSITORY_POLICY.md`
-- **Scientific gates**: `.github/copilot-instructions.md`
+- **Spectral utilities**: `wave_crispr_signal/spectral.py`
+- **Current workflow**: `docs/INDEX.md`
+- **Contribution rules**: `docs/CONTRIBUTING.md`
 
 ### Related Work
 - Doench et al. (2016) - On-target CRISPR prediction
@@ -234,13 +234,9 @@ Testing Demo MVP API...
 4. **Export**: Download results as JSON/CSV
 5. **Rate ratio sweep**: Stability heatmap across r ∈ [5, 200]
 
-### Integration with Trinity Experiments
-This demo uses the same spectral utilities as the trinity experiments:
-- **Experiment A**: Doench-2016 lift (nested model)
-- **Experiment B**: Cross-species generalization
-- **Experiment C**: Rotational phase figure
-
-See `experiments/trinity/` for full research implementations.
+### Historical Provenance
+Earlier research implementations are preserved under `archive/code/experiments/`.
+The demo now relies on `wave_crispr_signal/spectral.py` as the active spectral source.
 
 ## Troubleshooting
 
@@ -272,7 +268,7 @@ MIT License - See repository LICENSE file
 
 For questions or issues:
 - Open a GitHub issue tagged `demo-mvp`
-- See `experiments/trinity/README.md` for research details
+- See `docs/ARCHIVE_INDEX.md` for archived research references
 
 ---
 

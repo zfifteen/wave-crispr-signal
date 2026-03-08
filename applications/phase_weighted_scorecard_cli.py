@@ -47,22 +47,15 @@ from typing import List, Dict, Optional, Tuple
 import numpy as np
 from pathlib import Path
 
-# Add parent directory for imports
+# Add repository root so package-style imports work when file is executed directly.
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-# Import directly from the module file to avoid __init__.py issues
-import importlib.util
-spec = importlib.util.spec_from_file_location(
-    "phase_weighted_scorecard",
-    os.path.join(os.path.dirname(__file__), "phase_weighted_scorecard.py")
+from applications.phase_weighted_scorecard import (  # noqa: E402
+    PhaseWeightedScorecard,
+    score_guide_batch,
+    K_STAR,
+    PHI,
 )
-pwsc = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(pwsc)
-
-PhaseWeightedScorecard = pwsc.PhaseWeightedScorecard
-score_guide_batch = pwsc.score_guide_batch
-K_STAR = pwsc.K_STAR
-PHI = pwsc.PHI
 
 
 def read_fasta(filepath: str) -> Dict[str, str]:

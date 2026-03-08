@@ -39,8 +39,8 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, field_validator
 import numpy as np
 
-# Import our spectral utilities
-from experiments.trinity.spectral import (
+# Import shared spectral utilities from core package
+from wave_crispr_signal.spectral import (
     validate_dna_sequence,
     validate_rna_sequence,
     breathing_features,

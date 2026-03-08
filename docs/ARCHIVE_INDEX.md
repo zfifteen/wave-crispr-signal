@@ -1,12 +1,22 @@
 # Archive Index
 
-This index tracks historical documents retained for provenance.
+This index tracks historical documents and non-primary code retained for provenance.
 
-Archived documents are **non-authoritative** and **non-blocking**. They may reference deprecated policy, testing, or CI workflows.
+Archived content is **non-authoritative** and **non-blocking**. It may reference deprecated policy, testing, or CI workflows.
 
 For current workflow and contribution guidance, use:
 - `INDEX.md`
 - `CONTRIBUTING.md`
+
+## Code Archive
+
+- `../archive/code/README.md`
+- `../archive/code/experiments/`
+- `../archive/code/proof_pack/`
+- `../archive/code/web_apps/` (non-demo surfaces)
+- `../archive/code/scripts/`
+- `../archive/code/tools/`
+- `../archive/code/modules/`
 
 ## High-Traffic Archived References
 

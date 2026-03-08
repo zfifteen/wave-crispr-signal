@@ -9,22 +9,61 @@ from __future__ import annotations
 import numpy as np
 from typing import Dict, Tuple, List
 
+HELICAL_PERIOD = 10.5
 
-def encode_complex(seq: str, r: float = 20.0) -> np.ndarray:
+def validate_dna_sequence(seq: str) -> str:
+    """Validate DNA sequence and return uppercase normalized text."""
+    seq = seq.upper().replace(" ", "").replace("\n", "")
+    invalid_bases = set(seq) - set("ACGT")
+    if invalid_bases:
+        raise ValueError(
+            f"Invalid DNA bases detected: {invalid_bases}. "
+            f"Only A, C, G, T allowed for DNA sequences. "
+            f"Use A, C, G, U for RNA sequences (convert separately)."
+        )
+    return seq
+
+
+def validate_rna_sequence(seq: str) -> str:
+    """Validate RNA sequence and return uppercase normalized text."""
+    seq = seq.upper().replace(" ", "").replace("\n", "")
+    invalid_bases = set(seq) - set("ACGU")
+    if invalid_bases:
+        raise ValueError(
+            f"Invalid RNA bases detected: {invalid_bases}. "
+            f"Only A, C, G, U allowed for RNA sequences. "
+            f"Use A, C, G, T for DNA sequences (convert separately)."
+        )
+    return seq
+
+
+def encode_complex(seq: str, r: float = 20.0, is_rna: bool = False) -> np.ndarray:
     """
     Map DNA string -> complex vector using dimensionless opening-rate ratio.
     A,T receive negative real + positive imag; G,C inverse-signed.
     r ~ k_GC/k_AT controls contrast; default 20 (biophysically plausible order-of-magnitude).
     """
-    seq = seq.upper().replace("U", "T")
+    if is_rna:
+        seq = validate_rna_sequence(seq)
+    else:
+        seq = validate_dna_sequence(seq)
+
     alpha = float(np.log(max(r, 1.0000001)))  # strength (real)
     beta = 0.3 * alpha  # phase skew (imag)
-    tbl = {
-        "A": -alpha + 1j * beta,
-        "T": -alpha + 1j * beta,
-        "G": alpha - 1j * beta,
-        "C": alpha - 1j * beta,
-    }
+    if is_rna:
+        tbl = {
+            "A": -alpha + 1j * beta,
+            "U": -alpha + 1j * beta,
+            "G": alpha - 1j * beta,
+            "C": alpha - 1j * beta,
+        }
+    else:
+        tbl = {
+            "A": -alpha + 1j * beta,
+            "T": -alpha + 1j * beta,
+            "G": alpha - 1j * beta,
+            "C": alpha - 1j * beta,
+        }
     return np.array([tbl.get(ch, 0.0 + 0.0j) for ch in seq], dtype=np.complex128)
 
 
@@ -52,29 +91,46 @@ def cz_power_at_period(z: np.ndarray, period: float) -> float:
     return float(np.abs(X))
 
 
-def breathing_features(seq: str, r: float = 20.0) -> Dict[str, float]:
+def breathing_features(seq: str, r: float = 20.0, is_rna: bool = False) -> Dict[str, float]:
     """Three-term spectrum around the helical period and its first two harmonics."""
-    z = encode_complex(seq, r=r)
+    z = encode_complex(seq, r=r, is_rna=is_rna)
+    seq_upper = seq.upper()
+    gc_content = (
+        (seq_upper.count("G") + seq_upper.count("C")) / len(seq_upper)
+        if len(seq_upper) > 0
+        else 0.0
+    )
     return {
         "P10_5": cz_power_at_period(z, 10.5),
         "P5_25": cz_power_at_period(z, 5.25),
         "P3_5": cz_power_at_period(z, 3.5),
+        "length": len(seq_upper),
+        "gc_content": gc_content,
     }
 
 
-def rotational_phase_at(pos: int, period: float = 10.5) -> float:
+def rotational_phase_at(pos: int, period: float = HELICAL_PERIOD) -> float:
     """Return circular phase in [0, 2π) for a cut-site position index."""
     return float((2.0 * np.pi * pos / period) % (2.0 * np.pi))
 
 
+def phase_at(pos: int, period: float = HELICAL_PERIOD) -> float:
+    """Alias kept for compatibility with existing demo imports."""
+    return rotational_phase_at(pos, period=period)
+
+
 def rotational_phase_curve(
-    seq: str, period: float = 10.5, bins: int = 24, r: float = 20.0
+    seq: str,
+    period: float = HELICAL_PERIOD,
+    bins: int = 24,
+    r: float = 20.0,
+    is_rna: bool = False,
 ) -> Tuple[List[float], List[float]]:
     """
     Compute a phase-binned curve of average encoded magnitude across positions.
     Returns (phase_centers, averaged_magnitudes).
     """
-    z = encode_complex(seq, r=r)
+    z = encode_complex(seq, r=r, is_rna=is_rna)
     N = len(z)
     if N == 0:
         centers = np.linspace(0, 2 * np.pi, bins, endpoint=False)
@@ -88,6 +144,35 @@ def rotational_phase_curve(
     avg = tot / np.clip(cnt, 1.0, None)
     centers = (edges[:-1] + edges[1:]) * 0.5
     return centers.tolist(), avg.tolist()
+
+
+def spectral_peak_analysis(
+    seq: str,
+    period: float = HELICAL_PERIOD,
+    r: float = 20.0,
+    is_rna: bool = False,
+) -> Dict[str, float]:
+    """Return complex peak metrics (power, angle, normalized_power) at period."""
+    z = encode_complex(seq, r=r, is_rna=is_rna)
+    n = len(z)
+    if n == 0:
+        return {"power": 0.0, "angle": 0.0, "normalized_power": 0.0}
+
+    z = z - np.mean(z)
+    if n >= 2:
+        idx = np.arange(n, dtype=np.float64)
+        hann = 0.5 - 0.5 * np.cos(2 * np.pi * idx / (n - 1))
+        z = z * hann
+
+    f = 1.0 / period
+    idx = np.arange(n)
+    x = np.sum(z * np.exp(-2j * np.pi * f * idx))
+    power = float(np.abs(x))
+    return {
+        "power": power,
+        "angle": float(np.angle(x)),
+        "normalized_power": power / np.sqrt(n),
+    }
 
 
 def baseline_seq_features(seq: str) -> Dict[str, float]:
