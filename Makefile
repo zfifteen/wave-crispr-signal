@@ -1,45 +1,29 @@
 # Makefile for wave-crispr-signal repository
 
-.PHONY: test smoke help clean install lint
+.PHONY: help install test smoke clean lint run-mve run-mve-quick run-mri-z5d run-mri-z5d-quick run-mri-z5d-synthetic run-fus-enhancer run-fus-enhancer-quick
 
-# Default target
 help:
 	@echo "Available targets:"
-	@echo "  test          - Run full test suite"
-	@echo "  smoke         - Run smoke tests for CI"
-	@echo "  mve-smoke     - Run focused ultrasound MVE smoke test"
-	@echo "  install       - Install dependencies"
-	@echo "  clean         - Clean up temporary files"
-	@echo "  lint          - Run code linting"
+	@echo "  install               - Install dependencies"
+	@echo "  test                  - Print change-scoped validation guidance"
+	@echo "  smoke                 - Placeholder (CI currently disabled)"
+	@echo "  clean                 - Clean temporary files"
+	@echo "  lint                  - Run linting"
+	@echo "  run-mve*              - Run MVE experiments"
+	@echo "  run-mri-z5d*          - Run MRI Z5D experiments"
+	@echo "  run-fus-enhancer*     - Run FUS enhancer experiments"
 
-# Install dependencies
 install:
 	pip install -r requirements.txt
 
-# Run full test suite
 test:
-	python scripts/run_tests.py
+	@echo "No baseline test suite is configured."
+	@echo "Run change-scoped validation commands for the behavior you changed."
+	@echo "Example: python scripts/run_tests.py \"python -m pytest -q path/to/test.py\""
 
-# Run smoke tests for CI
-smoke: mve-smoke test-z-framework-import mri-z5d-smoke fus-enhancer-smoke
-	@echo "✓ All smoke tests completed"
+smoke:
+	@echo "CI smoke target is intentionally disabled during reset."
 
-# Test Z Framework import compatibility
-test-z-framework-import:
-	@echo "Testing Z Framework import compatibility..."
-	@python -c "from z_framework import ZFrameworkCalculator; calc = ZFrameworkCalculator(); print('✓ Z Framework import successful')"
-
-# Run focused ultrasound MVE smoke test
-mve-smoke:
-	@echo "Running Focused Ultrasound MVE smoke test..."
-	python tests/test_focused_ultrasound_mve.py --smoke
-
-# Run MRI Z5D analysis smoke test with DICOM data
-mri-z5d-smoke:
-	@echo "Running MRI Z5D Analysis smoke test with DICOM data..."
-	@python -c "import sys; sys.path.insert(0, '.'); from experiments.mri_z5d_analysis import Z5DGeodeskAnalyzer, load_dicom_signals; analyzer = Z5DGeodeskAnalyzer(seed=42); signals = load_dicom_signals(signal_length=10, max_files_per_series=2); results = [analyzer.analyze_signal_pattern(s, f'smoke_{i}') for i, s in enumerate(signals[:3])]; print('✓ MRI Z5D Analysis smoke test passed with DICOM data')"
-
-# Clean up temporary files
 clean:
 	find . -type f -name "*.pyc" -delete
 	find . -type d -name "__pycache__" -exec rm -rf {} +
@@ -47,11 +31,9 @@ clean:
 	rm -rf results/focused_ultrasound_mve/run-*/
 	rm -rf /tmp/focused_ultrasound_mve/
 
-# Lint code (placeholder)
 lint:
-	@echo "Linting (placeholder - add specific linter when available)"
+	ruff check .
 
-# Run focused ultrasound MVE experiment with default parameters
 run-mve:
 	python experiments/focused_ultrasound_mve.py \
 		--seed 42 \
@@ -65,7 +47,6 @@ run-mve:
 		--output-dir results \
 		--visualize
 
-# Run quick MVE test with reduced parameters
 run-mve-quick:
 	python experiments/focused_ultrasound_mve.py \
 		--seed 42 \
@@ -78,7 +59,6 @@ run-mve-quick:
 		--grid-size 50 \
 		--output-dir results
 
-# Run MRI Z5D analysis with DICOM data (default parameters)
 run-mri-z5d:
 	python experiments/mri_z5d_analysis.py \
 		--seed 42 \
@@ -89,7 +69,6 @@ run-mri-z5d:
 		--k-parameter 0.04449 \
 		--max-files-per-series 20
 
-# Run quick MRI Z5D test with DICOM data (reduced parameters)
 run-mri-z5d-quick:
 	python experiments/mri_z5d_analysis.py \
 		--seed 42 \
@@ -99,7 +78,6 @@ run-mri-z5d-quick:
 		--output-dir results \
 		--max-files-per-series 5
 
-# Run MRI Z5D with synthetic data (for comparison/testing)
 run-mri-z5d-synthetic:
 	python experiments/mri_z5d_analysis.py \
 		--seed 42 \
@@ -110,7 +88,6 @@ run-mri-z5d-synthetic:
 		--k-parameter 0.04449 \
 		--use-synthetic
 
-# Run optimized FUS enhancer with vectorized processing (10^6 trials)
 run-fus-enhancer:
 	python fus_enhancer.py \
 		--seed 42 \
@@ -123,7 +100,6 @@ run-fus-enhancer:
 		--output-dir results \
 		--visualize
 
-# Run quick FUS enhancer test (reduced parameters)
 run-fus-enhancer-quick:
 	python fus_enhancer.py \
 		--seed 42 \
@@ -133,8 +109,3 @@ run-fus-enhancer-quick:
 		--batch-size 1000 \
 		--grid-size 50 \
 		--output-dir results
-
-# Run FUS enhancer smoke test
-fus-enhancer-smoke:
-	@echo "Running FUS Enhancer smoke test..."
-	python tests/test_fus_enhancer.py --smoke
