@@ -1,0 +1,21 @@
+# Z Framework - Resonance Target Manifest
+# Strict mapping to NCBI Source of Truth for Reproducibility
+
+targets:
+  - name: "Human Chromosome 1 (Region X)"
+    accession: "NC_000001.11"
+    range: "1000000-2000000"
+    source: "NCBI RefSeq"
+    notes: "High GC content region; Mammalian baseline."
+
+  - name: "E. Coli K-12 (MG1655)"
+    accession: "U00096.3"
+    range: "full"
+    source: "NCBI RefSeq"
+    notes: "Prokaryotic control; high gene density."
+
+  - name: "Arabidopsis thaliana (Thale Cress) - Chr 1"
+    accession: "NC_003070.9"
+    range: "1-500000"
+    source: "NCBI RefSeq"
+    notes: "Plant model; distinct genomic architecture (high transposable elements)."
