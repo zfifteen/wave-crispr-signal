@@ -199,9 +199,9 @@ class TestIntegration(unittest.TestCase):
         try:
             experiment, report = run_complete_falsification_study()
 
-            # Check that files were created
-            self.assertTrue(os.path.exists("FALSIFICATION_REPORT.md"))
-            self.assertTrue(os.path.exists("falsification_results.json"))
+            # Check that files were created in legacy artifacts
+            self.assertTrue(os.path.exists("legacy/artifacts/FALSIFICATION_REPORT.md"))
+            self.assertTrue(os.path.exists("legacy/artifacts/falsification_results.json"))
 
             # Check report content
             self.assertIn("FALSIFICATION REPORT", report)
