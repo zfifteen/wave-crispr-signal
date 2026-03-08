@@ -10,6 +10,8 @@ __pycache__/
 .pytest_cache/
 .mypy_cache/
 .venv*/
+*$py.class
+*.so
 
 # OS
 .DS_Store
@@ -25,12 +27,6 @@ temp/
 tmp/
 test_results/
 
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-
 # Validation results (generated files)
 proof_pack/validation_results/
 proof_pack/__pycache__/
@@ -40,9 +36,3 @@ results/
 /data/get_hg38/
 .snapshots
 experiments/*/results.json
-
-# Python cache
-__pycache__/
-*.py[cod]
-*$py.class
-*.so

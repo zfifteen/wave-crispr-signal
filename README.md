@@ -14,8 +14,8 @@ Build and maintain a focused CRISPR signal-analysis toolkit that turns sequence-
 
 ### Primary Outputs
 - CRISPR scoring APIs and CLIs (`applications/`, `wave_crispr_signal/`).
-- Reproducible analysis scripts (`proof_pack/`).
 - Methodology and usage documentation (`docs/`).
+- Demo MVP interface (`web_apps/demo_mvp/`).
 
 ### Non-Goals
 - This repository is not a general cross-domain experiment lab.
@@ -28,25 +28,28 @@ Build and maintain a focused CRISPR signal-analysis toolkit that turns sequence-
 - Historical tests are not a blocking source of truth.
 - CI is intentionally absent for now and will be reintroduced later as a minimal, change-scoped gate.
 
-## Repository Layout
+## Active Runtime Layout
 
 - `wave_crispr_signal/`: core CRISPR feature and scoring package.
-- `applications/`: user-facing CRISPR applications and CLIs.
-- `experiments/`: active CRISPR experiments.
-- `proof_pack/`: reproducible validation and proof scripts.
-- `data/` and `test_data/`: datasets and fixtures.
+- `applications/`: primary CLIs and runtime-facing application code.
+- `web_apps/demo_mvp/`: preserved web demo surface.
+- `scripts/invariant_features.py`: invariant feature dependency used by active CLI flows.
 - `docs/`: canonical docs for current scope.
-- `tools/`: repository utility scripts.
+
+## Archive Layout
+
+- `archive/code/`: archived non-primary code retained for provenance.
+- `docs/ARCHIVE_INDEX.md`: index of archival references.
 
 ## Contributor Decision Tree
 
-1. Does this change advance CRISPR scoring/design/validation?
-   - Yes: implement in mainline.
-   - No: do not add it here without explicit direction.
+1. Does this change advance CRISPR scoring/design/validation for active runtime surfaces?
+   - Yes: implement in mainline active paths.
+   - No: move to archive paths or keep out of repo.
 2. Is the output generated or environment-specific?
    - Yes: keep it out of versioned root and add ignore rules if needed.
 3. Does the change alter behavior?
-   - Yes: add change-coupled validation (test or explicit manual validation steps).
+   - Yes: add change-coupled validation (targeted automated test + manual verification command).
 
 ## Quick Start
 
@@ -61,6 +64,7 @@ python applications/phase_weighted_scorecard_cli.py score --guide GCTGCGGAGACCTG
 
 - `docs/INDEX.md`: documentation index and navigation.
 - `docs/CONTRIBUTING.md`: contribution workflow.
+- `docs/ARCHIVE_INDEX.md`: archival reference map.
 
 ## License
 
