@@ -1,34 +1,19 @@
-# Repository Policy
+# Repository Policy (Deprecated)
 
-## Purpose
+This document is retained for historical reference only.
 
-`wave-crispr-signal` is a **CRISPR signal analytics toolkit**. Mainline code must directly support CRISPR scoring/design/validation outcomes.
+## Status
 
-## Scope Rules
+- Deprecated and non-blocking.
+- Not enforced by CI.
+- Not authoritative for current contribution workflow.
 
-- **Mainline (`core`/`support`)**: CRISPR package code, apps, tests, proof/repro tooling, datasets, and docs for current scope.
-- **Legacy (`research-legacy`)**: non-CRISPR exploratory work must live under `legacy/`.
-- **Generated artifacts (`delete/regenerate`)**: must not be committed to repo root.
+## Current Source of Truth
 
-## Top-Level Layout (Allowed)
+Use these documents instead:
 
-- `.github/`, `applications/`, `bin/`, `configs/`, `data/`, `docs/`, `experiments/`, `legacy/`, `modules/`, `notebooks/`, `proof_pack/`, `scripts/`, `static/`, `templates/`, `test_data/`, `tests/`, `tools/`, `wave_crispr_signal/`, `web_apps/`
+- `README.md`
+- `docs/CONTRIBUTING.md`
+- `docs/INDEX.md`
 
-Allowed root files:
-- `.gitignore`, `LICENSE`, `Makefile`, `README.md`, `pyproject.toml`, `repo_metadata.yaml`, `requirements.txt`, `targets.yaml`
-
-## Guardrails
-
-- No generated artifact files at root (for example `acf_scale_*.png`, `null_dist_output.txt`, root falsification outputs).
-- No non-CRISPR domain modules in core package paths (`wave_crispr_signal/`, `applications/`).
-- `docs/INDEX.md` must exist and reference both `docs/INVENTORY_CLASSIFICATION.md` and `legacy/README.md`.
-
-## Compatibility
-
-- Public CRISPR-facing package/API/CLI contracts must remain stable.
-- Historical non-CRISPR import paths may be preserved through explicit wrappers in `experiments/` that forward to `legacy/`.
-
-## Enforcement
-
-- CI executes `python tools/check_repo_policy.py`.
-- Structure policy tests run in `tests/test_repo_structure_policy.py`.
+Testing and validation are change-scoped and introduced as needed per change.
