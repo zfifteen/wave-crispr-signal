@@ -39,10 +39,12 @@ Current CLI truth for `applications/genomic_disruption_api.py`:
   - decision-grade clean manifest (authoritative),
   - raw exploratory manifest (non-authoritative).
 - Current authoritative Gate v3 outcome on clean holdouts: `NO-GO` against `baseline_c_crisprpred`.
+- Current model thesis status: **closed (NO-GO)** for incremental continuation.
 - See:
   - `validation/ontarget_gate/README.md`
   - `validation/ontarget_gate/PROTOCOL_V3.md`
   - `validation/ontarget_gate/BOARD_FUNDING_ADDENDUM.md`
+  - `validation/ontarget_gate/CLOSEOUT_NO_GO.md`
   - `validation/ontarget_gate/outputs/gate_report_v3.md`
 
 ## Canonical Docs

@@ -1,0 +1,17 @@
+{
+  "meta_ridge": {
+    "dev_val": 0.003565833953340175,
+    "primary_holdout": 0.02604807303318551,
+    "external_holdout": -0.0587509716047254
+  },
+  "meta_gbr": {
+    "dev_val": -0.0032361072839321783,
+    "primary_holdout": 0.029150205503302433,
+    "external_holdout": -0.056303237395777785
+  },
+  "meta_rf": {
+    "dev_val": -0.009784804549561092,
+    "primary_holdout": 0.02869964091881909,
+    "external_holdout": -0.0539208610554985
+  }
+}

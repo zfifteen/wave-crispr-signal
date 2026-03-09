@@ -1,0 +1,122 @@
+name: signal_theoretic_crispr
+version: "1.0.0"
+description: "Signal-Theoretic Modeling of CRISPR-Cas9 for Cancer-Target Editing"
+
+metadata:
+  experiment_type: "two_arm_benchmark"
+  domain: "crispr_genomics"
+  organism: "homo_sapiens"
+  reference_genome: "hg38"
+  created_date: "2025-01-20"
+  author: "wave-crispr-signal"
+  
+scientific_gates:
+  G1_human_source_only: true
+  G2_alphabet_validation: "A,C,G,T,N"
+  G3_hg38_anchoring: true
+  G4_determinism: true
+  G5_metrics_bootstrap: true
+  G6_numeric_stability: true
+  G7_controls: true
+  G8_ethics_compliance: true
+
+parameters:
+  default_seed: 42
+  bootstrap_iterations: 1000
+  permutation_iterations: 1000
+  window_size: 201
+  geodesic_k: 0.3
+  golden_ratio: 1.618033988749895
+  split_strategy: "split-by-gene"
+  pam_sequence: "NGG"
+  
+datasets:
+  primary:
+    - name: "doench2016"
+      path: "data/doench2016.csv"
+      type: "on_target_efficiency"
+      organism: "homo_sapiens"
+      validation_required: true
+  reference:
+    - name: "hg38"
+      path: "data/get_hg38/"
+      type: "reference_genome"
+      organism: "homo_sapiens"
+      build: "GRCh38"
+
+arms:
+  baseline:
+    name: "batch_scan_baseline"
+    description: "Spring Batch-style baseline with simple features"
+    features:
+      - "gc_content"
+      - "homopolymer_runs"
+      - "seed_mismatches"
+      - "thermodynamic_surrogates"
+    models:
+      regression: "linear_ridge"
+      classification: "logistic"
+      
+  spectral:
+    name: "wave_crispr_spectral"
+    description: "WAVE-CRISPR spectral-geodesic features"
+    encoding_bands:
+      - name: "bio_anchored"
+        type: "physicochemical"
+        description: "Polarizability + H-bond tendency complex mapping"
+      - name: "arbitrary"
+        type: "randomized_fixed_seed"
+        description: "Random complex amplitudes within predefined bounds"
+    features:
+      - "spectral_entropy"
+      - "spectral_flatness"
+      - "peak_magnitude"
+      - "peak_frequency"
+      - "sidelobe_bandpowers"
+      - "stability_ratios"
+      - "geodesic_modulated_z"
+    models:
+      regression: "linear_ridge"
+      classification: "logistic"
+
+metrics:
+  on_target:
+    primary: "r_squared"
+    secondary: "mae"
+    bootstrap_ci: 0.95
+  off_target:
+    primary: "auprc"
+    secondary: "auroc"
+    bootstrap_ci: 0.95
+  success_threshold:
+    improvement: 0.05
+    ci_exclusion: 0.0
+
+controls:
+  shuffled_labels: true
+  pam_broken: true
+  reverse_complement: true
+  negative_control_validation: true
+
+output:
+  results_format: ["json", "csv"]
+  figures: ["baseline_vs_spectral", "bootstrap_ci", "feature_importance"]
+  validation_report: true
+  environment_snapshot: true
+  execution_log: true
+
+dependencies:
+  python: ">=3.12"
+  numpy: "==1.26.4"
+  scipy: "==1.16.1"
+  scikit-learn: "==1.5.1"
+  mpmath: "==1.3.0"
+  matplotlib: "==3.10.5"
+  pandas: "==2.3.1"
+  biopython: "==1.83"
+  pyfaidx: "==0.8.1.1"
+
+runtime_config:
+  n_mode: "index"  # Options: index, length, position
+  geodesic_k: 0.3  # Geodesic resolution parameter
+  kappa_features: false  # Include κ(n) = d(n)·ln(n+1)/e² features

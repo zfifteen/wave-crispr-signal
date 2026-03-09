@@ -33,9 +33,12 @@ No additional documentation/implementation mismatches are currently tracked in t
 - Active gate implementation: `validation/ontarget_gate/scripts/run_gate_v3.py`
 - Active protocol: `validation/ontarget_gate/PROTOCOL_V3.md`
 - Active funding-governance addendum: `validation/ontarget_gate/BOARD_FUNDING_ADDENDUM.md`
+- Active closeout record: `validation/ontarget_gate/CLOSEOUT_NO_GO.md`
 - Comparator lane design:
   - decision-grade clean manifest (`decision_split_manifest_v3_clean.csv`) drives `GO/NO-GO`,
   - exploratory raw manifest (`exploratory_split_manifest_v3_raw.csv`) is report-only context.
 - Current authoritative result:
   - `NO-GO` on clean holdouts vs `baseline_c_crisprpred` fixed-delta criteria.
+- Current thesis state:
+  - closed (`NO-GO`) for incremental continuation under this model approach.
 - Current raw manifest remains overlap-contaminated and is explicitly non-authoritative.

@@ -1,0 +1,113 @@
+{
+  "generated_at": "2026-03-09T17:42:19.205009+00:00",
+  "manifest_path": "/Users/velocityworks/IdeaProjects/wave-crispr-signal/validation/ontarget_gate/outputs/locked_split_manifest_v3.csv",
+  "n_rows": {
+    "train": 64007,
+    "dev_val": 414,
+    "primary_holdout": 529,
+    "external_holdout": 4256
+  },
+  "model_config": {
+    "disruption_analyzer_k": 0.3,
+    "disruption_analyzer_seed": 42,
+    "A1_alpha": 0.0,
+    "A2_alpha": 0.0,
+    "A2_beta_gc": -0.01735311360068317,
+    "A3_model": "Ridge(alpha=1.0)",
+    "A4_model": "LogisticRegression(pairwise differences, max_iter=1000)",
+    "A4_pair_count": 119997
+  },
+  "metrics_by_candidate": {
+    "A0_current_model": {
+      "dev_val": {
+        "spearman_model": -0.040244777404174016,
+        "spearman_baseline_c": -0.045563321746390474,
+        "delta_vs_baseline_c": 0.005318544342216458
+      },
+      "primary_holdout": {
+        "spearman_model": -0.07021112281912584,
+        "spearman_baseline_c": -0.05373348773562545,
+        "delta_vs_baseline_c": -0.016477635083500385
+      },
+      "external_holdout": {
+        "spearman_model": -0.001910212700381293,
+        "spearman_baseline_c": 0.0147156667958793,
+        "delta_vs_baseline_c": -0.016625879496260595
+      }
+    },
+    "A1_zblend_model_plus_baseline_a": {
+      "dev_val": {
+        "spearman_model": -0.040244777404174016,
+        "spearman_baseline_c": -0.045563321746390474,
+        "delta_vs_baseline_c": 0.005318544342216458
+      },
+      "primary_holdout": {
+        "spearman_model": -0.07021112281912584,
+        "spearman_baseline_c": -0.05373348773562545,
+        "delta_vs_baseline_c": -0.016477635083500385
+      },
+      "external_holdout": {
+        "spearman_model": -0.001910212700381293,
+        "spearman_baseline_c": 0.0147156667958793,
+        "delta_vs_baseline_c": -0.016625879496260595
+      }
+    },
+    "A2_gc_debias_plus_zblend": {
+      "dev_val": {
+        "spearman_model": 0.002852889608756111,
+        "spearman_baseline_c": -0.045563321746390474,
+        "delta_vs_baseline_c": 0.048416211355146586
+      },
+      "primary_holdout": {
+        "spearman_model": -0.0656319462294913,
+        "spearman_baseline_c": -0.05373348773562545,
+        "delta_vs_baseline_c": -0.011898458493865845
+      },
+      "external_holdout": {
+        "spearman_model": -0.00251448264632343,
+        "spearman_baseline_c": 0.0147156667958793,
+        "delta_vs_baseline_c": -0.01723014944220273
+      }
+    },
+    "A3_stacked_ridge": {
+      "dev_val": {
+        "spearman_model": -0.0419974877930503,
+        "spearman_baseline_c": -0.045563321746390474,
+        "delta_vs_baseline_c": 0.003565833953340175
+      },
+      "primary_holdout": {
+        "spearman_model": -0.02768541470243994,
+        "spearman_baseline_c": -0.05373348773562545,
+        "delta_vs_baseline_c": 0.02604807303318551
+      },
+      "external_holdout": {
+        "spearman_model": -0.0440353048088461,
+        "spearman_baseline_c": 0.0147156667958793,
+        "delta_vs_baseline_c": -0.0587509716047254
+      }
+    },
+    "A4_pairwise_rank_logit": {
+      "dev_val": {
+        "spearman_model": -0.07237802668723108,
+        "spearman_baseline_c": -0.045563321746390474,
+        "delta_vs_baseline_c": -0.0268147049408406
+      },
+      "primary_holdout": {
+        "spearman_model": -0.02439576796212221,
+        "spearman_baseline_c": -0.05373348773562545,
+        "delta_vs_baseline_c": 0.029337719773503242
+      },
+      "external_holdout": {
+        "spearman_model": -0.04278322889985032,
+        "spearman_baseline_c": 0.0147156667958793,
+        "delta_vs_baseline_c": -0.05749889569572962
+      }
+    }
+  },
+  "selection_rule": "max dev_val delta_vs_baseline_c",
+  "winner": "A2_gc_debias_plus_zblend",
+  "winner_holdout_deltas": {
+    "primary": -0.011898458493865845,
+    "external": -0.01723014944220273
+  }
+}

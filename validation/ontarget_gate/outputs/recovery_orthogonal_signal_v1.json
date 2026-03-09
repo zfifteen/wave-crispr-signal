@@ -1,0 +1,17 @@
+{
+  "dev_val": {
+    "meta_minus_baseline_c": 0.00395682839748162,
+    "model_minus_baseline_c": 0.005318544342216458,
+    "baseline_a_minus_baseline_c": 0.0032911836482111823
+  },
+  "primary_holdout": {
+    "meta_minus_baseline_c": 0.020430820051147713,
+    "model_minus_baseline_c": -0.016477635083500385,
+    "baseline_a_minus_baseline_c": 0.029691512678074645
+  },
+  "external_holdout": {
+    "meta_minus_baseline_c": -0.05548521601688308,
+    "model_minus_baseline_c": -0.016625879496260595,
+    "baseline_a_minus_baseline_c": -0.05826460079626362
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "train_all": {
+    "_alpha": 0,
+    "dev_val": 0.005318544342216458,
+    "primary_holdout": -0.016477635083500385,
+    "external_holdout": -0.016625879496260595
+  },
+  "train_primary_only": {
+    "_alpha": 2.0,
+    "dev_val": 0.26050397709332834,
+    "primary_holdout": 0.048803394958054504,
+    "external_holdout": -0.029961683160692483
+  }
+}

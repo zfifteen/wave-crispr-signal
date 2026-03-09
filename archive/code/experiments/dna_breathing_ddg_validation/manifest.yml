@@ -1,0 +1,89 @@
+experiment_id: dna_breathing_ddg_validation
+version: "1.0.0"
+title: "DNA Breathing Dynamics ΔΔG Validation"
+description: |
+  Pre-registered validation testing whether DNA breathing dynamics encoding
+  shows sensitivity to thermodynamic perturbations (ΔΔG) from single-point
+  mutations using helical band sweep analysis.
+
+hypothesis:
+  primary: "H1: Within ΔΔG-high pairs, band-centered features show |Cohen's d| ≥ 0.5"
+  secondary: "H2: |d| increases with |ΔΔG| bin (low < mid < high)"
+  falsification: "H3: Off-band control windows yield |d| < 0.2"
+
+reference:
+  source: "https://github.com/zfifteen/dna-breathing-dynamics-encoding/pull/53"
+  issue: "DNA Breathing Dynamics — Rebuilt Test Plan (ΔΔG‑Pairs + Helical Band Sweep)"
+  issue_number: 52
+
+methodology:
+  data_source: "Real human CRISPR sequences (validated)"
+  pair_design: "Single-point mutations with ΔΔG calculation (SantaLucia 1998)"
+  binning: "Tertiles by absolute |ΔΔG| (low/mid/high)"
+  spectral_analysis:
+    centers: [10.3, 10.4, 10.5, 10.6, 10.7]  # bp/turn
+    widths: [0.01, 0.02, 0.03, 0.05, 0.06]  # percentage of center
+  features:
+    - peak_magnitude
+    - band_power
+    - phase_coherence
+    - snr
+  statistics:
+    effect_size: "Cohen's d (paired design)"
+    confidence_intervals: "BCa bootstrap (≥1,000 reps)"
+    multiple_testing: "Benjamini-Hochberg FDR"
+    trend_test: "Spearman correlation"
+    controls:
+      - off_band_windows
+      - label_shuffle_permutation
+
+acceptance_criteria:
+  primary:
+    threshold: "|Cohen's d| ≥ 0.5"
+    fdr_threshold: "q < 0.05"
+    confidence_interval: "95% CI excludes 0"
+  robustness:
+    threshold: "Effect replicates across ≥2 adjacent centers or widths"
+  specificity:
+    off_band_threshold: "|d| < 0.2"
+    shuffle_threshold: "q ≥ 0.1"
+
+scientific_gates:
+  human_dna_only: true
+  alphabet_validation: "A/C/G/T/N only"
+  no_fabrication: true
+  z_framework: "Z = A(B/e²) with divide-by-zero guards"
+  geometric_resolution: "θ′(n,k) with k ≈ 0.3"
+  pre_registered: true
+  reproducible_seeds: true
+  metadata_logging: true
+
+execution:
+  smoke_test:
+    command: "python ddg_validation.py --input ../../data/doench2016.csv --output results/smoke_test --n-pairs 100 --seed 42 --smoke"
+    duration_estimate: "< 5 seconds"
+  full_validation:
+    command: "python ddg_validation.py --input ../../data/doench2016.csv --output results/full_validation --n-pairs 6000 --bootstrap 1000 --permutation 1000 --seed 42"
+    duration_estimate: "10-30 minutes"
+
+artifacts:
+  - config.json
+  - pairs.csv
+  - stats.csv
+  - trend.csv
+  - env.txt
+  - log.txt
+  - FINDINGS.md
+
+maintainers:
+  - "Copilot Coding Agent"
+
+created: "2025-12-26"
+repository: "zfifteen/wave-crispr-signal"
+branch: "copilot/create-experiment-folder-again"
+
+compliance:
+  repository_policy: true
+  z_framework_gates: true
+  statistical_validity: true
+  reproducibility: true

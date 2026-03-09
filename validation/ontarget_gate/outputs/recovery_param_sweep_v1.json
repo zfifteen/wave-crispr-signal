@@ -1,0 +1,77 @@
+{
+  "top": [
+    {
+      "k": 0.1,
+      "phi": 19.0,
+      "dev_val_delta": 0.005668951127796501,
+      "primary_holdout_delta": -0.014364031783834406,
+      "external_holdout_delta": -0.01489425121523231,
+      "strict_score": -0.01489425121523231,
+      "holdout_sum": -0.029258282999066715
+    },
+    {
+      "k": 0.1,
+      "phi": 20.0,
+      "dev_val_delta": 0.005668951127796501,
+      "primary_holdout_delta": -0.014364031783834406,
+      "external_holdout_delta": -0.01489425121523231,
+      "strict_score": -0.01489425121523231,
+      "holdout_sum": -0.029258282999066715
+    },
+    {
+      "k": 0.1,
+      "phi": 21.0,
+      "dev_val_delta": 0.005668951127796501,
+      "primary_holdout_delta": -0.014364031783834406,
+      "external_holdout_delta": -0.01489425121523231,
+      "strict_score": -0.01489425121523231,
+      "holdout_sum": -0.029258282999066715
+    },
+    {
+      "k": 0.1,
+      "phi": 22.0,
+      "dev_val_delta": 0.005668951127796501,
+      "primary_holdout_delta": -0.014364031783834406,
+      "external_holdout_delta": -0.01489425121523231,
+      "strict_score": -0.01489425121523231,
+      "holdout_sum": -0.029258282999066715
+    },
+    {
+      "k": 0.1,
+      "phi": 23.0,
+      "dev_val_delta": 0.005668951127796501,
+      "primary_holdout_delta": -0.014364031783834406,
+      "external_holdout_delta": -0.01489425121523231,
+      "strict_score": -0.01489425121523231,
+      "holdout_sum": -0.029258282999066715
+    },
+    {
+      "k": 0.2,
+      "phi": 19.0,
+      "dev_val_delta": 0.005754354326019437,
+      "primary_holdout_delta": -0.01643175414971152,
+      "external_holdout_delta": -0.015960547954146906,
+      "strict_score": -0.01643175414971152,
+      "holdout_sum": -0.03239230210385843
+    },
+    {
+      "k": 0.2,
+      "phi": 20.0,
+      "dev_val_delta": 0.005754354326019437,
+      "primary_holdout_delta": -0.01643175414971152,
+      "external_holdout_delta": -0.015960547954146906,
+      "strict_score": -0.01643175414971152,
+      "holdout_sum": -0.03239230210385843
+    },
+    {
+      "k": 0.2,
+      "phi": 21.0,
+      "dev_val_delta": 0.005754354326019437,
+      "primary_holdout_delta": -0.01643175414971152,
+      "external_holdout_delta": -0.015960547954146906,
+      "strict_score": -0.01643175414971152,
+      "holdout_sum": -0.03239230210385843
+    }
+  ],
+  "all_count": 30
+}

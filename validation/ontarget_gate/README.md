@@ -2,6 +2,7 @@
 
 The active external-comparator protocol is `PROTOCOL_V3.md`.
 Board-facing conditional approval controls are in `BOARD_FUNDING_ADDENDUM.md`.
+Current model-thesis closeout is recorded in `CLOSEOUT_NO_GO.md`.
 
 - v3 adds required `baseline_c_crisprpred` comparator wiring.
 - v1/v2 outputs are historical and non-authoritative for comparator claims.
