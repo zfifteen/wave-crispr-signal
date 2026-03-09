@@ -41,6 +41,11 @@ Public scored datasets remain:
 
 Leakage-safe grouped split policy remains from v2.
 
+Two manifests are generated:
+
+- `decision_split_manifest_v3_clean.csv` (authoritative; overlap-sanitized)
+- `exploratory_split_manifest_v3_raw.csv` (non-authoritative; original split assignment)
+
 ## Comparator Environment Isolation
 
 Comparator execution mode is fixed:
@@ -66,6 +71,7 @@ All must pass before baseline_c criteria are evaluated:
 Minimum holdout behavior:
 
 - if either holdout has fewer than 200 scored guides -> `INCONCLUSIVE`.
+- overlap audit runs before decision-grade scoring; if clean-manifest overlap fails, authoritative scoring is skipped.
 
 ## Metrics
 
@@ -107,3 +113,12 @@ Potential v4 upgrade path:
 
 - CI-aware conjunctive gating (for example `delta >= +0.01 AND CI_lo > 0`) requires protocol amendment.
 
+## Decision vs Exploratory Lanes
+
+- Decision-grade lane:
+  - clean manifest only,
+  - drives `GO` / `NO-GO`.
+- Exploratory lane:
+  - raw manifest only,
+  - reported for context,
+  - never used in decision criteria.

@@ -27,6 +27,8 @@ Written to `validation/ontarget_gate/outputs/`:
 
 - `locked_dataset_manifest_v3.json`
 - `locked_split_manifest_v3.csv`
+- `decision_split_manifest_v3_clean.csv`
+- `exploratory_split_manifest_v3_raw.csv`
 - `locked_schema_manifest_v3.csv`
 - `gate_results_v3.json`
 - `gate_report_v3.md`
@@ -38,4 +40,5 @@ Written to `validation/ontarget_gate/outputs/`:
   - primary holdout: `delta(model - baseline_c) >= +0.01`
   - external holdout: `delta(model - baseline_c) >= +0.01`
 - CIs are diagnostic-only in this phase.
-
+- Authoritative decisions use the clean manifest only.
+- Raw manifest results are exploratory and non-authoritative.

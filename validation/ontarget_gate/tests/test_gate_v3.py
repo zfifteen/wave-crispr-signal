@@ -28,7 +28,7 @@ class GateV3Tests(unittest.TestCase):
             base,
             {
                 "comparator_self_check_ok": False,
-                "overlap_audit_ok": True,
+                "overlap_audit_clean_ok": True,
                 "holdout_min_n_ok": True,
             },
         )
@@ -53,7 +53,7 @@ class GateV3Tests(unittest.TestCase):
             external,
             {
                 "comparator_self_check_ok": True,
-                "overlap_audit_ok": True,
+                "overlap_audit_clean_ok": True,
                 "holdout_min_n_ok": True,
             },
         )
@@ -78,11 +78,26 @@ class GateV3Tests(unittest.TestCase):
             external,
             {
                 "comparator_self_check_ok": True,
-                "overlap_audit_ok": True,
+                "overlap_audit_clean_ok": True,
                 "holdout_min_n_ok": True,
             },
         )
         self.assertEqual(out["decision"], "GO")
+
+    def test_sanitize_decision_holdouts_removes_overlap_from_clean_path(self):
+        rows = [
+            {"split": "primary_holdout", "guide_seq": "AAAAAAAAAAAAAAAAAAAA"},
+            {"split": "external_holdout", "guide_seq": "CCCCCCCCCCCCCCCCCCCC"},
+            {"split": "dev_val", "guide_seq": "GGGGGGGGGGGGGGGGGGGG"},
+        ]
+        training = {"AAAAAAAAAAAAAAAAAAAA", "TTTTTTTTTTTTTTTTTTTT"}
+        clean, stat = gate.sanitize_decision_holdouts(rows, training)
+        self.assertEqual(stat["primary_holdout_dropped_overlap"], 1)
+        self.assertEqual(stat["external_holdout_dropped_overlap"], 0)
+        self.assertEqual(stat["total_decision_overlap_dropped"], 1)
+        splits = [r["split"] for r in clean]
+        self.assertIn("excluded_overlap_clean", splits)
+        self.assertIn("external_holdout", splits)
 
     def test_overlap_audit_training_manifest_unavailable(self):
         with tempfile.TemporaryDirectory() as td:

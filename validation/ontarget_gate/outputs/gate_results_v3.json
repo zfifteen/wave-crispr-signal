@@ -1,82 +1,147 @@
 {
-  "generated_at": "2026-03-09T06:57:36.237913+00:00",
+  "generated_at": "2026-03-09T07:21:47.250070+00:00",
   "protocol_version": "v3",
-  "decision": "INCONCLUSIVE",
-  "decision_reason": "overlap_audit_failed_or_unavailable",
-  "decision_criteria": {},
+  "decision": "NO-GO",
+  "decision_reason": "baseline_c_threshold_failed",
+  "decision_criteria": {
+    "hard_precondition_dev_not_materially_negative": true,
+    "primary_delta_vs_baseline_c_min_0p01": false,
+    "external_delta_vs_baseline_c_min_0p01": false
+  },
   "preconditions": {
-    "split_integrity_ok": true,
+    "split_integrity_clean_ok": true,
     "comparator_self_check_ok": true,
-    "overlap_audit_ok": false,
+    "overlap_audit_clean_ok": true,
     "holdout_min_n_ok": true,
     "holdout_min_n_required": 200
   },
   "split_integrity": {
-    "ok": true,
-    "violations": [],
-    "split_counts": {
-      "aux_train_weak": 62834,
-      "dev_train": 1173,
-      "dev_val": 414,
-      "primary_holdout": 2217,
-      "external_holdout": 4256
+    "clean": {
+      "ok": true,
+      "violations": [],
+      "split_counts": {
+        "aux_train_weak": 62834,
+        "dev_train": 1173,
+        "dev_val": 414,
+        "excluded_overlap_clean": 1688,
+        "primary_holdout": 529,
+        "external_holdout": 4256
+      }
+    },
+    "raw": {
+      "ok": true,
+      "violations": [],
+      "split_counts": {
+        "aux_train_weak": 62834,
+        "dev_train": 1173,
+        "dev_val": 414,
+        "primary_holdout": 2217,
+        "external_holdout": 4256
+      }
     }
   },
   "overlap_audit": {
-    "ok": false,
-    "message": "overlap_detected",
-    "overlap_count": 1688,
-    "overlap_examples": [
-      "AAAAAACCTACCGTAAACTC",
-      "AAAAATTCTAACGTGAGGTG",
-      "AAAACCAGGGGCCGGTGCTG",
-      "AAAAGGCAAGAAATGGAATC",
-      "AAAATTAAAACGACTCCTGA",
-      "AAACAGGGGCCCGAAACCCA",
-      "AAACATAAGGAGTATAGCCC",
-      "AAACATCTCGTACAGTGACA",
-      "AAACCAGGGGCCGGTGCTGA",
-      "AAAGAAGGCCACTCGGGACT",
-      "AAAGATCTACTGCCCTCCTG",
-      "AAAGCCATATGAAATTGTAG",
-      "AAAGCTCTTGCTGGCCATGG",
-      "AAAGCTTCGTGTTAATAAGC",
-      "AAAGGAGATACTTACACAAC",
-      "AAAGGCAAGAAATGGAATCA",
-      "AAAGGCCCAGATCACCGAGG",
-      "AAAGGCTGCTGGGGAAGAAT",
-      "AAAGGGACAGCAGAAACTGG",
-      "AAAGTGCGCAAACAGGTGGC"
-    ],
-    "holdout_counts": {
-      "primary_holdout": 2217,
-      "external_holdout": 4256
+    "clean": {
+      "ok": true,
+      "message": "no_overlap",
+      "overlap_count": 0,
+      "overlap_examples": [],
+      "holdout_counts": {
+        "primary_holdout": 529,
+        "external_holdout": 4256
+      },
+      "training_sequence_count": 4379,
+      "training_status": {
+        "available": true,
+        "status": "ready",
+        "reason": "sequence_level_training_manifest_acquired",
+        "checked_at": "2026-03-09",
+        "source_repo": "https://github.com/khaled-rahman/CRISPRpred",
+        "source_commit": "eee7ee8a9ba61c1afcb7a56d9893f8e661f41cc0",
+        "source_file": "https://raw.githubusercontent.com/khaled-rahman/CRISPRpred/master/CRISPRpred/SupplementaryFiles/Supplementary%20File1.csv",
+        "extraction_rule": "20mer = 30mer[4:24] (0-based, end-exclusive)",
+        "record_count": 5310
+      },
+      "returncode": 0,
+      "cmd": [
+        "/Library/Frameworks/Python.framework/Versions/3.13/bin/python3",
+        "/Users/velocityworks/IdeaProjects/wave-crispr-signal/validation/ontarget_gate/scripts/audit_overlap.py",
+        "--split-manifest",
+        "/Users/velocityworks/IdeaProjects/wave-crispr-signal/validation/ontarget_gate/outputs/decision_split_manifest_v3_clean.csv",
+        "--training-manifest",
+        "/Users/velocityworks/IdeaProjects/wave-crispr-signal/validation/ontarget_gate/comparators/crisprpred/training_manifest.fasta",
+        "--training-status",
+        "/Users/velocityworks/IdeaProjects/wave-crispr-signal/validation/ontarget_gate/comparators/crisprpred/training_manifest_status.json",
+        "--output",
+        "/var/folders/k_/spz3zlj566sc4qh29g0tk6jh0000gn/T/tmpwopofzea.json"
+      ]
     },
-    "training_sequence_count": 4379,
-    "training_status": {
-      "available": true,
-      "status": "ready",
-      "reason": "sequence_level_training_manifest_acquired",
-      "checked_at": "2026-03-09",
-      "source_repo": "https://github.com/khaled-rahman/CRISPRpred",
-      "source_commit": "eee7ee8a9ba61c1afcb7a56d9893f8e661f41cc0",
-      "source_file": "https://raw.githubusercontent.com/khaled-rahman/CRISPRpred/master/CRISPRpred/SupplementaryFiles/Supplementary%20File1.csv",
-      "extraction_rule": "20mer = 30mer[4:24] (0-based, end-exclusive)",
-      "record_count": 5310
-    },
-    "returncode": 6,
-    "cmd": [
-      "/Library/Frameworks/Python.framework/Versions/3.13/bin/python3",
-      "/Users/velocityworks/IdeaProjects/wave-crispr-signal/validation/ontarget_gate/scripts/audit_overlap.py",
-      "--split-manifest",
-      "/Users/velocityworks/IdeaProjects/wave-crispr-signal/validation/ontarget_gate/outputs/locked_split_manifest_v3.csv",
-      "--training-manifest",
-      "/Users/velocityworks/IdeaProjects/wave-crispr-signal/validation/ontarget_gate/comparators/crisprpred/training_manifest.fasta",
-      "--training-status",
-      "/Users/velocityworks/IdeaProjects/wave-crispr-signal/validation/ontarget_gate/comparators/crisprpred/training_manifest_status.json",
-      "--output",
-      "/var/folders/k_/spz3zlj566sc4qh29g0tk6jh0000gn/T/tmpt70h60s6.json"
-    ]
+    "raw": {
+      "ok": false,
+      "message": "overlap_detected",
+      "overlap_count": 1688,
+      "overlap_examples": [
+        "AAAAAACCTACCGTAAACTC",
+        "AAAAATTCTAACGTGAGGTG",
+        "AAAACCAGGGGCCGGTGCTG",
+        "AAAAGGCAAGAAATGGAATC",
+        "AAAATTAAAACGACTCCTGA",
+        "AAACAGGGGCCCGAAACCCA",
+        "AAACATAAGGAGTATAGCCC",
+        "AAACATCTCGTACAGTGACA",
+        "AAACCAGGGGCCGGTGCTGA",
+        "AAAGAAGGCCACTCGGGACT",
+        "AAAGATCTACTGCCCTCCTG",
+        "AAAGCCATATGAAATTGTAG",
+        "AAAGCTCTTGCTGGCCATGG",
+        "AAAGCTTCGTGTTAATAAGC",
+        "AAAGGAGATACTTACACAAC",
+        "AAAGGCAAGAAATGGAATCA",
+        "AAAGGCCCAGATCACCGAGG",
+        "AAAGGCTGCTGGGGAAGAAT",
+        "AAAGGGACAGCAGAAACTGG",
+        "AAAGTGCGCAAACAGGTGGC"
+      ],
+      "holdout_counts": {
+        "primary_holdout": 2217,
+        "external_holdout": 4256
+      },
+      "training_sequence_count": 4379,
+      "training_status": {
+        "available": true,
+        "status": "ready",
+        "reason": "sequence_level_training_manifest_acquired",
+        "checked_at": "2026-03-09",
+        "source_repo": "https://github.com/khaled-rahman/CRISPRpred",
+        "source_commit": "eee7ee8a9ba61c1afcb7a56d9893f8e661f41cc0",
+        "source_file": "https://raw.githubusercontent.com/khaled-rahman/CRISPRpred/master/CRISPRpred/SupplementaryFiles/Supplementary%20File1.csv",
+        "extraction_rule": "20mer = 30mer[4:24] (0-based, end-exclusive)",
+        "record_count": 5310
+      },
+      "returncode": 6,
+      "cmd": [
+        "/Library/Frameworks/Python.framework/Versions/3.13/bin/python3",
+        "/Users/velocityworks/IdeaProjects/wave-crispr-signal/validation/ontarget_gate/scripts/audit_overlap.py",
+        "--split-manifest",
+        "/Users/velocityworks/IdeaProjects/wave-crispr-signal/validation/ontarget_gate/outputs/exploratory_split_manifest_v3_raw.csv",
+        "--training-manifest",
+        "/Users/velocityworks/IdeaProjects/wave-crispr-signal/validation/ontarget_gate/comparators/crisprpred/training_manifest.fasta",
+        "--training-status",
+        "/Users/velocityworks/IdeaProjects/wave-crispr-signal/validation/ontarget_gate/comparators/crisprpred/training_manifest_status.json",
+        "--output",
+        "/var/folders/k_/spz3zlj566sc4qh29g0tk6jh0000gn/T/tmph0pearwx.json"
+      ]
+    }
+  },
+  "manifest_paths": {
+    "decision_clean": "/Users/velocityworks/IdeaProjects/wave-crispr-signal/validation/ontarget_gate/outputs/decision_split_manifest_v3_clean.csv",
+    "exploratory_raw": "/Users/velocityworks/IdeaProjects/wave-crispr-signal/validation/ontarget_gate/outputs/exploratory_split_manifest_v3_raw.csv",
+    "compat_locked_split_manifest_v3": "/Users/velocityworks/IdeaProjects/wave-crispr-signal/validation/ontarget_gate/outputs/locked_split_manifest_v3.csv"
+  },
+  "sanitation": {
+    "primary_holdout_dropped_overlap": 1688,
+    "external_holdout_dropped_overlap": 0,
+    "total_decision_overlap_dropped": 1688
   },
   "baseline_c": {
     "slot": "baseline_c",
@@ -159,13 +224,127 @@
     }
   ],
   "split_counts": {
-    "aux_train_weak": 62834,
-    "dev_train": 1173,
-    "dev_val": 414,
-    "primary_holdout": 2217,
-    "external_holdout": 4256
+    "clean": {
+      "aux_train_weak": 62834,
+      "dev_train": 1173,
+      "dev_val": 414,
+      "excluded_overlap_clean": 1688,
+      "primary_holdout": 529,
+      "external_holdout": 4256
+    },
+    "raw": {
+      "aux_train_weak": 62834,
+      "dev_train": 1173,
+      "dev_val": 414,
+      "primary_holdout": 2217,
+      "external_holdout": 4256
+    }
   },
-  "results": [
+  "decision_results_clean": [
+    {
+      "split": "dev_val",
+      "source": "doench2016_hg19",
+      "n": 414,
+      "metrics": {
+        "baseline_a": {
+          "spearman": -0.04227213809817929,
+          "mse": 2.762499591358983
+        },
+        "baseline_b": {
+          "spearman": 0.014589825773247744,
+          "mse": 4.695581078974967
+        },
+        "baseline_c": {
+          "spearman": -0.047446575099324186,
+          "mse": 6.257918533770384
+        },
+        "model": {
+          "spearman": -0.040244777404174016,
+          "mse": 5.484627217672434
+        }
+      },
+      "delta_model_minus_baseline_a_spearman": 0.0020273606940052757,
+      "delta_model_minus_baseline_a_spearman_ci95": [
+        -0.10736243015023447,
+        0.10910699923691246
+      ],
+      "delta_model_minus_baseline_b_spearman": -0.05483460317742176,
+      "delta_model_minus_baseline_c_spearman": 0.007201797695150169,
+      "delta_model_minus_baseline_c_spearman_ci95": [
+        -0.08086392936117855,
+        0.0869950718463958
+      ]
+    },
+    {
+      "split": "primary_holdout",
+      "source": "doench2016_hg19",
+      "n": 529,
+      "metrics": {
+        "baseline_a": {
+          "spearman": -0.024041975057550808,
+          "mse": 5.3951244740623485
+        },
+        "baseline_b": {
+          "spearman": 0.04292526133690733,
+          "mse": 13.02353785605515
+        },
+        "baseline_c": {
+          "spearman": -0.050981760713334816,
+          "mse": 16.512466676951767
+        },
+        "model": {
+          "spearman": -0.07021112281912584,
+          "mse": 14.8311700166423
+        }
+      },
+      "delta_model_minus_baseline_a_spearman": -0.04616914776157503,
+      "delta_model_minus_baseline_a_spearman_ci95": [
+        -0.14578034719694674,
+        0.056276750472270674
+      ],
+      "delta_model_minus_baseline_b_spearman": -0.11313638415603317,
+      "delta_model_minus_baseline_c_spearman": -0.01922936210579102,
+      "delta_model_minus_baseline_c_spearman_ci95": [
+        -0.1066855746619964,
+        0.06370133799228637
+      ]
+    },
+    {
+      "split": "external_holdout",
+      "source": "hart2016_hela_lib1_avg",
+      "n": 4256,
+      "metrics": {
+        "baseline_a": {
+          "spearman": -0.043548934000384315,
+          "mse": 9.244718729508557
+        },
+        "baseline_b": {
+          "spearman": -0.004173086332216752,
+          "mse": 4.185577596818635
+        },
+        "baseline_c": {
+          "spearman": 0.012530069692070416,
+          "mse": 3.2800579302028385
+        },
+        "model": {
+          "spearman": -0.001910212700381293,
+          "mse": 3.6671860751024257
+        }
+      },
+      "delta_model_minus_baseline_a_spearman": 0.04163872130000302,
+      "delta_model_minus_baseline_a_spearman_ci95": [
+        0.00311688351752983,
+        0.08197372555201544
+      ],
+      "delta_model_minus_baseline_b_spearman": 0.002262873631835459,
+      "delta_model_minus_baseline_c_spearman": -0.014440282392451709,
+      "delta_model_minus_baseline_c_spearman_ci95": [
+        -0.0460103283673919,
+        0.01646378636700421
+      ]
+    }
+  ],
+  "exploratory_results_raw": [
     {
       "split": "dev_val",
       "source": "doench2016_hg19",
