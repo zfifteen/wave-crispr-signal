@@ -1,0 +1,271 @@
+{
+  "experiment": {
+    "id": "spectral_signal_routing_fft_cluster_pr_174_2026_01_14",
+    "name": "Spectral Signal Routing Hypothesis 1 Falsification",
+    "version": "1.0.0",
+    "date_created": "2026-01-14",
+    "status": "design_complete",
+    "pr_number": 174
+  },
+  
+  "hypothesis": {
+    "statement": "Local update rules on the Emergent Doom Engine substrate produce cell-state trajectories that, when viewed in the frequency domain, exhibit structured spectral channels that can be interpreted as routing pathways for task-relevant information.",
+    "falsifiable_form": "H1-strong: For appropriately chosen tasks and substrates in the Emergent Doom Engine, successful problem-solving runs will reliably exhibit non-trivial, stable spectral channels (distinct peaks or bands) that (a) are absent or strongly attenuated in matched non-solving controls, and (b) are causally necessary for maintaining high task performance."
+  },
+  
+  "task": {
+    "name": "TO_BE_SELECTED",
+    "description": "EDE-integrated task with binary success/failure criterion",
+    "candidates": [
+      "factor_localization",
+      "sat_solving_pr_174",
+      "other_ede_task"
+    ],
+    "success_criterion": {
+      "type": "TO_BE_DEFINED",
+      "description": "Task-specific success criterion independent of spectral analysis",
+      "parameters": {}
+    },
+    "step_budget": {
+      "T_max": null,
+      "note": "To be defined based on selected task"
+    }
+  },
+  
+  "substrate": {
+    "platform": "Emergent Doom Engine (Java)",
+    "array_type": "TO_BE_DEFINED",
+    "array_dimensions": null,
+    "cell_update_rules": "TO_BE_DEFINED",
+    "parameters": {
+      "note": "No changes to core substrate semantics assumed at design level"
+    }
+  },
+  
+  "data_collection": {
+    "snapshot_frequency": "per_step",
+    "cell_level_fields": {
+      "note": "To be selected during implementation",
+      "examples": [
+        "strategy_id (integer-encoded)",
+        "local_fitness",
+        "energy",
+        "other_task_relevant_scalars"
+      ]
+    },
+    "global_metadata": [
+      "step_index",
+      "task_level_metrics",
+      "run_identifier",
+      "configuration_hash",
+      "rng_seed"
+    ],
+    "output_format": "TO_BE_DEFINED",
+    "format_options": ["CSV", "JSON", "binary_tables"]
+  },
+  
+  "time_series": {
+    "note": "Must be declared before success/failure labeling",
+    "task_level": {
+      "x_task_t": {
+        "description": "One scalar per step capturing task progress",
+        "examples": ["best_fitness", "residual_error"]
+      }
+    },
+    "global_aggregation": {
+      "x_global_t": {
+        "description": "Aggregations across cell array",
+        "examples": ["mean_field", "variance_field"]
+      }
+    },
+    "spatially_localized": {
+      "x_cell_region_k_t": {
+        "description": "Series from specific spatial regions",
+        "regions": [
+          "front_band (first N cells)",
+          "cluster_cores (from EDE clustering)",
+          "random_samples (baseline)"
+        ]
+      }
+    }
+  },
+  
+  "spectral_analysis": {
+    "windowing": {
+      "T_window": null,
+      "T_stride": null,
+      "note": "To be chosen based on typical run durations"
+    },
+    "preprocessing": {
+      "detrending": {
+        "enabled": null,
+        "method": "TO_BE_DEFINED",
+        "options": ["mean_subtraction", "linear_fit", "none"]
+      },
+      "tapering": {
+        "enabled": true,
+        "window_function": "TO_BE_DEFINED",
+        "options": ["hann", "hamming", "blackman"]
+      },
+      "normalization": {
+        "enabled": true,
+        "method": "TO_BE_DEFINED",
+        "options": ["z_score", "unit_variance", "min_max"]
+      }
+    },
+    "fft": {
+      "output": ["magnitude_spectrum", "phase_spectrum"],
+      "sampling_frequency": "TO_BE_DEFINED",
+      "frequency_resolution": "TO_BE_DEFINED"
+    },
+    "channel_definition": {
+      "note": "Operational definition to avoid post-hoc re-interpretation",
+      "elevated_magnitude": {
+        "threshold_type": "TO_BE_DEFINED",
+        "threshold_value": null,
+        "options": ["N_std_dev", "quantile", "absolute"]
+      },
+      "reproducibility": {
+        "min_windows_fraction": null,
+        "min_runs": null
+      },
+      "min_bandwidth": null
+    }
+  },
+  
+  "conditions": {
+    "family_a": {
+      "name": "High-Performance vs Low-Performance",
+      "A1_high_performance": {
+        "description": "Runs meeting success criterion within T_max",
+        "n_runs": null,
+        "sampling": "TO_BE_DEFINED"
+      },
+      "A2_low_performance": {
+        "description": "Runs failing success criterion with identical macro-parameters",
+        "n_runs": null,
+        "sampling": "TO_BE_DEFINED"
+      }
+    },
+    "family_b": {
+      "name": "Structured vs Randomized Controls",
+      "B1_structured": {
+        "description": "Same as A1/A2, analyzed under same FFT pipeline",
+        "source": "A1_A2_data"
+      },
+      "B2_phase_scrambled": {
+        "description": "Phase randomization preserving power spectrum",
+        "method": "TO_BE_DEFINED",
+        "source": "B1_data"
+      },
+      "B3_iid_random": {
+        "description": "IID sampling from empirical marginals",
+        "method": "TO_BE_DEFINED",
+        "source": "B1_marginals"
+      }
+    },
+    "family_c": {
+      "name": "Spectral Disruption Interventions",
+      "C1_baseline_replay": {
+        "description": "Deterministic replay without perturbation",
+        "source": "A1_high_performance"
+      },
+      "C2_spectral_knockout": {
+        "description": "Targeted spectral band attenuation/removal",
+        "method": "TO_BE_DEFINED",
+        "application_mode": "TO_BE_DEFINED",
+        "options": ["inverse_fft_perturbation", "cell_state_modification"]
+      },
+      "C3_nonspectral_perturbation": {
+        "description": "Broad-spectrum noise matching C2 variance",
+        "methods": ["gaussian_noise", "uniform_noise", "random_flips"]
+      }
+    }
+  },
+  
+  "run_configuration": {
+    "runs_per_condition": null,
+    "seeding_strategy": "TO_BE_DEFINED",
+    "power_analysis": {
+      "note": "To be performed during implementation with non-fabricated data"
+    }
+  },
+  
+  "falsification_criteria": {
+    "distinctiveness_a1_vs_a2": {
+      "null_hypothesis": "No robust differences in spectral features between high and low performance runs",
+      "statistical_method": "TO_BE_DEFINED"
+    },
+    "specificity_b1_vs_b2_b3": {
+      "null_hypothesis": "Structured dynamics indistinguishable from phase-scrambled or IID controls",
+      "statistical_method": "TO_BE_DEFINED"
+    },
+    "causal_necessity_c1_vs_c2_vs_c3": {
+      "null_hypothesis": "Spectral knock-out does not degrade performance more than non-spectral perturbations",
+      "statistical_method": "TO_BE_DEFINED"
+    }
+  },
+  
+  "reproducibility": {
+    "required_flags": ["--seed", "--task", "--output"],
+    "environment": {
+      "python_version": "3.12+",
+      "dependencies": "requirements.txt",
+      "java_version": "TO_BE_DEFINED (for EDE substrate)"
+    },
+    "metadata_capture": [
+      "git_commit_hash",
+      "timestamp",
+      "pip_freeze",
+      "dataset_checksums_sha256",
+      "configuration_hash"
+    ]
+  },
+  
+  "outputs": {
+    "directory_pattern": "results/<exp_id>/run-YYYYMMDD-HHMMSS/",
+    "required_files": [
+      "results.json",
+      "results.csv",
+      "summary.json",
+      "env.txt",
+      "log.txt"
+    ],
+    "metadata_required": [
+      "seed",
+      "git_commit",
+      "dataset_name",
+      "dataset_version",
+      "dataset_sha256",
+      "runtime_seconds",
+      "pip_freeze",
+      "timestamp"
+    ]
+  },
+  
+  "scientific_gates": {
+    "no_fabrication": {
+      "description": "No fabricated metrics, p-values, or effect sizes",
+      "enforced": true
+    },
+    "pre_registration": {
+      "description": "Analysis parameters fixed before success/failure labeling",
+      "enforced": true
+    },
+    "fail_fast_validation": {
+      "description": "Immediate validation with clear error messages",
+      "enforced": true
+    },
+    "reproducibility": {
+      "description": "Fixed seeds, SHA256 checksums, environment capture",
+      "enforced": true
+    }
+  },
+  
+  "notes": {
+    "design_status": "Complete - awaiting implementation",
+    "implementation_checklist": "See TODO_IMPLEMENTATION.md",
+    "technical_specification": "See TECH_SPEC.md",
+    "scope_control": "All work must trace to H1-strong falsification or reusable FFT infrastructure"
+  }
+}
