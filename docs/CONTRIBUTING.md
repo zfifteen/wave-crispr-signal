@@ -17,6 +17,11 @@ For behavior changes, default expectation is:
 
 If automated coverage is not appropriate for the change, document the manual validation clearly.
 
+For changes affecting model scoring/evaluation claims:
+- run Gate v3 (`python3 validation/ontarget_gate/scripts/run_gate_v3.py`),
+- include the resulting decision and reason from `validation/ontarget_gate/outputs/gate_results_v3.json`,
+- clearly separate decision-grade clean-lane conclusions from exploratory raw-lane context.
+
 ## Pull Request Checklist
 
 - Explain what changed and why.

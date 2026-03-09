@@ -9,6 +9,8 @@ This index contains the active documentation set for the current application sur
 - `PRIMARY_CLI_VALIDATION.md` - manual validation commands for active CLIs and demo app import surface.
 - `PHASE_WEIGHTED_SCORECARD.md` - authoritative technical spec for phase-weighted scoring implementation.
 - `MODEL_NOVELTY_STATEMENT.md` - detailed novelty boundary and model-level claim framing.
+- `../validation/ontarget_gate/README.md` - on-target comparator gate usage and outputs.
+- `../validation/ontarget_gate/PROTOCOL_V3.md` - decision-grade comparator gate protocol.
 
 ## Runtime Entry Points
 

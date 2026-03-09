@@ -1,6 +1,6 @@
 # Current State and Documentation Alignment
 
-Date: 2026-03-08
+Date: 2026-03-09
 
 ## Active Runtime Surfaces
 
@@ -27,3 +27,14 @@ Known implemented limitation that is intentionally documented:
 - `genomic_disruption_api.py` exposes `batch` and `offtarget` parser options, but those two commands are not wired in the CLI dispatcher.
 
 No additional documentation/implementation mismatches are currently tracked in the retained docs.
+
+## Validation Gate Status (On-Target Comparator)
+
+- Active gate implementation: `validation/ontarget_gate/scripts/run_gate_v3.py`
+- Active protocol: `validation/ontarget_gate/PROTOCOL_V3.md`
+- Comparator lane design:
+  - decision-grade clean manifest (`decision_split_manifest_v3_clean.csv`) drives `GO/NO-GO`,
+  - exploratory raw manifest (`exploratory_split_manifest_v3_raw.csv`) is report-only context.
+- Current authoritative result:
+  - `NO-GO` on clean holdouts vs `baseline_c_crisprpred` fixed-delta criteria.
+- Current raw manifest remains overlap-contaminated and is explicitly non-authoritative.

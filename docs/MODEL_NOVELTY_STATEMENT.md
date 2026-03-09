@@ -116,7 +116,7 @@ Current implementation truth that constrains novelty statements:
 - phase-weighted scoring is available for design path via `--use-phase-weighted-scorecard`
 - not the default behavior unless flag is passed
 
-3. No authoritative in-repo benchmark harness currently proves superiority over external baselines under a maintained protocol.
+3. An authoritative in-repo comparator harness now exists (`validation/ontarget_gate`, protocol v3), but current clean-holdout results do not demonstrate superiority over the required external comparator threshold.
 
 4. Therefore, the repository can assert:
 - the model formulation is implemented,
@@ -127,6 +127,7 @@ Current implementation truth that constrains novelty statements:
 - proven state-of-the-art accuracy gains,
 - generalizable causal superiority across datasets,
 - publication-grade empirical validation completeness.
+ - superiority to modern external comparators based on current v3 clean-holdout decision outputs.
 
 ## 6) Falsifiable Novelty Claims (Testable Form)
 
@@ -168,9 +169,14 @@ To move from implemented hypothesis to validated novelty, a future validation pa
 5. Reproducibility contract:
 - seeded runs, exact commands, pinned environment, artifact capture.
 
-Until this exists, the correct positioning is:
+Current state update:
+- v3 comparator gate is implemented with decision-grade clean holdouts and strict overlap control.
+- current v3 decision outcome is `NO-GO` for baseline_c threshold criteria.
+
+Given this state, the correct positioning is:
 - novel model design and implementation,
-- not yet fully validated scientific superiority.
+- decision-grade comparator validation infrastructure in place,
+- no validated external-comparator superiority yet.
 
 ## 8) One-line Positioning for External Use
 

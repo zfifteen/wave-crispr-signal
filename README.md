@@ -32,6 +32,18 @@ Current CLI truth for `applications/genomic_disruption_api.py`:
   - one targeted automated test, and
   - one manual verification command with observed outcome.
 
+## Validation Milestone (Gate v3)
+
+- External comparator gate is active under `validation/ontarget_gate/`.
+- Gate v3 uses two manifest lanes:
+  - decision-grade clean manifest (authoritative),
+  - raw exploratory manifest (non-authoritative).
+- Current authoritative Gate v3 outcome on clean holdouts: `NO-GO` against `baseline_c_crisprpred`.
+- See:
+  - `validation/ontarget_gate/README.md`
+  - `validation/ontarget_gate/PROTOCOL_V3.md`
+  - `validation/ontarget_gate/outputs/gate_report_v3.md`
+
 ## Canonical Docs
 
 - `docs/INDEX.md`
