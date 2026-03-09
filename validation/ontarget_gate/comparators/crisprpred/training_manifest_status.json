@@ -1,0 +1,11 @@
+{
+  "available": true,
+  "status": "ready",
+  "reason": "sequence_level_training_manifest_acquired",
+  "checked_at": "2026-03-09",
+  "source_repo": "https://github.com/khaled-rahman/CRISPRpred",
+  "source_commit": "eee7ee8a9ba61c1afcb7a56d9893f8e661f41cc0",
+  "source_file": "https://raw.githubusercontent.com/khaled-rahman/CRISPRpred/master/CRISPRpred/SupplementaryFiles/Supplementary%20File1.csv",
+  "extraction_rule": "20mer = 30mer[4:24] (0-based, end-exclusive)",
+  "record_count": 5310
+}

@@ -1,0 +1,26 @@
+{
+  "source": "internal deterministic scaffold fixtures",
+  "tolerance": 1e-12,
+  "fixtures": [
+    {
+      "seq": "GGGTGGGGGGAGTTTGCTCC",
+      "target_context": "",
+      "expected_score": 0.8909031788043871
+    },
+    {
+      "seq": "ACAGCTGATCTCCAGATATA",
+      "target_context": "",
+      "expected_score": 0.9568927450589139
+    },
+    {
+      "seq": "TATATATATATATATATATA",
+      "target_context": "",
+      "expected_score": 0.4875026035157896
+    },
+    {
+      "seq": "GCGCGCGCGCGCGCGCGCGC",
+      "target_context": "",
+      "expected_score": 0.4875026035157896
+    }
+  ]
+}

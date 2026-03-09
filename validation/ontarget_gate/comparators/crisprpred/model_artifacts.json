@@ -1,0 +1,11 @@
+{
+  "model_name": "crisprpred_scaffold",
+  "version": "0.1",
+  "notes": "Deterministic inference scaffold used to wire Gate v3 comparator framework.",
+  "weights": {
+    "gc_center_weight": 2.0,
+    "homopolymer_penalty_weight": 0.25,
+    "sigmoid_scale": 4.0,
+    "context_gc_bonus_weight": 0.05
+  }
+}

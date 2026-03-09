@@ -1,49 +1,41 @@
 # Fast Go/No-Go On-Target Validation Gate
 
-This pack runs a decision-oriented validation gate for on-target efficiency claims.
+The active external-comparator protocol is `PROTOCOL_V3.md`.
 
-## Objective
+- v3 adds required `baseline_c_crisprpred` comparator wiring.
+- v1/v2 outputs are historical and non-authoritative for comparator claims.
 
-Determine whether the current model shows real predictive lift over a simple baseline under locked data and split manifests.
-
-The active decision protocol is `PROTOCOL_V2.md`.
-
-## Data Sources (public)
-
-- `doench2016-Gecko1-LentiCrispr_hg19.scores.tab` (dev pool)
-- `doench2016_hg19.scores.tab` (primary holdout)
-- `hart2016-HelaLib1Avg.scores.tab` (external holdout)
-
-All are fetched from `maximilianh/crisporPaper` `effData` tabular score files.
-
-## Locked Schema
-
-Fields used downstream:
-- `guide`
-- `label`
-- `source`
-- `gene_or_target_group`
-- `target_context` (optional)
-
-## Run
+## Run (v3)
 
 ```bash
 cd /Users/velocityworks/IdeaProjects/wave-crispr-signal
-python3 validation/ontarget_gate/scripts/run_gate_v2.py
+python3 validation/ontarget_gate/scripts/run_gate_v3.py
 ```
 
-## Outputs
+## Required Comparator Setup
+
+```bash
+cd /Users/velocityworks/IdeaProjects/wave-crispr-signal/validation/ontarget_gate/comparators/crisprpred
+./setup_venv.sh
+```
+
+Gate v3 is fail-closed if comparator preconditions are not met.
+
+## Outputs (v3)
 
 Written to `validation/ontarget_gate/outputs/`:
 
-- `locked_dataset_manifest_v2.json`
-- `locked_split_manifest_v2.csv`
-- `locked_schema_manifest_v2.csv`
-- `gate_results_v2.json`
-- `gate_report_v2.md`
+- `locked_dataset_manifest_v3.json`
+- `locked_split_manifest_v3.csv`
+- `locked_schema_manifest_v3.csv`
+- `gate_results_v3.json`
+- `gate_report_v3.md`
 
-## Decision Rule (v2)
+## Comparator Policy (v3)
 
-Locked criteria are defined in `PROTOCOL_V2.md` and enforced by `run_gate_v2.py`.
+- Required comparator: `baseline_c_crisprpred`
+- Hard decision thresholds:
+  - primary holdout: `delta(model - baseline_c) >= +0.01`
+  - external holdout: `delta(model - baseline_c) >= +0.01`
+- CIs are diagnostic-only in this phase.
 
-The previous v1 outputs (`gate_results.json`, `gate_report.md`) are historical and non-authoritative.

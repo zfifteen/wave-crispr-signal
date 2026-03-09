@@ -1,0 +1,10 @@
+field,description
+guide,Guide identifier from source
+guide_seq,20nt guide sequence
+label,Measured on-target activity (modFreq)
+source,Dataset source identifier
+gene_or_target_group,Grouping key for split integrity
+group_strength,strong or weak grouping metadata confidence
+group_method,Method used to derive grouping key
+target_context,Optional long context sequence
+split,Assigned split label
