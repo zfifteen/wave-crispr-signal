@@ -135,6 +135,69 @@ class GateV3Tests(unittest.TestCase):
         self.assertFalse(result.ok)
         self.assertEqual(result.message, "comparator_venv_missing")
 
+    def test_build_week1_checkpoint_stop_on_structural_signature(self):
+        preconditions = {
+            "split_integrity_clean_ok": True,
+            "comparator_self_check_ok": True,
+            "overlap_audit_clean_ok": True,
+            "holdout_min_n_ok": True,
+        }
+        decision_results = [
+            {
+                "split": "primary_holdout",
+                "metrics": {"model": {"spearman": -0.05}},
+                "delta_model_minus_baseline_c_spearman": -0.02,
+            },
+            {
+                "split": "external_holdout",
+                "metrics": {"model": {"spearman": -0.01}},
+                "delta_model_minus_baseline_c_spearman": -0.03,
+            },
+        ]
+        out = gate.build_week1_checkpoint(preconditions, decision_results)
+        self.assertEqual(out["recommendation"], "STOP")
+        self.assertEqual(out["reason"], "structural_failure_signature_detected")
+
+    def test_build_week1_checkpoint_continue_when_recovery_plausible(self):
+        preconditions = {
+            "split_integrity_clean_ok": True,
+            "comparator_self_check_ok": True,
+            "overlap_audit_clean_ok": True,
+            "holdout_min_n_ok": True,
+        }
+        decision_results = [
+            {
+                "split": "primary_holdout",
+                "metrics": {"model": {"spearman": 0.01}},
+                "delta_model_minus_baseline_c_spearman": -0.005,
+            },
+            {
+                "split": "external_holdout",
+                "metrics": {"model": {"spearman": 0.02}},
+                "delta_model_minus_baseline_c_spearman": 0.004,
+            },
+        ]
+        out = gate.build_week1_checkpoint(preconditions, decision_results)
+        self.assertEqual(out["recommendation"], "CONTINUE")
+
+    def test_split_diagnostics_has_gc_and_subgroup_sections(self):
+        rows = [
+            {"guide_seq": "G" * 20, "group_strength": "strong", "gene_or_target_group": "PMS2"},
+            {"guide_seq": "C" * 20, "group_strength": "strong", "gene_or_target_group": "PMS2"},
+            {"guide_seq": "A" * 20, "group_strength": "strong", "gene_or_target_group": "MSH6"},
+            {"guide_seq": "T" * 20, "group_strength": "strong", "gene_or_target_group": "MSH6"},
+        ]
+        pred = {
+            "y": gate.np.array([0.1, 0.2, 0.3, 0.4], dtype=float),
+            "model": gate.np.array([0.2, 0.1, 0.3, 0.4], dtype=float),
+            "baseline_c": gate.np.array([0.1, 0.2, 0.4, 0.3], dtype=float),
+        }
+        out = gate.split_diagnostics(rows, pred, min_group_n=2)
+        self.assertEqual(out["n"], 4)
+        self.assertTrue("score_std" in out and "correlations" in out)
+        self.assertGreaterEqual(len(out["gc_strata"]), 1)
+        self.assertGreaterEqual(len(out["subgroup_deltas"]), 1)
+
 
 if __name__ == "__main__":
     unittest.main()

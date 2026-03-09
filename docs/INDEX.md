@@ -11,6 +11,7 @@ This index contains the active documentation set for the current application sur
 - `MODEL_NOVELTY_STATEMENT.md` - detailed novelty boundary and model-level claim framing.
 - `../validation/ontarget_gate/README.md` - on-target comparator gate usage and outputs.
 - `../validation/ontarget_gate/PROTOCOL_V3.md` - decision-grade comparator gate protocol.
+- `../validation/ontarget_gate/BOARD_FUNDING_ADDENDUM.md` - board conditional-approval controls for the 4-week recovery cycle.
 
 ## Runtime Entry Points
 

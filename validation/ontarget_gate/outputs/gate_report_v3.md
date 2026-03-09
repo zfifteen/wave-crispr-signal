@@ -1,6 +1,6 @@
 # Fast Go/No-Go Validation Report v3 (On-Target)
 
-Generated: 2026-03-09T07:21:47.250070+00:00
+Generated: 2026-03-09T17:17:07.390845+00:00
 
 ## Decision: **NO-GO**
 - reason: baseline_c_threshold_failed
@@ -35,6 +35,11 @@ Generated: 2026-03-09T07:21:47.250070+00:00
 - raw_status: FAIL
 - raw_message: overlap_detected
 - raw_overlap_count: 1688
+
+## Week-1 Checkpoint Recommendation
+- recommendation: STOP
+- reason: structural_failure_signature_detected
+- triggers: {"holdout_deltas_both_negative": true, "persistent_rank_collapse": true, "preconditions_failed": false}
 
 ## Decision-Grade Metrics (Clean Manifests)
 ### dev_val (doench2016_hg19, n=414)
@@ -96,3 +101,45 @@ Generated: 2026-03-09T07:21:47.250070+00:00
 - hard_precondition_dev_not_materially_negative: PASS
 - primary_delta_vs_baseline_c_min_0p01: FAIL
 - external_delta_vs_baseline_c_min_0p01: FAIL
+
+## Decision-Grade Diagnostics (Clean)
+### dev_val diagnostics
+- n: 414
+- score_std(model, baseline_c): (0.014629, 0.048149)
+- tie_rate(model, baseline_c): (0.000000, 0.422705)
+- correlations: rho(label,model)=-0.0402, rho(label,baseline_c)=-0.0474, rho(model,gc)=-0.1739, rho(baseline_c,gc)=-0.2704, rho(label,gc)=0.2285
+- gc_strata:
+  - [0.00,0.30) n=21 delta(model-baseline_c)=-0.3248
+  - [0.30,0.50) n=116 delta(model-baseline_c)=-0.0284
+  - [0.50,0.70) n=200 delta(model-baseline_c)=0.0207
+  - [0.70,1.00] n=77 delta(model-baseline_c)=0.1143
+- subgroup_deltas:
+  - CLDN10 n=70 delta(model-baseline_c)=0.0472
+  - CUL3 n=146 delta(model-baseline_c)=-0.1005
+  - TADA2B n=198 delta(model-baseline_c)=0.1016
+
+### primary_holdout diagnostics
+- n: 529
+- score_std(model, baseline_c): (0.016336, 0.054752)
+- tie_rate(model, baseline_c): (0.000000, 0.508507)
+- correlations: rho(label,model)=-0.0702, rho(label,baseline_c)=-0.0510, rho(model,gc)=-0.3614, rho(baseline_c,gc)=-0.4045, rho(label,gc)=0.0879
+- gc_strata:
+  - [0.00,0.30) n=14 delta(model-baseline_c)=0.0532
+  - [0.30,0.50) n=260 delta(model-baseline_c)=0.0112
+  - [0.50,0.70) n=183 delta(model-baseline_c)=0.0390
+  - [0.70,1.00] n=72 delta(model-baseline_c)=-0.3763
+- subgroup_deltas:
+  - MED12 n=26 delta(model-baseline_c)=0.1477
+  - MSH6 n=407 delta(model-baseline_c)=0.0310
+  - PMS2 n=88 delta(model-baseline_c)=-0.0965
+
+### external_holdout diagnostics
+- n: 4256
+- score_std(model, baseline_c): (0.009717, 0.020319)
+- tie_rate(model, baseline_c): (0.000470, 0.936795)
+- correlations: rho(label,model)=-0.0019, rho(label,baseline_c)=0.0125, rho(model,gc)=-0.3280, rho(baseline_c,gc)=-0.8732, rho(label,gc)=-0.0003
+- gc_strata:
+  - [0.30,0.50) n=792 delta(model-baseline_c)=-0.0672
+  - [0.50,0.70) n=3072 delta(model-baseline_c)=-0.0010
+  - [0.70,1.00] n=392 delta(model-baseline_c)=-0.0726
+

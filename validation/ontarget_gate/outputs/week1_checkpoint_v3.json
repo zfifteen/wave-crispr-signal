@@ -1,0 +1,16 @@
+{
+  "checkpoint": "week1",
+  "recommendation": "STOP",
+  "reason": "structural_failure_signature_detected",
+  "triggers": {
+    "preconditions_failed": false,
+    "persistent_rank_collapse": true,
+    "holdout_deltas_both_negative": true
+  },
+  "observed": {
+    "primary_model_spearman": -0.07021112281912584,
+    "external_model_spearman": -0.001910212700381293,
+    "primary_delta_vs_baseline_c": -0.01922936210579102,
+    "external_delta_vs_baseline_c": -0.014440282392451709
+  }
+}

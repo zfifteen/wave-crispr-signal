@@ -4,6 +4,9 @@ Version: `v3`
 Status: `Active`  
 Date locked: `2026-03-09`
 
+Related governance document:
+- `BOARD_FUNDING_ADDENDUM.md` (conditional funding controls for 4-week recovery cycle)
+
 ## Purpose
 
 Gate v3 adds a required external comparator (`baseline_c_crisprpred`) via a pluggable comparator framework.
@@ -101,6 +104,31 @@ Decision mapping:
 - `GO`: all preconditions pass and both baseline_c thresholds pass
 - `NO-GO`: dev material-negative precondition fails, or baseline_c threshold(s) fail
 - `INCONCLUSIVE`: comparator/overlap/manifest/min-N preconditions fail
+
+## Funding-Governance Controls (Board Conditional Approval)
+
+For the approved 4-week recovery cycle, Gate v3 execution is additionally bound by:
+
+1. Hard caps:
+   - duration <= 4 weeks,
+   - team <= 2 FTE equivalent,
+   - ablations <= 4 (`A0` to `A3`),
+   - compute within fixed board-approved budget envelope.
+2. Week-1 early off-ramp:
+   - publish checkpoint artifact with explicit `CONTINUE` or `STOP`,
+   - immediate `STOP` if diagnostics indicate structural in-scope infeasibility.
+3. Short-cycle exception path:
+   - available only when both holdout deltas are positive but threshold miss is <= 0.005,
+   - max duration 10 business days,
+   - one intervention class only,
+   - requires explicit re-approval memo.
+4. Fixed reporting package:
+   - baseline vs final metrics (holdouts + subgroups),
+   - precondition integrity table,
+   - budget burn vs cap,
+   - criterion-traceable decision memo.
+
+If governance controls are violated, results are non-authoritative for funding decisions.
 
 ## Bootstrap Confidence Intervals (Diagnostic-Only Policy)
 

@@ -42,6 +42,7 @@ Current CLI truth for `applications/genomic_disruption_api.py`:
 - See:
   - `validation/ontarget_gate/README.md`
   - `validation/ontarget_gate/PROTOCOL_V3.md`
+  - `validation/ontarget_gate/BOARD_FUNDING_ADDENDUM.md`
   - `validation/ontarget_gate/outputs/gate_report_v3.md`
 
 ## Canonical Docs

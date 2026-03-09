@@ -234,6 +234,186 @@ def metrics(y: np.ndarray, pred: np.ndarray) -> Dict[str, float]:
     }
 
 
+def safe_pearson(x: np.ndarray, y: np.ndarray) -> float:
+    if len(x) < 2 or len(y) < 2:
+        return 0.0
+    if float(np.std(x)) == 0.0 or float(np.std(y)) == 0.0:
+        return 0.0
+    v = float(np.corrcoef(x, y)[0, 1])
+    if np.isnan(v):
+        return 0.0
+    return v
+
+
+def tie_rate(pred: np.ndarray, decimals: int = 8) -> float:
+    if len(pred) == 0:
+        return 0.0
+    rounded = np.round(pred.astype(float), decimals=decimals)
+    unique = len(np.unique(rounded))
+    return float(1.0 - (unique / len(rounded)))
+
+
+def gc_fraction(seq: str) -> float:
+    s = clean_seq(seq)
+    if not s:
+        return 0.0
+    return float((s.count("G") + s.count("C")) / len(s))
+
+
+def gc_bin_label(gc: float) -> str:
+    if gc < 0.30:
+        return "[0.00,0.30)"
+    if gc < 0.50:
+        return "[0.30,0.50)"
+    if gc < 0.70:
+        return "[0.50,0.70)"
+    return "[0.70,1.00]"
+
+
+def split_diagnostics(rows: Sequence[dict], pred: Dict[str, np.ndarray], min_group_n: int = 10) -> dict:
+    if not rows:
+        return {
+            "n": 0,
+            "score_std": {},
+            "tie_rate": {},
+            "correlations": {},
+            "gc_strata": [],
+            "subgroup_deltas": [],
+        }
+
+    y = pred["y"]
+    p_model = pred["model"]
+    p_c = pred["baseline_c"]
+    gc = np.array([gc_fraction(r.get("guide_seq", "")) for r in rows], dtype=float)
+
+    out = {
+        "n": int(len(rows)),
+        "score_std": {
+            "model": float(np.std(p_model)),
+            "baseline_c": float(np.std(p_c)),
+        },
+        "tie_rate": {
+            "model": tie_rate(p_model),
+            "baseline_c": tie_rate(p_c),
+        },
+        "correlations": {
+            "rho_label_model_spearman": safe_spearman(y, p_model),
+            "rho_label_baseline_c_spearman": safe_spearman(y, p_c),
+            "rho_model_gc_pearson": safe_pearson(p_model, gc),
+            "rho_baseline_c_gc_pearson": safe_pearson(p_c, gc),
+            "rho_label_gc_pearson": safe_pearson(y, gc),
+        },
+        "gc_strata": [],
+        "subgroup_deltas": [],
+    }
+
+    gc_rows: Dict[str, List[int]] = {}
+    for idx, g in enumerate(gc):
+        gc_rows.setdefault(gc_bin_label(float(g)), []).append(idx)
+    for key in sorted(gc_rows.keys()):
+        idxs = np.array(gc_rows[key], dtype=int)
+        if len(idxs) < min_group_n:
+            continue
+        sm = safe_spearman(y[idxs], p_model[idxs])
+        sc = safe_spearman(y[idxs], p_c[idxs])
+        out["gc_strata"].append(
+            {
+                "bin": key,
+                "n": int(len(idxs)),
+                "spearman_model": float(sm),
+                "spearman_baseline_c": float(sc),
+                "delta_model_minus_baseline_c": float(sm - sc),
+            }
+        )
+
+    group_to_idx: Dict[str, List[int]] = {}
+    for idx, r in enumerate(rows):
+        if r.get("group_strength", "") != "strong":
+            continue
+        group = r.get("gene_or_target_group", "") or ""
+        if not group:
+            continue
+        group_to_idx.setdefault(group, []).append(idx)
+    for group, idxs_raw in sorted(group_to_idx.items()):
+        if len(idxs_raw) < min_group_n:
+            continue
+        idxs = np.array(idxs_raw, dtype=int)
+        sm = safe_spearman(y[idxs], p_model[idxs])
+        sc = safe_spearman(y[idxs], p_c[idxs])
+        out["subgroup_deltas"].append(
+            {
+                "group": group,
+                "n": int(len(idxs)),
+                "spearman_model": float(sm),
+                "spearman_baseline_c": float(sc),
+                "delta_model_minus_baseline_c": float(sm - sc),
+            }
+        )
+
+    return out
+
+
+def build_week1_checkpoint(preconditions: dict, decision_results: Sequence[dict]) -> dict:
+    by_split = {r.get("split", ""): r for r in decision_results}
+    p = by_split.get("primary_holdout")
+    e = by_split.get("external_holdout")
+
+    if p is None or e is None:
+        return {
+            "checkpoint": "week1",
+            "recommendation": "STOP",
+            "reason": "missing_decision_holdout_results",
+            "triggers": {
+                "preconditions_failed": True,
+                "persistent_rank_collapse": False,
+                "holdout_deltas_both_negative": False,
+            },
+        }
+
+    p_model_rho = float(p["metrics"]["model"]["spearman"])
+    e_model_rho = float(e["metrics"]["model"]["spearman"])
+    p_delta = float(p["delta_model_minus_baseline_c_spearman"])
+    e_delta = float(e["delta_model_minus_baseline_c_spearman"])
+
+    preconditions_failed = not all(
+        [
+            preconditions.get("split_integrity_clean_ok", False),
+            preconditions.get("comparator_self_check_ok", False),
+            preconditions.get("overlap_audit_clean_ok", False),
+            preconditions.get("holdout_min_n_ok", False),
+        ]
+    )
+    persistent_rank_collapse = p_model_rho < 0.0 and e_model_rho < 0.0
+    holdout_deltas_both_negative = p_delta < 0.0 and e_delta < 0.0
+
+    if preconditions_failed:
+        recommendation = "STOP"
+        reason = "preconditions_unresolved"
+    elif persistent_rank_collapse and holdout_deltas_both_negative:
+        recommendation = "STOP"
+        reason = "structural_failure_signature_detected"
+    else:
+        recommendation = "CONTINUE"
+        reason = "in_scope_recovery_still_plausible"
+
+    return {
+        "checkpoint": "week1",
+        "recommendation": recommendation,
+        "reason": reason,
+        "triggers": {
+            "preconditions_failed": preconditions_failed,
+            "persistent_rank_collapse": persistent_rank_collapse,
+            "holdout_deltas_both_negative": holdout_deltas_both_negative,
+        },
+        "observed": {
+            "primary_model_spearman": p_model_rho,
+            "external_model_spearman": e_model_rho,
+            "primary_delta_vs_baseline_c": p_delta,
+            "external_delta_vs_baseline_c": e_delta,
+        },
+    }
+
+
 def validate_split_integrity(rows: Sequence[dict]) -> dict:
     violations: List[str] = []
     group_to_splits: Dict[str, set] = {}
@@ -582,6 +762,7 @@ def main() -> int:
     )
 
     decision_results: List[dict] = []
+    decision_diagnostics: Dict[str, dict] = {}
     if can_score_decision:
         pred_dev_clean = predict_pack(dev_rows_clean, include_comparator=True)
         pred_primary_clean = predict_pack(primary_rows_clean, include_comparator=True)
@@ -590,6 +771,11 @@ def main() -> int:
         res_primary_clean = evaluate_split("primary_holdout", primary_rows_clean, pred_primary_clean)
         res_external_clean = evaluate_split("external_holdout", external_rows_clean, pred_external_clean)
         decision_results = [res_dev_clean, res_primary_clean, res_external_clean]
+        decision_diagnostics = {
+            "dev_val": split_diagnostics(dev_rows_clean, pred_dev_clean),
+            "primary_holdout": split_diagnostics(primary_rows_clean, pred_primary_clean),
+            "external_holdout": split_diagnostics(external_rows_clean, pred_external_clean),
+        }
         decision_pack = decide_outcome_v3(res_dev_clean, res_primary_clean, res_external_clean, preconditions)
     else:
         fail_reason = "unknown_precondition_failure"
@@ -608,6 +794,7 @@ def main() -> int:
         }
 
     exploratory_results: List[dict] = []
+    exploratory_diagnostics: Dict[str, dict] = {}
     if preconditions["comparator_self_check_ok"]:
         pred_dev_raw = predict_pack(dev_rows_raw, include_comparator=True)
         pred_primary_raw = predict_pack(primary_rows_raw, include_comparator=True)
@@ -617,6 +804,13 @@ def main() -> int:
             evaluate_split("primary_holdout", primary_rows_raw, pred_primary_raw),
             evaluate_split("external_holdout", external_rows_raw, pred_external_raw),
         ]
+        exploratory_diagnostics = {
+            "dev_val": split_diagnostics(dev_rows_raw, pred_dev_raw),
+            "primary_holdout": split_diagnostics(primary_rows_raw, pred_primary_raw),
+            "external_holdout": split_diagnostics(external_rows_raw, pred_external_raw),
+        }
+
+    week1_checkpoint = build_week1_checkpoint(preconditions, decision_results)
 
     report_json = {
         "generated_at": generated_at,
@@ -656,10 +850,26 @@ def main() -> int:
             "raw": integrity_raw["split_counts"],
         },
         "decision_results_clean": decision_results,
+        "decision_diagnostics_clean": decision_diagnostics,
         "exploratory_results_raw": exploratory_results,
+        "exploratory_diagnostics_raw": exploratory_diagnostics,
+        "week1_checkpoint": week1_checkpoint,
         "ci_policy": {
             "mode": "diagnostic_only",
             "note": "CI values are computed and reported, but v3 gating uses fixed delta thresholds for baseline_c only.",
+        },
+        "funding_governance": {
+            "document": str((root / "BOARD_FUNDING_ADDENDUM.md").resolve()),
+            "caps": {
+                "duration_weeks_max": 4,
+                "team_fte_max": 2,
+                "ablation_count_max": 4,
+                "compute_cap_placeholder": "$CAP_USD_or_GPU_HOURS_CAP",
+            },
+            "short_cycle_constraint": {
+                "max_business_days": 10,
+                "requires_reapproval": True,
+            },
         },
         "deprecated_prior_artifacts": {
             "gate_results.json": "historical_non_authoritative",
@@ -669,6 +879,7 @@ def main() -> int:
         },
     }
     (outputs_dir / "gate_results_v3.json").write_text(json.dumps(report_json, indent=2), encoding="utf-8")
+    (outputs_dir / "week1_checkpoint_v3.json").write_text(json.dumps(week1_checkpoint, indent=2), encoding="utf-8")
 
     md: List[str] = []
     md.append("# Fast Go/No-Go Validation Report v3 (On-Target)")
@@ -705,6 +916,11 @@ def main() -> int:
     md.append(f"- raw_status: {'PASS' if overlap_raw.get('ok', False) else 'FAIL'}")
     md.append(f"- raw_message: {overlap_raw.get('message', '')}")
     md.append(f"- raw_overlap_count: {overlap_raw.get('overlap_count', 'n/a')}")
+    md.append("")
+    md.append("## Week-1 Checkpoint Recommendation")
+    md.append(f"- recommendation: {week1_checkpoint['recommendation']}")
+    md.append(f"- reason: {week1_checkpoint['reason']}")
+    md.append(f"- triggers: {json.dumps(week1_checkpoint['triggers'], sort_keys=True)}")
     md.append("")
     md.append("## Decision-Grade Metrics (Clean Manifests)")
     if decision_results:
@@ -745,6 +961,42 @@ def main() -> int:
             md.append(f"- {name}: {'PASS' if passed else 'FAIL'}")
     else:
         md.append("- criteria_not_evaluated_due_to_precondition_failure: true")
+    md.append("")
+    md.append("## Decision-Grade Diagnostics (Clean)")
+    if decision_diagnostics:
+        for split_name, diag in decision_diagnostics.items():
+            md.append(f"### {split_name} diagnostics")
+            md.append(f"- n: {diag['n']}")
+            md.append(
+                f"- score_std(model, baseline_c): ({diag['score_std']['model']:.6f}, {diag['score_std']['baseline_c']:.6f})"
+            )
+            md.append(
+                f"- tie_rate(model, baseline_c): ({diag['tie_rate']['model']:.6f}, {diag['tie_rate']['baseline_c']:.6f})"
+            )
+            corr = diag["correlations"]
+            md.append(
+                "- correlations: "
+                f"rho(label,model)={corr['rho_label_model_spearman']:.4f}, "
+                f"rho(label,baseline_c)={corr['rho_label_baseline_c_spearman']:.4f}, "
+                f"rho(model,gc)={corr['rho_model_gc_pearson']:.4f}, "
+                f"rho(baseline_c,gc)={corr['rho_baseline_c_gc_pearson']:.4f}, "
+                f"rho(label,gc)={corr['rho_label_gc_pearson']:.4f}"
+            )
+            if diag["gc_strata"]:
+                md.append("- gc_strata:")
+                for s in diag["gc_strata"]:
+                    md.append(
+                        f"  - {s['bin']} n={s['n']} delta(model-baseline_c)={s['delta_model_minus_baseline_c']:.4f}"
+                    )
+            if diag["subgroup_deltas"]:
+                md.append("- subgroup_deltas:")
+                for s in diag["subgroup_deltas"]:
+                    md.append(
+                        f"  - {s['group']} n={s['n']} delta(model-baseline_c)={s['delta_model_minus_baseline_c']:.4f}"
+                    )
+            md.append("")
+    else:
+        md.append("- diagnostics_unavailable_due_to_precondition_failure: true")
 
     (outputs_dir / "gate_report_v3.md").write_text("\n".join(md) + "\n", encoding="utf-8")
 
@@ -757,6 +1009,7 @@ def main() -> int:
     print(f"wrote {outputs_dir / 'locked_schema_manifest_v3.csv'}")
     print(f"wrote {outputs_dir / 'gate_results_v3.json'}")
     print(f"wrote {outputs_dir / 'gate_report_v3.md'}")
+    print(f"wrote {outputs_dir / 'week1_checkpoint_v3.json'}")
     return 0
 
 

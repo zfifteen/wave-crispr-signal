@@ -32,6 +32,7 @@ No additional documentation/implementation mismatches are currently tracked in t
 
 - Active gate implementation: `validation/ontarget_gate/scripts/run_gate_v3.py`
 - Active protocol: `validation/ontarget_gate/PROTOCOL_V3.md`
+- Active funding-governance addendum: `validation/ontarget_gate/BOARD_FUNDING_ADDENDUM.md`
 - Comparator lane design:
   - decision-grade clean manifest (`decision_split_manifest_v3_clean.csv`) drives `GO/NO-GO`,
   - exploratory raw manifest (`exploratory_split_manifest_v3_raw.csv`) is report-only context.
