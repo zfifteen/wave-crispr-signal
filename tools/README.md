@@ -1,17 +1,11 @@
 # Tools
 
-Active tooling is intentionally minimal.
+## Active Tooling
 
-## Active Files
-
-- `check_repo_policy.py` - deprecated non-blocking compatibility command
-
-## Archive
-
-Non-primary tools were moved to `archive/code/tools/`.
+- `check_repo_policy.py`: compatibility command that is intentionally non-blocking.
 
 ## Usage
 
 ```bash
-python tools/check_repo_policy.py
+python3 tools/check_repo_policy.py
 ```

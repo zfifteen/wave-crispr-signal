@@ -1,5 +1,5 @@
 # Experiments
 
-Active experiment implementations were moved to `archive/code/experiments/` in this LOC-reduction pass.
+This directory is currently a placeholder for future focused experiments.
 
-This directory remains as a compatibility anchor for future focused experiment additions.
+No experiment in this directory is part of the active runtime contract.

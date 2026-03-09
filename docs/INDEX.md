@@ -1,28 +1,20 @@
 # Documentation Index
 
-This is the canonical documentation index for the active CRISPR scope.
+This index contains the active documentation set for the current application surface.
 
-## Active Guidance
+## Core Documents
 
-- `WAVE_CRISPR_SIGNAL_TLDR.md` - project overview and intent.
-- `TOPOLOGICAL_ANALYSIS.md` - topology bridge and analysis notes.
-- `REPRODUCIBILITY_VALIDATION.md` - reproducibility guidance.
-- `INVARIANT_FEATURES.md` - invariant feature definitions.
-- `CONTRIBUTING.md` - contribution workflow.
-- `INVENTORY_CLASSIFICATION.md` - current top-level classification.
-- `PRIMARY_CLI_VALIDATION.md` - manual verification commands for preserved CLIs.
+- `CURRENT_STATE_AND_DOC_GAPS.md` - current runtime state and documented limitations.
+- `CONTRIBUTING.md` - contribution workflow and validation contract.
+- `PRIMARY_CLI_VALIDATION.md` - manual validation commands for active CLIs and demo app import surface.
+- `PHASE_WEIGHTED_SCORECARD.md` - authoritative technical spec for phase-weighted scoring implementation.
+- `MODEL_NOVELTY_STATEMENT.md` - detailed novelty boundary and model-level claim framing.
 
-## Running Key Workflows
+## Runtime Entry Points
 
-- Phase-weighted CLI: `python applications/phase_weighted_scorecard_cli.py score --guide <GUIDE>`
-- CRISPR CLI: `python applications/crispr_cli.py --help`
-- Genomic disruption API CLI: `python applications/genomic_disruption_api.py --help`
-
-## Testing and CI
-
-- Validation is change-scoped: add tests or manual validation steps only for the behavior you change.
-- CI is intentionally absent during reset and will be reintroduced later as a minimal gate.
-
-## Historical Reference
-
-- `ARCHIVE_INDEX.md` - archival document map (non-authoritative, non-blocking).
+```bash
+python3 applications/phase_weighted_scorecard_cli.py --help
+python3 applications/crispr_cli.py --help
+python3 applications/genomic_disruption_api.py --help
+python3 -c "from web_apps.demo_mvp.app import app; print(sorted([r.path for r in app.router.routes]))"
+```

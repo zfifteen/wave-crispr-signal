@@ -1,6 +1,12 @@
 # Web Apps
 
-Active web surface:
-- `demo_mvp/` (preserved)
+Active web runtime surface:
+- `demo_mvp/`
 
-Non-primary web apps were moved to `archive/code/web_apps/`.
+Run locally:
+
+```bash
+python3 web_apps/demo_mvp/app.py
+```
+
+Then open `http://127.0.0.1:8000`.

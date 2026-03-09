@@ -1,45 +1,25 @@
 # Contributing to wave-crispr-signal
 
-This repository uses a reset workflow: testing and validation are introduced per change, not inherited from historical suites.
+This repository uses a change-scoped workflow. Validation is introduced per change, not inherited from historical suites.
 
-## Quick Start
+## Workflow
 
-1. Install dependencies: `pip install -r requirements.txt`
-2. Create a branch for your change.
-3. Implement the change.
-4. Add change-coupled validation (default):
-   - one targeted unit/integration test for the behavior changed, and
-   - one manual verification command with observed outcome.
-   - if automated testing is not appropriate, state that explicitly in the PR.
-
-## Contribution Rules
-
-- Keep changes scoped to CRISPR functionality.
-- Prefer small, reviewable commits.
-- Update docs when behavior or interfaces change.
-- Do not treat historical tests or historical policy docs as blockers.
+1. Create a branch for the change.
+2. Implement scoped code updates.
+3. Update docs when behavior or interfaces change.
+4. Add validation for what changed.
 
 ## Validation Contract
 
-For each PR, include the exact validation you ran for that change.
-Default expectation for behavior changes: targeted automated test + manual check.
+For behavior changes, default expectation is:
+- one targeted automated test, and
+- one manual verification command with observed outcome.
 
-Examples:
-
-```bash
-# Example targeted test
-python -m pytest -q path/to/new_test.py
-
-# Example manual validation
-python applications/phase_weighted_scorecard_cli.py score --guide GCTGCGGAGACCTGGAGAGA
-```
+If automated coverage is not appropriate for the change, document the manual validation clearly.
 
 ## Pull Request Checklist
 
 - Explain what changed and why.
-- Describe validation run for this change.
-- Note follow-up work if validation or CI is intentionally deferred.
-
-## CI Status
-
-CI is intentionally absent during this reset period. A new minimal CI will be introduced later and will gate only active, change-scoped checks.
+- Include exact validation commands run.
+- Include observed outcomes.
+- Call out known limitations or follow-up work.

@@ -1,70 +1,45 @@
 # wave-crispr-signal
 
-Signal-theoretic CRISPR analytics toolkit for guide scoring, disruption analysis, and reproducible validation.
+Focused CRISPR signal-analysis toolkit for guide scoring and disruption analysis.
 
-## Project Charter
+## Active Runtime Surfaces
 
-### Mission
-Build and maintain a focused CRISPR signal-analysis toolkit that turns sequence-level signals into reproducible guide-quality and disruption metrics.
-
-### Intended Users
-- Computational biologists evaluating gRNA candidates.
-- Research engineers building CRISPR scoring and validation pipelines.
-- Reproducibility reviewers validating CRISPR signal claims.
-
-### Primary Outputs
-- CRISPR scoring APIs and CLIs (`applications/`, `wave_crispr_signal/`).
-- Methodology and usage documentation (`docs/`).
-- Demo MVP interface (`web_apps/demo_mvp/`).
-
-### Non-Goals
-- This repository is not a general cross-domain experiment lab.
-
-## Working Model
-
-- Keep active CRISPR work in mainline directories.
-- Keep generated artifacts and machine-specific files out of versioned root.
-- Introduce tests only when a specific add/remove/alter change requires them.
-- Historical tests are not a blocking source of truth.
-- CI is intentionally absent for now and will be reintroduced later as a minimal, change-scoped gate.
-
-## Active Runtime Layout
-
-- `wave_crispr_signal/`: core CRISPR feature and scoring package.
-- `applications/`: primary CLIs and runtime-facing application code.
-- `web_apps/demo_mvp/`: preserved web demo surface.
-- `scripts/invariant_features.py`: invariant feature dependency used by active CLI flows.
-- `docs/`: canonical docs for current scope.
-
-## Archive Layout
-
-- `archive/code/`: archived non-primary code retained for provenance.
-- `docs/ARCHIVE_INDEX.md`: index of archival references.
-
-## Contributor Decision Tree
-
-1. Does this change advance CRISPR scoring/design/validation for active runtime surfaces?
-   - Yes: implement in mainline active paths.
-   - No: move to archive paths or keep out of repo.
-2. Is the output generated or environment-specific?
-   - Yes: keep it out of versioned root and add ignore rules if needed.
-3. Does the change alter behavior?
-   - Yes: add change-coupled validation (targeted automated test + manual verification command).
+- `wave_crispr_signal/` (core sequence, spectral, and stats utilities)
+- `applications/phase_weighted_scorecard_cli.py`
+- `applications/crispr_cli.py`
+- `applications/genomic_disruption_api.py`
+- `web_apps/demo_mvp/app.py`
 
 ## Quick Start
 
 ```bash
-python -m pip install -r requirements.txt
+python3 -m pip install -r requirements.txt
 
-# Example: phase-weighted scorecard
-python applications/phase_weighted_scorecard_cli.py score --guide GCTGCGGAGACCTGGAGAGA
+python3 applications/phase_weighted_scorecard_cli.py --help
+python3 applications/crispr_cli.py --help
+python3 applications/genomic_disruption_api.py --help
 ```
+
+Current CLI truth for `applications/genomic_disruption_api.py`:
+- `score` is implemented.
+- `design` is implemented.
+- `batch` and `offtarget` are parser options, but CLI execution returns `Command <name> not yet implemented in CLI`.
+
+## Validation Model
+
+- Validation is change-scoped.
+- For behavior changes, default expectation is:
+  - one targeted automated test, and
+  - one manual verification command with observed outcome.
 
 ## Canonical Docs
 
-- `docs/INDEX.md`: documentation index and navigation.
-- `docs/CONTRIBUTING.md`: contribution workflow.
-- `docs/ARCHIVE_INDEX.md`: archival reference map.
+- `docs/INDEX.md`
+- `docs/CURRENT_STATE_AND_DOC_GAPS.md`
+- `docs/CONTRIBUTING.md`
+- `docs/PRIMARY_CLI_VALIDATION.md`
+- `docs/PHASE_WEIGHTED_SCORECARD.md`
+- `docs/MODEL_NOVELTY_STATEMENT.md`
 
 ## License
 

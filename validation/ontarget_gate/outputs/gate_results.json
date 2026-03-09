@@ -1,0 +1,113 @@
+{
+  "generated_at": "2026-03-09T05:48:18.560336+00:00",
+  "decision": "INCONCLUSIVE",
+  "thresholds": {
+    "primary_delta_min": 0.03,
+    "primary_ci_excludes_zero": true,
+    "external_delta_min": 0.01,
+    "no_underperform_vs_baseline_b": true
+  },
+  "dataset_counts": [
+    {
+      "source": "doench2016_gecko1_lenticrispr_hg19",
+      "role": "dev_pool",
+      "url": "https://raw.githubusercontent.com/maximilianh/crisporPaper/master/effData/doench2016-Gecko1-LentiCrispr_hg19.scores.tab",
+      "raw_local_path": "/Users/velocityworks/IdeaProjects/wave-crispr-signal/validation/ontarget_gate/data/doench2016_gecko1_lenticrispr_hg19.scores.tab",
+      "row_count": 62834
+    },
+    {
+      "source": "doench2016_hg19",
+      "role": "primary_holdout",
+      "url": "https://raw.githubusercontent.com/maximilianh/crisporPaper/master/effData/doench2016_hg19.scores.tab",
+      "raw_local_path": "/Users/velocityworks/IdeaProjects/wave-crispr-signal/validation/ontarget_gate/data/doench2016_hg19.scores.tab",
+      "row_count": 3804
+    },
+    {
+      "source": "hart2016_hela_lib1_avg",
+      "role": "external_holdout",
+      "url": "https://raw.githubusercontent.com/maximilianh/crisporPaper/master/effData/hart2016-HelaLib1Avg.scores.tab",
+      "raw_local_path": "/Users/velocityworks/IdeaProjects/wave-crispr-signal/validation/ontarget_gate/data/hart2016_hela_lib1_avg.scores.tab",
+      "row_count": 4256
+    }
+  ],
+  "split_counts": {
+    "dev_train": 50030,
+    "dev_val": 12804,
+    "primary_holdout": 3804,
+    "external_holdout": 4256
+  },
+  "results": [
+    {
+      "split": "dev_val",
+      "n": 12804,
+      "metrics": {
+        "baseline_a": {
+          "spearman": 0.2292938754968056,
+          "mse": 0.33906324136121346
+        },
+        "baseline_b": {
+          "spearman": 0.02005545307743531,
+          "mse": 1.8561724272834126
+        },
+        "model": {
+          "spearman": 0.009905314056638845,
+          "mse": 2.5248588613986604
+        }
+      },
+      "delta_model_minus_baseline_a_spearman": -0.21938856144016677,
+      "delta_model_minus_baseline_a_spearman_ci95": [
+        -0.24429466336607142,
+        -0.19480534400968613
+      ],
+      "delta_model_minus_baseline_b_spearman": -0.010150139020796464
+    },
+    {
+      "split": "primary_holdout",
+      "n": 3804,
+      "metrics": {
+        "baseline_a": {
+          "spearman": -0.027274902093718252,
+          "mse": 4.412988669991855
+        },
+        "baseline_b": {
+          "spearman": 0.050829379660382035,
+          "mse": 7.332585990427331
+        },
+        "model": {
+          "spearman": 0.02741163016240241,
+          "mse": 8.287800149818777
+        }
+      },
+      "delta_model_minus_baseline_a_spearman": 0.05468653225612066,
+      "delta_model_minus_baseline_a_spearman_ci95": [
+        0.012689746879989944,
+        0.09484958394248776
+      ],
+      "delta_model_minus_baseline_b_spearman": -0.023417749497979624
+    },
+    {
+      "split": "external_holdout",
+      "n": 4256,
+      "metrics": {
+        "baseline_a": {
+          "spearman": -0.04901836541712727,
+          "mse": 9.03405176365152
+        },
+        "baseline_b": {
+          "spearman": -0.004173086332216752,
+          "mse": 4.185577596818635
+        },
+        "model": {
+          "spearman": -0.001910212700381293,
+          "mse": 3.6671860751024257
+        }
+      },
+      "delta_model_minus_baseline_a_spearman": 0.047108152716745975,
+      "delta_model_minus_baseline_a_spearman_ci95": [
+        0.00981336040368394,
+        0.08425494099645102
+      ],
+      "delta_model_minus_baseline_b_spearman": 0.002262873631835459
+    }
+  ]
+}

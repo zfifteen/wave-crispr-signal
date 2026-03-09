@@ -1,0 +1,33 @@
+{
+  "generated_at": "2026-03-09T05:48:18.560336+00:00",
+  "schema": [
+    "guide",
+    "label",
+    "source",
+    "gene_or_target_group",
+    "target_context"
+  ],
+  "sources": [
+    {
+      "source": "doench2016_gecko1_lenticrispr_hg19",
+      "role": "dev_pool",
+      "url": "https://raw.githubusercontent.com/maximilianh/crisporPaper/master/effData/doench2016-Gecko1-LentiCrispr_hg19.scores.tab",
+      "raw_local_path": "/Users/velocityworks/IdeaProjects/wave-crispr-signal/validation/ontarget_gate/data/doench2016_gecko1_lenticrispr_hg19.scores.tab",
+      "row_count": 62834
+    },
+    {
+      "source": "doench2016_hg19",
+      "role": "primary_holdout",
+      "url": "https://raw.githubusercontent.com/maximilianh/crisporPaper/master/effData/doench2016_hg19.scores.tab",
+      "raw_local_path": "/Users/velocityworks/IdeaProjects/wave-crispr-signal/validation/ontarget_gate/data/doench2016_hg19.scores.tab",
+      "row_count": 3804
+    },
+    {
+      "source": "hart2016_hela_lib1_avg",
+      "role": "external_holdout",
+      "url": "https://raw.githubusercontent.com/maximilianh/crisporPaper/master/effData/hart2016-HelaLib1Avg.scores.tab",
+      "raw_local_path": "/Users/velocityworks/IdeaProjects/wave-crispr-signal/validation/ontarget_gate/data/hart2016_hela_lib1_avg.scores.tab",
+      "row_count": 4256
+    }
+  ]
+}

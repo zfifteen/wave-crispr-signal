@@ -12,21 +12,16 @@ Describe what changed and why.
 
 ## Validation Performed
 
-List exactly what you ran for this change.
-Default for behavior changes: one targeted automated test and one manual verification check.
-
-- [ ] Targeted automated test(s)
-- [ ] Manual validation
-- [ ] Validation intentionally deferred (explain)
-
-### Commands / Evidence
+For behavior changes, provide:
+- one targeted automated test, and
+- one manual verification command with observed output.
 
 ```bash
-# Paste commands and brief outcomes
+# commands run
 ```
 
 ## Notes for Reviewers
 
 - Behavioral impact:
-- Risk areas:
-- Follow-up tasks (if any):
+- Risks:
+- Follow-up work:

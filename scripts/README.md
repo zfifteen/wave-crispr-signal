@@ -2,16 +2,12 @@
 
 ## Active Scripts
 
-- `run_tests.py` - change-scoped validation helper
-- `invariant_features.py` - invariant feature implementation used by active guide-designer flow
-
-## Archive
-
-Non-primary scripts were moved to `archive/code/scripts/`.
+- `run_tests.py`: change-scoped validation command runner.
+- `invariant_features.py`: invariant feature implementation used by active code paths.
 
 ## Usage
 
 ```bash
-python scripts/run_tests.py
-python scripts/run_tests.py "python -m pytest -q path/to/test_file.py"
+python3 scripts/run_tests.py
+python3 scripts/run_tests.py "python3 -m pytest -q path/to/test_file.py"
 ```

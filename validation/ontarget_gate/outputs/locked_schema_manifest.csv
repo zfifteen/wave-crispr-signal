@@ -1,0 +1,6 @@
+field,description
+guide,20nt guide sequence (A/C/G/T only after normalization)
+label,Measured on-target activity (modFreq from source)
+source,Dataset source identifier
+gene_or_target_group,Group key derived from guide identifier
+target_context,Optional long context sequence from source
